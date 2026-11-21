@@ -18,7 +18,7 @@
       --info: #3b82f6;
     }
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); }
+    body { margin: 0; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
     header {
       background: #0b1120;
@@ -171,7 +171,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 0.85rem;
-      min-width: 600px;
+      min-width: 420px;
     }
     .summary-table th, .summary-table td {
       padding: 9px 12px;
@@ -185,6 +185,110 @@
     .summary-table td:first-child { font-weight: 700; background: rgba(22, 32, 50, 0.45); }
     .summary-table tr.total-row td { background: #131d2e; font-weight: 700; color: #34d399; border-bottom: none; }
     .summary-table tr.total-row td:first-child { color: var(--text); }
+
+    /* Panel de Gráficas */
+    .charts-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+    .charts-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .charts-title {
+      margin: 0;
+      font-size: 0.96rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .charts-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    .period-tabs {
+      display: inline-flex;
+      flex-wrap: wrap;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .period-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .period-btn.active {
+      background: var(--primary);
+      color: #05251b;
+    }
+    .metric-select {
+      width: auto;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      background: #0f172a;
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+    @media (max-width: 960px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    .chart-box {
+      background: #131c2e;
+      border: 1px solid rgba(51, 65, 85, 0.75);
+      border-radius: 8px;
+      padding: 10px;
+      min-width: 0;
+    }
+    .chart-box-title {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    canvas.chart-canvas {
+      width: 100%;
+      height: 220px;
+      display: block;
+    }
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
 
     .filters {
       display: grid;
@@ -307,24 +411,50 @@
       word-break: break-word;
     }
 
+    /* Ajustes compactos para celular */
     @media (max-width: 640px) {
-      header { padding: 10px 12px; gap: 8px; }
-      header h1 { font-size: 1rem; }
-      .toolbar-row { flex-direction: column; align-items: stretch; gap: 8px; }
-      .field-actions { justify-content: space-between; }
-      .field-actions .btn-primary,
-      .field-actions .btn-lutocar { flex: 1 1 auto; justify-content: center; }
+      header { padding: 8px 10px; gap: 6px; }
+      header h1 { font-size: 0.94rem; gap: 5px; }
+      .badge-live, .badge-admin { font-size: 0.64rem; padding: 2px 6px; }
+      .status-text { font-size: 0.7rem; }
+      .toolbar-row { gap: 6px; }
+      .field-actions { gap: 6px; }
+      button { padding: 6px 8px; font-size: 0.75rem; gap: 4px; border-radius: 7px; }
+      button.btn-primary, button.btn-lutocar { padding: 7px 9px; font-size: 0.76rem; flex: 1 1 auto; justify-content: center; }
       .admin-group {
         padding-left: 0;
         border-left: none;
-        padding-top: 6px;
-        border-top: 1px solid rgba(51, 65, 85, 0.6);
+        padding-top: 5px;
+        border-top: 1px solid rgba(51, 65, 85, 0.55);
         justify-content: space-between;
+        gap: 4px;
       }
-      .container { padding: 10px; }
-      .kpis { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-      .kpi { padding: 10px; }
-      .kpi .val { font-size: 1.25rem; }
+      .admin-tools { gap: 4px; }
+      button.btn-admin-toggle { padding: 5px 8px; font-size: 0.72rem; }
+      .container { padding: 8px; }
+      .kpis { grid-template-columns: repeat(2, 1fr); gap: 6px; margin-bottom: 10px; }
+      .kpi { padding: 8px 10px; border-radius: 8px; }
+      .kpi .label { font-size: 0.68rem; }
+      .kpi .val { font-size: 1.15rem; margin: 2px 0; }
+      .kpi .sub { font-size: 0.66rem; }
+      .summary-card { margin-bottom: 10px; border-radius: 8px; }
+      .summary-table { font-size: 0.75rem; min-width: 320px; }
+      .summary-table th, .summary-table td { padding: 6px 8px; }
+      .charts-card { padding: 10px; margin-bottom: 10px; border-radius: 8px; }
+      .charts-title { font-size: 0.85rem; }
+      .period-btn { padding: 4px 7px; font-size: 0.7rem; }
+      .metric-select { padding: 5px 7px; font-size: 0.72rem; }
+      canvas.chart-canvas { height: 175px; }
+      .filters { gap: 6px; margin-bottom: 10px; }
+      input, select, textarea { padding: 7px 9px; font-size: 0.8rem; border-radius: 7px; }
+      .main-grid { gap: 10px; }
+      .detail-box { padding: 10px; border-radius: 8px; }
+      .detail-box h3 { font-size: 0.88rem; }
+      table { font-size: 0.75rem; }
+      th, td { padding: 6px 8px; }
+      .pill { font-size: 0.66rem; padding: 2px 6px; }
+      .modal { padding: 12px; }
+      .form-grid { grid-template-columns: 1fr; gap: 8px; }
     }
   </style>
 </head>
@@ -402,6 +532,49 @@
         </thead>
         <tbody id="summaryBody"></tbody>
       </table>
+    </section>
+
+    <!-- Gráficas debajo de la tabla de resumen -->
+    <section class="charts-card" aria-label="Gráficas de entregas">
+      <div class="charts-header">
+        <h2 class="charts-title">📈 Gráficas por Tiempo</h2>
+        <div class="charts-controls">
+          <div id="periodTabs" class="period-tabs" role="tablist">
+            <button type="button" class="period-btn active" data-period="mes">Mensual</button>
+            <button type="button" class="period-btn" data-period="semana">Por Semana</button>
+            <button type="button" class="period-btn" data-period="dia">Día</button>
+            <button type="button" class="period-btn" data-period="numdia">Número de Día</button>
+          </div>
+          <select id="chartMetric" class="metric-select" aria-label="Métrica de gráfica">
+            <option value="cantidad">Cantidad Entregada</option>
+            <option value="registros">N° de Registros</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-box">
+          <div class="chart-box-title">
+            <span id="timeChartLabel">Distribución Mensual</span>
+            <span id="timeChartTotal">Total: 0</span>
+          </div>
+          <canvas id="timeChartCanvas" class="chart-canvas"></canvas>
+          <div class="chart-legend">
+            <span><i class="legend-dot" style="background:#10b981"></i>Bolsa</span>
+            <span><i class="legend-dot" style="background:#ef4444"></i>Lutocar</span>
+            <span><i class="legend-dot" style="background:#3b82f6"></i>Herramientas</span>
+            <span><i class="legend-dot" style="background:#f59e0b"></i>Otro</span>
+          </div>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-box-title">
+            <span id="toolChartLabel">Por Herramienta en vista Mensual</span>
+            <span id="toolChartPeak">Máx: 0</span>
+          </div>
+          <canvas id="toolChartCanvas" class="chart-canvas"></canvas>
+        </div>
+      </div>
     </section>
 
     <section class="filters">
@@ -594,6 +767,7 @@
       '9 - Puntos Limpios (m3)',
       '10 - Patológico CI (Kg)'
     ];
+    const DIAS_SEMANA = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
     let entries = [];
     let staffList = [];
@@ -603,6 +777,247 @@
     let lastRawSample = null;
     let isAdminUnlocked = false;
     let isSyncingStaffFields = false;
+    let currentPeriod = 'mes';
+    let lastFilteredEntries = [];
+
+    function parseLocalDate(dateStr) {
+      const m = String(dateStr || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (!m) return null;
+      const y = Number(m[1]);
+      const mo = Number(m[2]) - 1;
+      const d = Number(m[3]);
+      const dt = new Date(y, mo, d);
+      if (dt.getFullYear() !== y || dt.getMonth() !== mo || dt.getDate() !== d) return null;
+      return dt;
+    }
+
+    function getIsoWeekKey(dt) {
+      const utc = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate()));
+      const dayNum = utc.getUTCDay() || 7;
+      utc.setUTCDate(utc.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil((((utc - yearStart) / 86400000) + 1) / 7);
+      return {
+        sortKey: `${utc.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`,
+        label: `Sem ${String(weekNo).padStart(2, '0')}`
+      };
+    }
+
+    function getEntryBucket(entry, period) {
+      const dt = parseLocalDate(entry.fecha);
+      if (!dt) {
+        return { sortKey: 'zzzz', label: 'Sin fecha' };
+      }
+      if (period === 'mes') {
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth() + 1).padStart(2, '0');
+        return { sortKey: `${y}-${m}`, label: `${y}-${m}` };
+      }
+      if (period === 'semana') {
+        return getIsoWeekKey(dt);
+      }
+      if (period === 'dia') {
+        const dow = dt.getDay();
+        const orderMap = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 0: '07' };
+        return { sortKey: orderMap[dow], label: DIAS_SEMANA[dow] };
+      }
+      const dayNum = String(dt.getDate()).padStart(2, '0');
+      return { sortKey: dayNum, label: `Día ${dayNum}` };
+    }
+
+    function getMetricValue(list, metric) {
+      if (metric === 'registros') return list.length;
+      return list.reduce((acc, item) => acc + (Number(item.cantidad) || 0), 0);
+    }
+
+    function getToolGroup(herr) {
+      if (herr === 'Bolsa') return 'bolsa';
+      if (herr === 'Lutocar') return 'lutocar';
+      if (herr === 'Escobillón' || herr === 'Rastrillo' || herr === 'Pala' || herr === 'Carretilla') return 'herramienta';
+      return 'otro';
+    }
+
+    function prepareCanvas(canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const width = Math.max(240, Math.floor(rect.width || canvas.parentElement.clientWidth - 20 || 300));
+      const height = Math.max(150, Math.floor(rect.height || 200));
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+      }
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+      return { ctx, width, height };
+    }
+
+    function renderCharts(filtered) {
+      lastFilteredEntries = filtered;
+      const metric = document.getElementById('chartMetric').value || 'cantidad';
+      const periodTitles = {
+        mes: 'Mensual',
+        semana: 'Por Semana',
+        dia: 'Día de la Semana',
+        numdia: 'Número de Día'
+      };
+
+      document.getElementById('timeChartLabel').textContent = `Distribución · ${periodTitles[currentPeriod]}`;
+      document.getElementById('toolChartLabel').textContent = `Por Herramienta · ${periodTitles[currentPeriod]}`;
+
+      const bucketMap = new Map();
+      filtered.forEach(item => {
+        const b = getEntryBucket(item, currentPeriod);
+        if (!bucketMap.has(b.sortKey)) {
+          bucketMap.set(b.sortKey, {
+            sortKey: b.sortKey,
+            label: b.label,
+            bolsa: 0,
+            lutocar: 0,
+            herramienta: 0,
+            otro: 0,
+            total: 0
+          });
+        }
+        const row = bucketMap.get(b.sortKey);
+        const val = metric === 'registros' ? 1 : (Number(item.cantidad) || 0);
+        const grp = getToolGroup(item.herramienta);
+        row[grp] += val;
+        row.total += val;
+      });
+
+      let buckets = Array.from(bucketMap.values()).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+      if (currentPeriod === 'numdia' && buckets.length === 0) {
+        buckets = [];
+      }
+
+      const grandTotal = buckets.reduce((s, r) => s + r.total, 0);
+      document.getElementById('timeChartTotal').textContent = `${metric === 'registros' ? 'Regs' : 'Total'}: ${grandTotal}`;
+
+      // 1. Gráfica de barras apiladas por periodo
+      const tCanvas = document.getElementById('timeChartCanvas');
+      const { ctx: tCtx, width: tW, height: tH } = prepareCanvas(tCanvas);
+
+      if (!buckets.length) {
+        tCtx.fillStyle = '#94a3b8';
+        tCtx.font = '12px system-ui, sans-serif';
+        tCtx.textAlign = 'center';
+        tCtx.fillText('Sin datos para graficar en este filtro', tW / 2, tH / 2);
+      } else {
+        const padLeft = 36;
+        const padRight = 10;
+        const padTop = 18;
+        const padBottom = 28;
+        const plotW = Math.max(40, tW - padLeft - padRight);
+        const plotH = Math.max(40, tH - padTop - padBottom);
+        const maxVal = Math.max(1, ...buckets.map(b => b.total));
+
+        // Líneas guía horizontales
+        tCtx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+        tCtx.lineWidth = 1;
+        tCtx.fillStyle = '#94a3b8';
+        tCtx.font = '10px system-ui, sans-serif';
+        tCtx.textAlign = 'right';
+        for (let i = 0; i <= 3; i++) {
+          const frac = i / 3;
+          const y = padTop + plotH - frac * plotH;
+          tCtx.beginPath();
+          tCtx.moveTo(padLeft, y);
+          tCtx.lineTo(tW - padRight, y);
+          tCtx.stroke();
+          const tickVal = Math.round(maxVal * frac);
+          tCtx.fillText(String(tickVal), padLeft - 5, y + 3);
+        }
+
+        const step = plotW / buckets.length;
+        const barW = Math.max(8, Math.min(34, step * 0.62));
+        const labelEvery = Math.max(1, Math.ceil(buckets.length / 8));
+
+        buckets.forEach((b, idx) => {
+          const x = padLeft + idx * step + (step - barW) / 2;
+          const segs = [
+            { val: b.bolsa, color: '#10b981' },
+            { val: b.lutocar, color: '#ef4444' },
+            { val: b.herramienta, color: '#3b82f6' },
+            { val: b.otro, color: '#f59e0b' }
+          ];
+          let curBottom = padTop + plotH;
+          segs.forEach(s => {
+            if (s.val <= 0) return;
+            const h = (s.val / maxVal) * plotH;
+            curBottom -= h;
+            tCtx.fillStyle = s.color;
+            tCtx.fillRect(x, curBottom, barW, Math.max(1.5, h));
+          });
+
+          if (b.total > 0 && buckets.length <= 16) {
+            tCtx.fillStyle = '#e2e8f0';
+            tCtx.font = 'bold 10px system-ui, sans-serif';
+            tCtx.textAlign = 'center';
+            tCtx.fillText(String(b.total), x + barW / 2, curBottom - 4);
+          }
+
+          if (idx % labelEvery === 0 || idx === buckets.length - 1) {
+            tCtx.fillStyle = '#94a3b8';
+            tCtx.font = '10px system-ui, sans-serif';
+            tCtx.textAlign = 'center';
+            tCtx.fillText(b.label, x + barW / 2, tH - 8);
+          }
+        });
+      }
+
+      // 2. Gráfica horizontal por herramienta
+      const hCanvas = document.getElementById('toolChartCanvas');
+      const { ctx: hCtx, width: hW, height: hH } = prepareCanvas(hCanvas);
+      const toolColors = {
+        'Bolsa': '#10b981',
+        'Lutocar': '#ef4444',
+        'Escobillón': '#3b82f6',
+        'Rastrillo': '#60a5fa',
+        'Pala': '#38bdf8',
+        'Carretilla': '#818cf8',
+        'Otro': '#f59e0b'
+      };
+      const toolStats = HERRAMIENTAS.map(h => {
+        const list = filtered.filter(e => e.herramienta === h);
+        return { name: h, val: getMetricValue(list, metric), color: toolColors[h] || '#38bdf8' };
+      });
+      const maxTool = Math.max(1, ...toolStats.map(t => t.val));
+      document.getElementById('toolChartPeak').textContent = `Máx: ${maxTool === 1 && toolStats.every(t => t.val === 0) ? 0 : maxTool}`;
+
+      const hPadLeft = 68;
+      const hPadRight = 38;
+      const hPadTop = 8;
+      const hPadBottom = 8;
+      const hPlotW = Math.max(40, hW - hPadLeft - hPadRight);
+      const hPlotH = Math.max(40, hH - hPadTop - hPadBottom);
+      const rowH = hPlotH / toolStats.length;
+      const hBarH = Math.max(8, Math.min(18, rowH * 0.62));
+
+      toolStats.forEach((t, idx) => {
+        const yCenter = hPadTop + idx * rowH + rowH / 2;
+        const y = yCenter - hBarH / 2;
+        const w = (t.val / maxTool) * hPlotW;
+
+        hCtx.fillStyle = '#cbd5e1';
+        hCtx.font = '11px system-ui, sans-serif';
+        hCtx.textAlign = 'right';
+        hCtx.fillText(t.name, hPadLeft - 7, yCenter + 3.5);
+
+        hCtx.fillStyle = 'rgba(148, 163, 184, 0.12)';
+        hCtx.fillRect(hPadLeft, y, hPlotW, hBarH);
+
+        if (t.val > 0) {
+          hCtx.fillStyle = t.color;
+          hCtx.fillRect(hPadLeft, y, Math.max(3, w), hBarH);
+        }
+
+        hCtx.fillStyle = '#e2e8f0';
+        hCtx.font = 'bold 10px system-ui, sans-serif';
+        hCtx.textAlign = 'left';
+        hCtx.fillText(String(t.val), hPadLeft + Math.max(3, w) + 6, yCenter + 3.5);
+      });
+    }
 
     function normalizeSimple(str) {
       return String(str || '')
@@ -1240,6 +1655,7 @@
       updateFilterOptions();
       const filtered = getFiltered();
       renderSummary(filtered);
+      renderCharts(filtered);
 
       const totalEntregas = filtered.length;
       const uniqueOps = new Set(filtered.map(e => `${(e.codigo || '').trim()}|${(e.nombre || '').trim().toLowerCase()}`)).size;
@@ -1327,6 +1743,23 @@
     function closeModal() {
       document.getElementById('modalBackdrop').classList.remove('open');
     }
+
+    document.querySelectorAll('#periodTabs .period-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#periodTabs .period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPeriod = btn.dataset.period || 'mes';
+        renderCharts(lastFilteredEntries);
+      });
+    });
+
+    document.getElementById('chartMetric').addEventListener('change', () => {
+      renderCharts(lastFilteredEntries);
+    });
+
+    window.addEventListener('resize', () => {
+      renderCharts(lastFilteredEntries);
+    });
 
     document.getElementById('fCodigo').addEventListener('input', () => handleCodeInput(true));
     document.getElementById('fCodigo').addEventListener('change', () => handleCodeInput(true));
