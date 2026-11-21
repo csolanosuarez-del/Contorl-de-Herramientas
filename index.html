@@ -294,6 +294,7 @@
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
     .msg-hint { font-size: 0.74rem; color: #93c5fd; margin-top: 4px; }
     .staff-match { font-size: 0.74rem; color: #34d399; margin-top: 3px; min-height: 16px; }
+    .staff-warn { font-size: 0.74rem; color: #fbbf24; margin-top: 3px; min-height: 16px; }
     pre.debug-pre {
       background: #0b1120;
       border: 1px solid var(--border);
@@ -486,10 +487,10 @@
             </select>
           </div>
           <div>
-            <label>Código Trabajador</label>
-            <input id="fCodigo" list="staffCodeList" placeholder="Ej: 894 o MA-532" autocomplete="off" required />
+            <label>Código Trabajador (o interno MA-001)</label>
+            <input id="fCodigo" list="staffCodeList" placeholder="Ej: 894 o MA-532" autocomplete="off" />
             <datalist id="staffCodeList"></datalist>
-            <div id="staffMatchHint" class="staff-match"></div>
+            <div id="staffCodeHint" class="staff-match"></div>
           </div>
           <div>
             <label>Cantidad</label>
@@ -508,8 +509,10 @@
             <input id="fSupervisor" placeholder="Ej: Diego Yepez" />
           </div>
           <div class="full">
-            <label>Nombre y Apellido del Personal Operativo</label>
-            <input id="fNombre" placeholder="Se autocompleta al escribir el código..." required />
+            <label>Nombre y Apellido del Personal Operativo (búsqueda o escritura manual)</label>
+            <input id="fNombre" list="staffNameList" placeholder="Escribe o busca nombre para ubicar su código..." autocomplete="off" required />
+            <datalist id="staffNameList"></datalist>
+            <div id="staffNameHint" class="staff-warn"></div>
           </div>
           <div>
             <label>Servicio / Sector</label>
@@ -561,9 +564,20 @@
     let entries = [];
     let staffList = [];
     let staffByCode = new Map();
+    let staffByName = new Map();
     let pendingMap = {};
     let lastRawSample = null;
     let isAdminUnlocked = false;
+    let isSyncingStaffFields = false;
+
+    function normalizeNameText(str) {
+      return String(str || '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase();
+    }
 
     function normalizeStaffItem(raw) {
       const r = raw || {};
@@ -580,18 +594,38 @@
     function rebuildStaffIndex(list) {
       const clean = (Array.isArray(list) ? list : [])
         .map(normalizeStaffItem)
-        .filter(s => s.codigo && s.nombre);
+        .filter(s => s.codigo || s.nombre);
       staffList = clean;
       staffByCode = new Map();
+      staffByName = new Map();
+
       clean.forEach(s => {
-        staffByCode.set(s.codigo.toLowerCase(), s);
+        if (s.codigo) {
+          staffByCode.set(s.codigo.toLowerCase(), s);
+        }
+        if (s.nombre) {
+          const nKey = normalizeNameText(s.nombre);
+          if (!staffByName.has(nKey)) {
+            staffByName.set(nKey, s);
+          }
+        }
       });
 
-      const dl = document.getElementById('staffCodeList');
-      if (dl) {
-        dl.innerHTML = clean
+      const dlCode = document.getElementById('staffCodeList');
+      if (dlCode) {
+        dlCode.innerHTML = clean
+          .filter(s => s.codigo)
           .slice(0, 1500)
           .map(s => `<option value="${s.codigo.replace(/"/g, '&quot;')}">${s.nombre.replace(/"/g, '&quot;')}</option>`)
+          .join('');
+      }
+
+      const dlName = document.getElementById('staffNameList');
+      if (dlName) {
+        dlName.innerHTML = clean
+          .filter(s => s.nombre)
+          .slice(0, 1500)
+          .map(s => `<option value="${s.nombre.replace(/"/g, '&quot;')}">${s.codigo ? `Cód: ${s.codigo}` : 'Sin código'}</option>`)
           .join('');
       }
     }
@@ -619,36 +653,112 @@
       return staffByCode.get(key) || null;
     }
 
-    function applyStaffAutofill(forceOverwrite = false) {
-      const codeVal = document.getElementById('fCodigo').value.trim();
-      const hintEl = document.getElementById('staffMatchHint');
-      const nombreEl = document.getElementById('fNombre');
+    function lookupStaffByName(name) {
+      const norm = normalizeNameText(name);
+      if (!norm) return null;
+      if (staffByName.has(norm)) return staffByName.get(norm);
+      if (norm.length >= 6) {
+        for (const item of staffList) {
+          if (normalizeNameText(item.nombre).includes(norm)) {
+            return item;
+          }
+        }
+      }
+      return null;
+    }
+
+    function populateExtraStaffFields(match, forceOverwrite = false) {
+      if (!match) return;
       const servicioEl = document.getElementById('fServicio');
       const supervisorEl = document.getElementById('fSupervisor');
-
-      if (!codeVal) {
-        hintEl.textContent = staffList.length ? `${staffList.length} operarios cargados en catálogo.` : 'Escribe el código del trabajador.';
-        return;
+      const srvText = [match.servicio, match.sector ? `Sec. ${match.sector}` : ''].filter(Boolean).join(' · ');
+      if (srvText && (forceOverwrite || !servicioEl.value.trim() || servicioEl.dataset.autofilled === '1')) {
+        servicioEl.value = srvText;
+        servicioEl.dataset.autofilled = '1';
       }
+      if (match.supervisor && (forceOverwrite || !supervisorEl.value.trim() || supervisorEl.dataset.autofilled === '1')) {
+        supervisorEl.value = match.supervisor;
+        supervisorEl.dataset.autofilled = '1';
+      }
+    }
 
-      const match = lookupStaffByCode(codeVal);
-      if (match) {
-        if (forceOverwrite || !nombreEl.value.trim() || nombreEl.dataset.autofilled === '1') {
-          nombreEl.value = match.nombre;
-          nombreEl.dataset.autofilled = '1';
+    function handleCodeInput(forceOverwrite = true) {
+      if (isSyncingStaffFields) return;
+      isSyncingStaffFields = true;
+      try {
+        const codigoEl = document.getElementById('fCodigo');
+        const nombreEl = document.getElementById('fNombre');
+        const codeHint = document.getElementById('staffCodeHint');
+        const nameHint = document.getElementById('staffNameHint');
+        const codeVal = codigoEl.value.trim();
+
+        if (!codeVal) {
+          codeHint.className = 'staff-match';
+          codeHint.textContent = staffList.length ? `${staffList.length} operarios en catálogo.` : '';
+          return;
         }
-        const srvText = [match.servicio, match.sector ? `Sec. ${match.sector}` : ''].filter(Boolean).join(' · ');
-        if (srvText && (forceOverwrite || !servicioEl.value.trim() || servicioEl.dataset.autofilled === '1')) {
-          servicioEl.value = srvText;
-          servicioEl.dataset.autofilled = '1';
+
+        const match = lookupStaffByCode(codeVal);
+        if (match) {
+          if (forceOverwrite || !nombreEl.value.trim() || nombreEl.dataset.autofilled === '1') {
+            nombreEl.value = match.nombre;
+            nombreEl.dataset.autofilled = '1';
+          }
+          populateExtraStaffFields(match, forceOverwrite);
+          codeHint.className = 'staff-match';
+          codeHint.textContent = `✓ Código vinculado a ${match.nombre}`;
+          nameHint.className = 'staff-match';
+          nameHint.textContent = `✓ Código interno / oficial: ${match.codigo}${match.turno ? ` · Turno ${match.turno}` : ''}`;
+        } else {
+          codeHint.className = 'staff-warn';
+          codeHint.textContent = 'Código no encontrado en catálogo (puedes escribir el nombre manualmente).';
         }
-        if (match.supervisor && (forceOverwrite || !supervisorEl.value.trim() || supervisorEl.dataset.autofilled === '1')) {
-          supervisorEl.value = match.supervisor;
-          supervisorEl.dataset.autofilled = '1';
+      } finally {
+        isSyncingStaffFields = false;
+      }
+    }
+
+    function handleNameInput(forceOverwrite = true) {
+      if (isSyncingStaffFields) return;
+      isSyncingStaffFields = true;
+      try {
+        const codigoEl = document.getElementById('fCodigo');
+        const nombreEl = document.getElementById('fNombre');
+        const codeHint = document.getElementById('staffCodeHint');
+        const nameHint = document.getElementById('staffNameHint');
+        const nameVal = nombreEl.value.trim();
+
+        nombreEl.dataset.autofilled = '0';
+
+        if (!nameVal) {
+          nameHint.className = 'staff-warn';
+          nameHint.textContent = 'Escribe o selecciona el nombre del trabajador.';
+          return;
         }
-        hintEl.textContent = `✓ ${match.nombre}${match.turno ? ` (${match.turno})` : ''}`;
-      } else {
-        hintEl.textContent = 'Código no encontrado en catálogo: puedes escribir el nombre manualmente.';
+
+        const match = lookupStaffByName(nameVal);
+        if (match) {
+          if (match.codigo && (forceOverwrite || !codigoEl.value.trim() || codigoEl.dataset.autofilled === '1')) {
+            codigoEl.value = match.codigo;
+            codigoEl.dataset.autofilled = '1';
+          }
+          populateExtraStaffFields(match, false);
+          nameHint.className = 'staff-match';
+          nameHint.textContent = match.codigo
+            ? `✓ Código encontrado: ${match.codigo} (${match.nombre})`
+            : `✓ Encontrado sin código asignado`;
+          codeHint.className = 'staff-match';
+          codeHint.textContent = match.codigo ? `✓ Código: ${match.codigo}` : 'Sin código en base';
+        } else {
+          nameHint.className = 'staff-warn';
+          nameHint.textContent = 'Nombre manual / terciarizado no registrado aún en Personal: se guardará tal como lo escribiste.';
+          if (codigoEl.dataset.autofilled === '1') {
+            codigoEl.value = '';
+            codigoEl.dataset.autofilled = '0';
+          }
+        }
+      } finally {
+        isSyncingStaffFields = false;
       }
     }
 
@@ -987,7 +1097,7 @@
       }
       const imgHtml = item.foto ? `<img src="${item.foto}" alt="${item.nombre}" onerror="this.style.display='none'" />` : '';
       box.innerHTML = `
-        <h3>[${item.codigo}] ${item.nombre}</h3>
+        <h3>[${item.codigo || 'S/C'}] ${item.nombre}</h3>
         <div class="status-text">Fecha: ${item.fecha || '-'} · <strong>${item.herramienta}</strong> (${item.cantidad}) · Estado: <strong>${item.estado}</strong></div>
         <div style="margin-top:8px; font-size:0.86rem; line-height:1.55;">
           <strong>Supervisor:</strong> ${item.supervisor || '-'}<br/>
@@ -1051,7 +1161,7 @@
       tbody.innerHTML = filtered.map(e => `
         <tr onclick="selectEntry('${e.uid}')" style="cursor:pointer">
           <td>${e.fecha || '-'}</td>
-          <td><strong>${e.codigo || '-'}</strong></td>
+          <td><strong>${e.codigo || 'S/C'}</strong></td>
           <td>${e.nombre || '-'}</td>
           <td><span class="pill ${getToolPillClass(e.herramienta)}">${e.herramienta}</span></td>
           <td><strong>${e.cantidad}</strong></td>
@@ -1082,10 +1192,12 @@
         ? `Editar Entrega — ${item.nombre}`
         : (defaultTool === 'Lutocar' ? 'Asignar Carro Lutocar' : 'Nueva Entrega de Herramienta / Dotación');
 
+      const codigoEl = document.getElementById('fCodigo');
       const nombreEl = document.getElementById('fNombre');
       const servicioEl = document.getElementById('fServicio');
       const supervisorEl = document.getElementById('fSupervisor');
 
+      codigoEl.dataset.autofilled = item ? '0' : '1';
       nombreEl.dataset.autofilled = item ? '0' : '1';
       servicioEl.dataset.autofilled = item ? '0' : '1';
       supervisorEl.dataset.autofilled = item ? '0' : '1';
@@ -1093,7 +1205,7 @@
       document.getElementById('fUid').value = item ? item.uid : '';
       document.getElementById('fFecha').value = item ? item.fecha : (lastEntry?.fecha || today);
       document.getElementById('fHerramienta').value = item ? item.herramienta : defaultTool;
-      document.getElementById('fCodigo').value = item ? item.codigo : '';
+      codigoEl.value = item ? item.codigo : '';
       document.getElementById('fCantidad').value = item ? item.cantidad : (defaultTool === 'Lutocar' ? 1 : 100);
       document.getElementById('fEstado').value = item ? item.estado : 'Entregado / Operativo';
       nombreEl.value = item ? item.nombre : '';
@@ -1104,19 +1216,24 @@
       document.getElementById('fFoto').value = item ? item.foto : '';
       document.getElementById('fFotoFile').value = '';
       document.getElementById('fotoMsg').textContent = '';
+      document.getElementById('staffCodeHint').textContent = staffList.length ? `${staffList.length} operarios cargados.` : '';
+      document.getElementById('staffNameHint').textContent = 'Puedes escribir el nombre manual o elegirlo para hallar su código.';
 
-      applyStaffAutofill(!item);
+      if (item && item.codigo) {
+        handleCodeInput(false);
+      }
       document.getElementById('modalBackdrop').classList.add('open');
-      setTimeout(() => document.getElementById('fCodigo').focus(), 40);
+      setTimeout(() => codigoEl.focus(), 40);
     }
 
     function closeModal() {
       document.getElementById('modalBackdrop').classList.remove('open');
     }
 
-    document.getElementById('fCodigo').addEventListener('input', () => applyStaffAutofill(true));
-    document.getElementById('fCodigo').addEventListener('change', () => applyStaffAutofill(true));
-    document.getElementById('fNombre').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
+    document.getElementById('fCodigo').addEventListener('input', () => handleCodeInput(true));
+    document.getElementById('fCodigo').addEventListener('change', () => handleCodeInput(true));
+    document.getElementById('fNombre').addEventListener('input', () => handleNameInput(true));
+    document.getElementById('fNombre').addEventListener('change', () => handleNameInput(true));
     document.getElementById('fServicio').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
     document.getElementById('fSupervisor').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
 
