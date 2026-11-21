@@ -293,6 +293,7 @@
     label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
     .msg-hint { font-size: 0.74rem; color: #93c5fd; margin-top: 4px; }
+    .staff-match { font-size: 0.74rem; color: #34d399; margin-top: 3px; min-height: 16px; }
     pre.debug-pre {
       background: #0b1120;
       border: 1px solid var(--border);
@@ -486,7 +487,9 @@
           </div>
           <div>
             <label>Código Trabajador</label>
-            <input id="fCodigo" placeholder="Ej: 842" required />
+            <input id="fCodigo" list="staffCodeList" placeholder="Ej: 894 o MA-532" autocomplete="off" required />
+            <datalist id="staffCodeList"></datalist>
+            <div id="staffMatchHint" class="staff-match"></div>
           </div>
           <div>
             <label>Cantidad</label>
@@ -506,11 +509,11 @@
           </div>
           <div class="full">
             <label>Nombre y Apellido del Personal Operativo</label>
-            <input id="fNombre" placeholder="Ej: Vania Lopez" required />
+            <input id="fNombre" placeholder="Se autocompleta al escribir el código..." required />
           </div>
           <div>
             <label>Servicio / Sector</label>
-            <input id="fServicio" placeholder="Ej: 1 Barrido Noche - Sector 2 Sur" />
+            <input id="fServicio" placeholder="Ej: BARRIDO / Sector A" />
           </div>
           <div>
             <label>No. Celular</label>
@@ -552,12 +555,102 @@
     const ADMIN_SESSION_KEY = 'herramientas_admin_unlocked_v1';
     const STORAGE_KEY = 'control_herramientas_v1';
     const PENDING_KEY = 'control_herramientas_pending_v1';
+    const STAFF_CACHE_KEY = 'control_herramientas_staff_v1';
     const HERRAMIENTAS = ['Bolsa', 'Lutocar', 'Escobillón', 'Rastrillo', 'Pala', 'Carretilla', 'Otro'];
 
     let entries = [];
+    let staffList = [];
+    let staffByCode = new Map();
     let pendingMap = {};
     let lastRawSample = null;
     let isAdminUnlocked = false;
+
+    function normalizeStaffItem(raw) {
+      const r = raw || {};
+      const codigo = String(r.codigo ?? r.CODIGO ?? '').trim();
+      const nombre = String(r.nombre ?? r.NOMBRE_COMPLETO ?? r.NOMBRE ?? '').trim().replace(/\s+/g, ' ').toUpperCase();
+      const servicio = String(r.servicio ?? r.SERVICIO ?? '').trim();
+      const sector = String(r.sector ?? r.SECTOR ?? '').trim();
+      const turno = String(r.turno ?? r.TURNO ?? '').trim();
+      const supervisor = String(r.supervisor ?? r.SUPERVISOR ?? r.encargado ?? r.ENCARGADO ?? '').trim();
+      const status = String(r.status ?? r.STATUS ?? 'ACTIVO').trim();
+      return { codigo, nombre, servicio, sector, turno, supervisor, status };
+    }
+
+    function rebuildStaffIndex(list) {
+      const clean = (Array.isArray(list) ? list : [])
+        .map(normalizeStaffItem)
+        .filter(s => s.codigo && s.nombre);
+      staffList = clean;
+      staffByCode = new Map();
+      clean.forEach(s => {
+        staffByCode.set(s.codigo.toLowerCase(), s);
+      });
+
+      const dl = document.getElementById('staffCodeList');
+      if (dl) {
+        dl.innerHTML = clean
+          .slice(0, 1500)
+          .map(s => `<option value="${s.codigo.replace(/"/g, '&quot;')}">${s.nombre.replace(/"/g, '&quot;')}</option>`)
+          .join('');
+      }
+    }
+
+    function loadCachedStaff() {
+      try {
+        const raw = localStorage.getItem(STAFF_CACHE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed.map(normalizeStaffItem) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCachedStaff(list) {
+      try {
+        localStorage.setItem(STAFF_CACHE_KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    function lookupStaffByCode(code) {
+      const key = String(code || '').trim().toLowerCase();
+      if (!key) return null;
+      return staffByCode.get(key) || null;
+    }
+
+    function applyStaffAutofill(forceOverwrite = false) {
+      const codeVal = document.getElementById('fCodigo').value.trim();
+      const hintEl = document.getElementById('staffMatchHint');
+      const nombreEl = document.getElementById('fNombre');
+      const servicioEl = document.getElementById('fServicio');
+      const supervisorEl = document.getElementById('fSupervisor');
+
+      if (!codeVal) {
+        hintEl.textContent = staffList.length ? `${staffList.length} operarios cargados en catálogo.` : 'Escribe el código del trabajador.';
+        return;
+      }
+
+      const match = lookupStaffByCode(codeVal);
+      if (match) {
+        if (forceOverwrite || !nombreEl.value.trim() || nombreEl.dataset.autofilled === '1') {
+          nombreEl.value = match.nombre;
+          nombreEl.dataset.autofilled = '1';
+        }
+        const srvText = [match.servicio, match.sector ? `Sec. ${match.sector}` : ''].filter(Boolean).join(' · ');
+        if (srvText && (forceOverwrite || !servicioEl.value.trim() || servicioEl.dataset.autofilled === '1')) {
+          servicioEl.value = srvText;
+          servicioEl.dataset.autofilled = '1';
+        }
+        if (match.supervisor && (forceOverwrite || !supervisorEl.value.trim() || supervisorEl.dataset.autofilled === '1')) {
+          supervisorEl.value = match.supervisor;
+          supervisorEl.dataset.autofilled = '1';
+        }
+        hintEl.textContent = `✓ ${match.nombre}${match.turno ? ` (${match.turno})` : ''}`;
+      } else {
+        hintEl.textContent = 'Código no encontrado en catálogo: puedes escribir el nombre manualmente.';
+      }
+    }
 
     function applyAdminUiState() {
       const toolsEl = document.getElementById('adminTools');
@@ -745,6 +838,11 @@
         const data = await res.json();
         if (!data.ok) throw new Error(data.error || 'Respuesta inválida');
 
+        if (Array.isArray(data.staff)) {
+          rebuildStaffIndex(data.staff);
+          saveCachedStaff(staffList);
+        }
+
         const rawList = Array.isArray(data.records) ? data.records : [];
         lastRawSample = rawList.length > 0 ? rawList[0] : { note: 'Hoja vacía' };
         const serverRecords = rawList.map(normalizeEntry);
@@ -752,7 +850,7 @@
         entries = mergeServerAndLocal(serverRecords, entries);
         saveEntries();
         render();
-        setStatus(`Sincronizado: ${serverRecords.length} en nube · ${entries.length} activos (${new Date().toLocaleTimeString()})`);
+        setStatus(`Sincronizado: ${serverRecords.length} entregas · ${staffList.length} personal (${new Date().toLocaleTimeString()})`);
       } catch (err) {
         entries = mergeServerAndLocal([], entries);
         saveEntries();
@@ -984,26 +1082,43 @@
         ? `Editar Entrega — ${item.nombre}`
         : (defaultTool === 'Lutocar' ? 'Asignar Carro Lutocar' : 'Nueva Entrega de Herramienta / Dotación');
 
+      const nombreEl = document.getElementById('fNombre');
+      const servicioEl = document.getElementById('fServicio');
+      const supervisorEl = document.getElementById('fSupervisor');
+
+      nombreEl.dataset.autofilled = item ? '0' : '1';
+      servicioEl.dataset.autofilled = item ? '0' : '1';
+      supervisorEl.dataset.autofilled = item ? '0' : '1';
+
       document.getElementById('fUid').value = item ? item.uid : '';
       document.getElementById('fFecha').value = item ? item.fecha : (lastEntry?.fecha || today);
       document.getElementById('fHerramienta').value = item ? item.herramienta : defaultTool;
       document.getElementById('fCodigo').value = item ? item.codigo : '';
       document.getElementById('fCantidad').value = item ? item.cantidad : (defaultTool === 'Lutocar' ? 1 : 100);
       document.getElementById('fEstado').value = item ? item.estado : 'Entregado / Operativo';
-      document.getElementById('fNombre').value = item ? item.nombre : '';
-      document.getElementById('fSupervisor').value = item ? item.supervisor : (lastEntry?.supervisor || '');
-      document.getElementById('fServicio').value = item ? item.servicio : (lastEntry?.servicio || '');
+      nombreEl.value = item ? item.nombre : '';
+      supervisorEl.value = item ? item.supervisor : (lastEntry?.supervisor || '');
+      servicioEl.value = item ? item.servicio : (lastEntry?.servicio || '');
       document.getElementById('fCelular').value = item ? item.celular : '';
       document.getElementById('fObservaciones').value = item ? item.observaciones : '';
       document.getElementById('fFoto').value = item ? item.foto : '';
       document.getElementById('fFotoFile').value = '';
       document.getElementById('fotoMsg').textContent = '';
+
+      applyStaffAutofill(!item);
       document.getElementById('modalBackdrop').classList.add('open');
+      setTimeout(() => document.getElementById('fCodigo').focus(), 40);
     }
 
     function closeModal() {
       document.getElementById('modalBackdrop').classList.remove('open');
     }
+
+    document.getElementById('fCodigo').addEventListener('input', () => applyStaffAutofill(true));
+    document.getElementById('fCodigo').addEventListener('change', () => applyStaffAutofill(true));
+    document.getElementById('fNombre').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
+    document.getElementById('fServicio').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
+    document.getElementById('fSupervisor').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
 
     document.getElementById('btnAdminToggle').addEventListener('click', handleAdminToggle);
     document.getElementById('btnNewEntrega').addEventListener('click', () => openModal('', 'Bolsa'));
@@ -1016,6 +1131,7 @@
       if (!isAdminUnlocked) return;
       document.getElementById('debugOutput').textContent = JSON.stringify({
         totalLocal: entries.length,
+        totalPersonal: staffList.length,
         pendientes: Object.keys(pendingMap).length,
         primerRegistroNube: lastRawSample
       }, null, 2);
@@ -1132,6 +1248,7 @@
 
     isAdminUnlocked = sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
     applyAdminUiState();
+    rebuildStaffIndex(loadCachedStaff());
     pendingMap = loadPending();
     entries = mergeServerAndLocal([], loadEntries());
     saveEntries();
