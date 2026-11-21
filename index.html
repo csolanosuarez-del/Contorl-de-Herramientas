@@ -299,11 +299,11 @@
     }
     .date-filters {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 10px;
       margin-bottom: 16px;
     }
-    @media (max-width: 1120px) {
+    @media (max-width: 1180px) {
       .filters { grid-template-columns: repeat(2, 1fr); }
       .date-filters { grid-template-columns: repeat(3, 1fr); }
     }
@@ -642,6 +642,9 @@
         <option value="11">Noviembre</option>
         <option value="12">Diciembre</option>
       </select>
+      <select id="filterMesEspecifico" aria-label="Mes específico Año-Mes">
+        <option value="">Mes específico (A-M)</option>
+      </select>
       <select id="filterDia" aria-label="Filtrar por Días de la semana">
         <option value="">Todos los Días</option>
         <option value="1">Lunes</option>
@@ -812,6 +815,11 @@
       '10 - Patológico CI (Kg)'
     ];
     const DIAS_SEMANA = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const MESES_NOMBRES = {
+      '01': 'Enero', '02': 'Febrero', '03': 'Marzo', '04': 'Abril',
+      '05': 'Mayo', '06': 'Junio', '07': 'Julio', '08': 'Agosto',
+      '09': 'Septiembre', '10': 'Octubre', '11': 'Noviembre', '12': 'Diciembre'
+    };
 
     let entries = [];
     let staffList = [];
@@ -825,14 +833,32 @@
     let lastFilteredEntries = [];
 
     function parseLocalDate(dateStr) {
-      const m = String(dateStr || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
-      if (!m) return null;
-      const y = Number(m[1]);
-      const mo = Number(m[2]) - 1;
-      const d = Number(m[3]);
-      const dt = new Date(y, mo, d);
-      if (dt.getFullYear() !== y || dt.getMonth() !== mo || dt.getDate() !== d) return null;
-      return dt;
+      const raw = String(dateStr || '').trim();
+      if (!raw) return null;
+
+      let m = raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (m) {
+        const y = Number(m[1]);
+        const mo = Number(m[2]) - 1;
+        const d = Number(m[3]);
+        const dt = new Date(y, mo, d);
+        if (dt.getFullYear() === y && dt.getMonth() === mo && dt.getDate() === d) return dt;
+      }
+
+      m = raw.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+      if (m) {
+        const d = Number(m[1]);
+        const mo = Number(m[2]) - 1;
+        const y = Number(m[3]);
+        const dt = new Date(y, mo, d);
+        if (dt.getFullYear() === y && dt.getMonth() === mo && dt.getDate() === d) return dt;
+      }
+
+      const fallback = new Date(raw);
+      if (!Number.isNaN(fallback.getTime())) {
+        return new Date(fallback.getFullYear(), fallback.getMonth(), fallback.getDate());
+      }
+      return null;
     }
 
     function getIsoWeekKey(dt) {
@@ -1356,7 +1382,10 @@
     function normalizeEntry(raw) {
       const uid = String(raw.uid ?? raw.UID ?? '').trim() || ('id-' + Math.random().toString(36).slice(2, 9));
       const rawFecha = String(raw.fecha ?? raw.FECHA ?? '').trim();
-      const fecha = rawFecha.includes('T') ? rawFecha.slice(0, 10) : rawFecha;
+      const parsedDt = parseLocalDate(rawFecha);
+      const fecha = parsedDt
+        ? `${parsedDt.getFullYear()}-${String(parsedDt.getMonth() + 1).padStart(2, '0')}-${String(parsedDt.getDate()).padStart(2, '0')}`
+        : (rawFecha.includes('T') ? rawFecha.slice(0, 10) : rawFecha);
       const herrRaw = String(raw.herramienta ?? raw.HERRAMIENTA ?? 'Bolsa').trim();
       const matchedTool = HERRAMIENTAS.find(h => h.toLowerCase() === herrRaw.toLowerCase()) || (herrRaw || 'Otro');
       const cantNum = Number(String(raw.cantidad ?? raw.CANTIDAD ?? 0).replace(',', '.'));
@@ -1606,6 +1635,21 @@
         anos.map(a => `<option value="${a}">${a}</option>`).join('');
       anoSel.value = curAno;
 
+      const mesEspSel = document.getElementById('filterMesEspecifico');
+      const curMesEsp = mesEspSel.value;
+      const ymKeys = [...new Set(parsedDates.map(dt => {
+        const y = dt.getFullYear();
+        const m = String(dt.getMonth() + 1).padStart(2, '0');
+        return `${y}-${m}`;
+      }))].sort().reverse();
+      mesEspSel.innerHTML = '<option value="">Mes específico (A-M)</option>' +
+        ymKeys.map(ym => {
+          const [y, m] = ym.split('-');
+          const mLabel = MESES_NOMBRES[m] || m;
+          return `<option value="${ym}">${mLabel} ${y} (${ym})</option>`;
+        }).join('');
+      mesEspSel.value = curMesEsp;
+
       const numDiaSel = document.getElementById('filterNumDia');
       const curNumDia = numDiaSel.value;
       const existingDays = [...new Set(parsedDates.map(dt => String(dt.getDate()).padStart(2, '0')))].sort();
@@ -1643,6 +1687,7 @@
       const sup = document.getElementById('filterSupervisor').value;
       const ano = document.getElementById('filterAno').value;
       const mes = document.getElementById('filterMes').value;
+      const mesEsp = document.getElementById('filterMesEspecifico').value;
       const dia = document.getElementById('filterDia').value;
       const numDia = document.getElementById('filterNumDia').value;
       const fec = document.getElementById('filterFecha').value;
@@ -1654,11 +1699,15 @@
         if (sup && (e.supervisor || '').trim() !== sup) return false;
         if (fec && (e.fecha || '').trim() !== fec) return false;
 
-        if (ano || mes || dia || numDia) {
+        if (ano || mes || mesEsp || dia || numDia) {
           const dt = parseLocalDate(e.fecha);
           if (!dt) return false;
-          if (ano && String(dt.getFullYear()) !== ano) return false;
-          if (mes && String(dt.getMonth() + 1).padStart(2, '0') !== mes) return false;
+          const yStr = String(dt.getFullYear());
+          const mStr = String(dt.getMonth() + 1).padStart(2, '0');
+          const ymStr = `${yStr}-${mStr}`;
+          if (ano && yStr !== ano) return false;
+          if (mes && mStr !== mes) return false;
+          if (mesEsp && ymStr !== mesEsp) return false;
           if (dia && String(dt.getDay()) !== dia) return false;
           if (numDia && String(dt.getDate()).padStart(2, '0') !== numDia) return false;
         }
@@ -1727,6 +1776,13 @@
       const filtered = getFiltered();
       renderSummary(filtered);
       renderCharts(filtered);
+
+      const mesSel = document.getElementById('filterMes').value;
+      const mesEspSel = document.getElementById('filterMesEspecifico').value;
+      if (filtered.length === 0 && (mesSel || mesEspSel)) {
+        const etiqueta = mesEspSel || (MESES_NOMBRES[mesSel] || mesSel);
+        setStatus(`Sin registros para ${etiqueta}. Cambia el filtro de mes o selecciona "Todos los Meses".`);
+      }
 
       const totalEntregas = filtered.length;
       const uniqueOps = new Set(filtered.map(e => `${(e.codigo || '').trim()}|${(e.nombre || '').trim().toLowerCase()}`)).size;
@@ -1968,6 +2024,7 @@
       'filterSupervisor',
       'filterAno',
       'filterMes',
+      'filterMesEspecifico',
       'filterDia',
       'filterNumDia',
       'filterFecha'
