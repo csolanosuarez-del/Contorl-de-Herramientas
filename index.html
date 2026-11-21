@@ -516,7 +516,19 @@
           </div>
           <div>
             <label>Servicio / Sector</label>
-            <input id="fServicio" placeholder="Ej: BARRIDO / Sector A" />
+            <select id="fServicio">
+              <option value="">— Seleccionar servicio —</option>
+              <option value="1 - Barrido (Km)">1 - Barrido (Km)</option>
+              <option value="2 - Desempapelado (Km)">2 - Desempapelado (Km)</option>
+              <option value="3 - Areas Verdes (Ha)">3 - Areas Verdes (Ha)</option>
+              <option value="4 - Ferias y Eventos (EQ)">4 - Ferias y Eventos (EQ)</option>
+              <option value="5 - Áridos (m3)">5 - Áridos (m3)</option>
+              <option value="6 - Lavado (EQ)">6 - Lavado (EQ)</option>
+              <option value="7 - Recolección (Ton)">7 - Recolección (Ton)</option>
+              <option value="8 - Microbasural (EQ)">8 - Microbasural (EQ)</option>
+              <option value="9 - Puntos Limpios (m3)">9 - Puntos Limpios (m3)</option>
+              <option value="10 - Patológico CI (Kg)">10 - Patológico CI (Kg)</option>
+            </select>
           </div>
           <div>
             <label>No. Celular</label>
@@ -560,6 +572,18 @@
     const PENDING_KEY = 'control_herramientas_pending_v1';
     const STAFF_CACHE_KEY = 'control_herramientas_staff_v1';
     const HERRAMIENTAS = ['Bolsa', 'Lutocar', 'Escobillón', 'Rastrillo', 'Pala', 'Carretilla', 'Otro'];
+    const SERVICIOS_OFICIALES = [
+      '1 - Barrido (Km)',
+      '2 - Desempapelado (Km)',
+      '3 - Areas Verdes (Ha)',
+      '4 - Ferias y Eventos (EQ)',
+      '5 - Áridos (m3)',
+      '6 - Lavado (EQ)',
+      '7 - Recolección (Ton)',
+      '8 - Microbasural (EQ)',
+      '9 - Puntos Limpios (m3)',
+      '10 - Patológico CI (Kg)'
+    ];
 
     let entries = [];
     let staffList = [];
@@ -569,6 +593,55 @@
     let lastRawSample = null;
     let isAdminUnlocked = false;
     let isSyncingStaffFields = false;
+
+    function normalizeSimple(str) {
+      return String(str || '')
+        .trim()
+        .toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function matchServicioOficial(rawService) {
+      const norm = normalizeSimple(rawService);
+      if (!norm) return '';
+      const exact = SERVICIOS_OFICIALES.find(s => normalizeSimple(s) === norm);
+      if (exact) return exact;
+      if (norm.includes('BARRIDO')) return '1 - Barrido (Km)';
+      if (norm.includes('DESEMPAPEL')) return '2 - Desempapelado (Km)';
+      if (norm.includes('AREA') && norm.includes('VERDE')) return '3 - Areas Verdes (Ha)';
+      if (norm.includes('FERIA') || norm.includes('EVENTO')) return '4 - Ferias y Eventos (EQ)';
+      if (norm.includes('ARIDO')) return '5 - Áridos (m3)';
+      if (norm.includes('LAVADO')) return '6 - Lavado (EQ)';
+      if (norm.includes('RECOLECCION') || norm.includes('LEVANTE')) return '7 - Recolección (Ton)';
+      if (norm.includes('MICROBASURAL')) return '8 - Microbasural (EQ)';
+      if (norm.includes('PUNTO') && norm.includes('LIMPIO')) return '9 - Puntos Limpios (m3)';
+      if (norm.includes('PATOLOGICO')) return '10 - Patológico CI (Kg)';
+      return '';
+    }
+
+    function setServicioSelectValue(val, allowCreateOption = true) {
+      const sel = document.getElementById('fServicio');
+      const cleanVal = String(val || '').trim();
+      if (!cleanVal) {
+        sel.value = '';
+        return;
+      }
+      const mapped = matchServicioOficial(cleanVal);
+      const targetVal = mapped || cleanVal;
+      const exactOpt = Array.from(sel.options).find(o => normalizeSimple(o.value) === normalizeSimple(targetVal));
+      if (exactOpt) {
+        sel.value = exactOpt.value;
+        return;
+      }
+      if (allowCreateOption) {
+        const opt = document.createElement('option');
+        opt.value = targetVal;
+        opt.textContent = targetVal;
+        sel.appendChild(opt);
+        sel.value = targetVal;
+      }
+    }
 
     function normalizeNameText(str) {
       return String(str || '')
@@ -671,9 +744,8 @@
       if (!match) return;
       const servicioEl = document.getElementById('fServicio');
       const supervisorEl = document.getElementById('fSupervisor');
-      const srvText = [match.servicio, match.sector ? `Sec. ${match.sector}` : ''].filter(Boolean).join(' · ');
-      if (srvText && (forceOverwrite || !servicioEl.value.trim() || servicioEl.dataset.autofilled === '1')) {
-        servicioEl.value = srvText;
+      if (match.servicio && (forceOverwrite || !servicioEl.value.trim() || servicioEl.dataset.autofilled === '1')) {
+        setServicioSelectValue(match.servicio, true);
         servicioEl.dataset.autofilled = '1';
       }
       if (match.supervisor && (forceOverwrite || !supervisorEl.value.trim() || supervisorEl.dataset.autofilled === '1')) {
@@ -1052,7 +1124,11 @@
 
       const srvSel = document.getElementById('filterServicio');
       const curSrv = srvSel.value;
-      const srvs = [...new Set(entries.map(e => (e.servicio || '').trim()).filter(Boolean))].sort();
+      const extraSrvs = entries
+        .map(e => (e.servicio || '').trim())
+        .filter(Boolean)
+        .filter(s => !SERVICIOS_OFICIALES.some(of => normalizeSimple(of) === normalizeSimple(s)));
+      const srvs = [...SERVICIOS_OFICIALES, ...new Set(extraSrvs)];
       srvSel.innerHTML = '<option value="">Todos los Servicios / Sectores</option>' +
         srvs.map(s => `<option value="${s.replace(/"/g, '&quot;')}">${s}</option>`).join('');
       srvSel.value = curSrv;
@@ -1077,7 +1153,7 @@
         if (herr && e.herramienta !== herr) return false;
         if (est && e.estado !== est) return false;
         if (sup && (e.supervisor || '').trim() !== sup) return false;
-        if (srv && (e.servicio || '').trim() !== srv) return false;
+        if (srv && normalizeSimple(e.servicio) !== normalizeSimple(srv)) return false;
         if (fec && (e.fecha || '').trim() !== fec) return false;
         if (q) {
           const hay = [e.codigo, e.nombre, e.observaciones, e.servicio, e.supervisor, e.herramienta, e.estado]
@@ -1210,7 +1286,7 @@
       document.getElementById('fEstado').value = item ? item.estado : 'Entregado / Operativo';
       nombreEl.value = item ? item.nombre : '';
       supervisorEl.value = item ? item.supervisor : (lastEntry?.supervisor || '');
-      servicioEl.value = item ? item.servicio : (lastEntry?.servicio || '');
+      setServicioSelectValue(item ? item.servicio : (lastEntry?.servicio || ''), true);
       document.getElementById('fCelular').value = item ? item.celular : '';
       document.getElementById('fObservaciones').value = item ? item.observaciones : '';
       document.getElementById('fFoto').value = item ? item.foto : '';
@@ -1234,7 +1310,7 @@
     document.getElementById('fCodigo').addEventListener('change', () => handleCodeInput(true));
     document.getElementById('fNombre').addEventListener('input', () => handleNameInput(true));
     document.getElementById('fNombre').addEventListener('change', () => handleNameInput(true));
-    document.getElementById('fServicio').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
+    document.getElementById('fServicio').addEventListener('change', (e) => { e.target.dataset.autofilled = '0'; });
     document.getElementById('fSupervisor').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
 
     document.getElementById('btnAdminToggle').addEventListener('click', handleAdminToggle);
