@@ -290,17 +290,26 @@
       vertical-align: middle;
     }
 
+    /* Filtros generales + Año, Mes, Días y Número de Día */
     .filters {
       display: grid;
-      grid-template-columns: 1.35fr repeat(5, 1fr);
+      grid-template-columns: 1.4fr repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .date-filters {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
       gap: 10px;
       margin-bottom: 16px;
     }
-    @media (max-width: 1180px) {
+    @media (max-width: 1120px) {
       .filters { grid-template-columns: repeat(2, 1fr); }
+      .date-filters { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 560px) {
       .filters { grid-template-columns: 1fr; }
+      .date-filters { grid-template-columns: repeat(2, 1fr); }
     }
 
     input, select, textarea {
@@ -445,7 +454,8 @@
       .period-btn { padding: 4px 7px; font-size: 0.7rem; }
       .metric-select { padding: 5px 7px; font-size: 0.72rem; }
       canvas.chart-canvas { height: 175px; }
-      .filters { gap: 6px; margin-bottom: 10px; }
+      .filters, .date-filters { gap: 6px; margin-bottom: 8px; }
+      .date-filters { margin-bottom: 10px; }
       input, select, textarea { padding: 7px 9px; font-size: 0.8rem; border-radius: 7px; }
       .main-grid { gap: 10px; }
       .detail-box { padding: 10px; border-radius: 8px; }
@@ -611,7 +621,41 @@
       <select id="filterSupervisor">
         <option value="">Todos los Supervisores</option>
       </select>
-      <select id="filterFecha">
+    </section>
+
+    <section class="date-filters" aria-label="Filtros de Año, Mes, Días y Número de Día">
+      <select id="filterAno" aria-label="Filtrar por Año">
+        <option value="">Todos los Años</option>
+      </select>
+      <select id="filterMes" aria-label="Filtrar por Mes">
+        <option value="">Todos los Meses</option>
+        <option value="01">Enero</option>
+        <option value="02">Febrero</option>
+        <option value="03">Marzo</option>
+        <option value="04">Abril</option>
+        <option value="05">Mayo</option>
+        <option value="06">Junio</option>
+        <option value="07">Julio</option>
+        <option value="08">Agosto</option>
+        <option value="09">Septiembre</option>
+        <option value="10">Octubre</option>
+        <option value="11">Noviembre</option>
+        <option value="12">Diciembre</option>
+      </select>
+      <select id="filterDia" aria-label="Filtrar por Días de la semana">
+        <option value="">Todos los Días</option>
+        <option value="1">Lunes</option>
+        <option value="2">Martes</option>
+        <option value="3">Miércoles</option>
+        <option value="4">Jueves</option>
+        <option value="5">Viernes</option>
+        <option value="6">Sábado</option>
+        <option value="0">Domingo</option>
+      </select>
+      <select id="filterNumDia" aria-label="Filtrar por Número de Día">
+        <option value="">N° de Día (Todos)</option>
+      </select>
+      <select id="filterFecha" aria-label="Filtrar por Fecha exacta">
         <option value="">Todas las Fechas</option>
       </select>
     </section>
@@ -886,15 +930,10 @@
         row.total += val;
       });
 
-      let buckets = Array.from(bucketMap.values()).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
-      if (currentPeriod === 'numdia' && buckets.length === 0) {
-        buckets = [];
-      }
-
+      const buckets = Array.from(bucketMap.values()).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
       const grandTotal = buckets.reduce((s, r) => s + r.total, 0);
       document.getElementById('timeChartTotal').textContent = `${metric === 'registros' ? 'Regs' : 'Total'}: ${grandTotal}`;
 
-      // 1. Gráfica de barras apiladas por periodo
       const tCanvas = document.getElementById('timeChartCanvas');
       const { ctx: tCtx, width: tW, height: tH } = prepareCanvas(tCanvas);
 
@@ -912,7 +951,6 @@
         const plotH = Math.max(40, tH - padTop - padBottom);
         const maxVal = Math.max(1, ...buckets.map(b => b.total));
 
-        // Líneas guía horizontales
         tCtx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
         tCtx.lineWidth = 1;
         tCtx.fillStyle = '#94a3b8';
@@ -966,7 +1004,6 @@
         });
       }
 
-      // 2. Gráfica horizontal por herramienta
       const hCanvas = document.getElementById('toolChartCanvas');
       const { ctx: hCtx, width: hW, height: hH } = prepareCanvas(hCanvas);
       const toolColors = {
@@ -1559,6 +1596,26 @@
       srvSel.innerHTML = baseOptions.concat(extraOptions).join('');
       srvSel.value = curSrv;
 
+      const parsedDates = entries.map(e => parseLocalDate(e.fecha)).filter(Boolean);
+
+      const anoSel = document.getElementById('filterAno');
+      const curAno = anoSel.value;
+      const anos = [...new Set(parsedDates.map(dt => String(dt.getFullYear())))].sort().reverse();
+      if (!anos.length) anos.push(String(new Date().getFullYear()));
+      anoSel.innerHTML = '<option value="">Todos los Años</option>' +
+        anos.map(a => `<option value="${a}">${a}</option>`).join('');
+      anoSel.value = curAno;
+
+      const numDiaSel = document.getElementById('filterNumDia');
+      const curNumDia = numDiaSel.value;
+      const existingDays = [...new Set(parsedDates.map(dt => String(dt.getDate()).padStart(2, '0')))].sort();
+      const dayList = existingDays.length
+        ? existingDays
+        : Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
+      numDiaSel.innerHTML = '<option value="">N° de Día (Todos)</option>' +
+        dayList.map(d => `<option value="${d}">Día ${d}</option>`).join('');
+      numDiaSel.value = curNumDia;
+
       const fecSel = document.getElementById('filterFecha');
       const curFec = fecSel.value;
       const fecs = [...new Set(entries.map(e => (e.fecha || '').trim()).filter(Boolean))].sort().reverse();
@@ -1584,6 +1641,10 @@
       const herr = document.getElementById('filterHerramienta').value;
       const est = document.getElementById('filterEstado').value;
       const sup = document.getElementById('filterSupervisor').value;
+      const ano = document.getElementById('filterAno').value;
+      const mes = document.getElementById('filterMes').value;
+      const dia = document.getElementById('filterDia').value;
+      const numDia = document.getElementById('filterNumDia').value;
       const fec = document.getElementById('filterFecha').value;
 
       return entries.filter(e => {
@@ -1592,8 +1653,18 @@
         if (est && e.estado !== est) return false;
         if (sup && (e.supervisor || '').trim() !== sup) return false;
         if (fec && (e.fecha || '').trim() !== fec) return false;
+
+        if (ano || mes || dia || numDia) {
+          const dt = parseLocalDate(e.fecha);
+          if (!dt) return false;
+          if (ano && String(dt.getFullYear()) !== ano) return false;
+          if (mes && String(dt.getMonth() + 1).padStart(2, '0') !== mes) return false;
+          if (dia && String(dt.getDay()) !== dia) return false;
+          if (numDia && String(dt.getDate()).padStart(2, '0') !== numDia) return false;
+        }
+
         if (q) {
-          const hay = [e.codigo, e.nombre, e.observaciones, e.servicio, e.supervisor, e.herramienta, e.estado]
+          const hay = [e.codigo, e.nombre, e.observaciones, e.servicio, e.supervisor, e.herramienta, e.estado, e.fecha]
             .join(' ')
             .toLowerCase();
           if (!hay.includes(q)) return false;
@@ -1889,7 +1960,18 @@
       reader.readAsText(file);
     });
 
-    ['searchInput', 'filterServicio', 'filterHerramienta', 'filterEstado', 'filterSupervisor', 'filterFecha'].forEach(id => {
+    [
+      'searchInput',
+      'filterServicio',
+      'filterHerramienta',
+      'filterEstado',
+      'filterSupervisor',
+      'filterAno',
+      'filterMes',
+      'filterDia',
+      'filterNumDia',
+      'filterFecha'
+    ].forEach(id => {
       document.getElementById(id).addEventListener('input', render);
       document.getElementById(id).addEventListener('change', render);
     });
