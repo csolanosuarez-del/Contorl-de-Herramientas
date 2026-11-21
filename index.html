@@ -188,11 +188,11 @@
 
     .filters {
       display: grid;
-      grid-template-columns: 1.5fr repeat(5, 1fr);
+      grid-template-columns: 1.35fr repeat(5, 1fr);
       gap: 10px;
       margin-bottom: 16px;
     }
-    @media (max-width: 1120px) {
+    @media (max-width: 1180px) {
       .filters { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
@@ -406,6 +406,19 @@
 
     <section class="filters">
       <input id="searchInput" type="search" placeholder="Buscar código, operario, ruta (S.2.045)..." />
+      <select id="filterServicio" aria-label="Filtrar por los 10 servicios">
+        <option value="">10 Servicios (Todos)</option>
+        <option value="1 - Barrido (Km)">1 - Barrido (Km)</option>
+        <option value="2 - Desempapelado (Km)">2 - Desempapelado (Km)</option>
+        <option value="3 - Areas Verdes (Ha)">3 - Areas Verdes (Ha)</option>
+        <option value="4 - Ferias y Eventos (EQ)">4 - Ferias y Eventos (EQ)</option>
+        <option value="5 - Áridos (m3)">5 - Áridos (m3)</option>
+        <option value="6 - Lavado (EQ)">6 - Lavado (EQ)</option>
+        <option value="7 - Recolección (Ton)">7 - Recolección (Ton)</option>
+        <option value="8 - Microbasural (EQ)">8 - Microbasural (EQ)</option>
+        <option value="9 - Puntos Limpios (m3)">9 - Puntos Limpios (m3)</option>
+        <option value="10 - Patológico CI (Kg)">10 - Patológico CI (Kg)</option>
+      </select>
       <select id="filterHerramienta">
         <option value="">Todas las Herramientas</option>
         <option value="Bolsa">Bolsa</option>
@@ -424,9 +437,6 @@
       </select>
       <select id="filterSupervisor">
         <option value="">Todos los Supervisores</option>
-      </select>
-      <select id="filterServicio">
-        <option value="">Todos los Servicios / Sectores</option>
       </select>
       <select id="filterFecha">
         <option value="">Todas las Fechas</option>
@@ -1127,10 +1137,11 @@
       const extraSrvs = entries
         .map(e => (e.servicio || '').trim())
         .filter(Boolean)
-        .filter(s => !SERVICIOS_OFICIALES.some(of => normalizeSimple(of) === normalizeSimple(s)));
-      const srvs = [...SERVICIOS_OFICIALES, ...new Set(extraSrvs)];
-      srvSel.innerHTML = '<option value="">Todos los Servicios / Sectores</option>' +
-        srvs.map(s => `<option value="${s.replace(/"/g, '&quot;')}">${s}</option>`).join('');
+        .filter(s => !matchServicioOficial(s) && !SERVICIOS_OFICIALES.some(of => normalizeSimple(of) === normalizeSimple(s)));
+      const baseOptions = ['<option value="">10 Servicios (Todos)</option>']
+        .concat(SERVICIOS_OFICIALES.map(s => `<option value="${s.replace(/"/g, '&quot;')}">${s}</option>`));
+      const extraOptions = [...new Set(extraSrvs)].map(s => `<option value="${s.replace(/"/g, '&quot;')}">${s}</option>`);
+      srvSel.innerHTML = baseOptions.concat(extraOptions).join('');
       srvSel.value = curSrv;
 
       const fecSel = document.getElementById('filterFecha');
@@ -1141,19 +1152,30 @@
       fecSel.value = curFec;
     }
 
+    function matchesServicioFilter(entryServicio, selectedFilter) {
+      if (!selectedFilter) return true;
+      const normFilter = normalizeSimple(selectedFilter);
+      const normEntry = normalizeSimple(entryServicio);
+      if (!normEntry) return false;
+      if (normEntry === normFilter) return true;
+      const mappedEntry = matchServicioOficial(entryServicio);
+      if (mappedEntry && normalizeSimple(mappedEntry) === normFilter) return true;
+      return false;
+    }
+
     function getFiltered() {
       const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const srv = document.getElementById('filterServicio').value;
       const herr = document.getElementById('filterHerramienta').value;
       const est = document.getElementById('filterEstado').value;
       const sup = document.getElementById('filterSupervisor').value;
-      const srv = document.getElementById('filterServicio').value;
       const fec = document.getElementById('filterFecha').value;
 
       return entries.filter(e => {
+        if (!matchesServicioFilter(e.servicio, srv)) return false;
         if (herr && e.herramienta !== herr) return false;
         if (est && e.estado !== est) return false;
         if (sup && (e.supervisor || '').trim() !== sup) return false;
-        if (srv && normalizeSimple(e.servicio) !== normalizeSimple(srv)) return false;
         if (fec && (e.fecha || '').trim() !== fec) return false;
         if (q) {
           const hay = [e.codigo, e.nombre, e.observaciones, e.servicio, e.supervisor, e.herramienta, e.estado]
@@ -1434,7 +1456,7 @@
       reader.readAsText(file);
     });
 
-    ['searchInput', 'filterHerramienta', 'filterEstado', 'filterSupervisor', 'filterServicio', 'filterFecha'].forEach(id => {
+    ['searchInput', 'filterServicio', 'filterHerramienta', 'filterEstado', 'filterSupervisor', 'filterFecha'].forEach(id => {
       document.getElementById(id).addEventListener('input', render);
       document.getElementById(id).addEventListener('change', render);
     });
