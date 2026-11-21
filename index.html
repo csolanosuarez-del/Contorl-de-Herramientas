@@ -186,13 +186,42 @@
     .summary-table tr.total-row td { background: #131d2e; font-weight: 700; color: #34d399; border-bottom: none; }
     .summary-table tr.total-row td:first-child { color: var(--text); }
 
-    /* Panel de Gráficas */
+    /* Gráfica Agrupada por Servicio con Filtros de Año, Mes y Día arriba */
+    .service-chart-section {
+      margin-bottom: 16px;
+    }
+    .chart-top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .chart-date-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+    .chart-date-controls select {
+      width: auto;
+      min-width: 98px;
+      padding: 6px 9px;
+      font-size: 0.78rem;
+      background: var(--card);
+    }
+    .btn-clear-date {
+      padding: 6px 9px;
+      font-size: 0.75rem;
+      background: rgba(148, 163, 184, 0.12);
+    }
+
     .charts-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 14px;
-      margin-bottom: 16px;
     }
     .charts-header {
       display: flex;
@@ -200,43 +229,21 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .charts-title {
       margin: 0;
       font-size: 0.96rem;
       font-weight: 700;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 8px;
     }
-    .charts-controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-    }
-    .period-tabs {
-      display: inline-flex;
-      flex-wrap: wrap;
-      background: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 3px;
-      gap: 3px;
-    }
-    .period-btn {
-      background: transparent;
-      border: none;
+    .charts-sub {
+      font-size: 0.75rem;
       color: var(--muted);
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 600;
-    }
-    .period-btn.active {
-      background: var(--primary);
-      color: #05251b;
+      font-weight: 400;
     }
     .metric-select {
       width: auto;
@@ -244,72 +251,52 @@
       font-size: 0.78rem;
       background: #0f172a;
     }
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1.45fr 1fr;
-      gap: 14px;
-      align-items: stretch;
-    }
-    @media (max-width: 960px) {
-      .charts-grid { grid-template-columns: 1fr; }
-    }
     .chart-box {
       background: #131c2e;
       border: 1px solid rgba(51, 65, 85, 0.75);
       border-radius: 8px;
       padding: 10px;
       min-width: 0;
+      overflow-x: auto;
     }
-    .chart-box-title {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-bottom: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    canvas.chart-canvas {
+    canvas.service-chart-canvas {
       width: 100%;
-      height: 220px;
+      min-width: 680px;
+      height: 270px;
       display: block;
     }
     .chart-legend {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 8px;
-      font-size: 0.72rem;
-      color: var(--muted);
+      gap: 12px;
+      margin-top: 10px;
+      font-size: 0.74rem;
+      color: #cbd5e1;
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
     .legend-dot {
       display: inline-block;
-      width: 9px;
-      height: 9px;
+      width: 10px;
+      height: 10px;
       border-radius: 2px;
-      margin-right: 4px;
-      vertical-align: middle;
     }
 
-    /* Filtros generales + Año, Mes, Días y Número de Día */
+    /* Filtros generales */
     .filters {
       display: grid;
-      grid-template-columns: 1.4fr repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-    .date-filters {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: 1.4fr repeat(5, 1fr);
       gap: 10px;
       margin-bottom: 16px;
     }
     @media (max-width: 1180px) {
       .filters { grid-template-columns: repeat(2, 1fr); }
-      .date-filters { grid-template-columns: repeat(3, 1fr); }
     }
     @media (max-width: 560px) {
       .filters { grid-template-columns: 1fr; }
-      .date-filters { grid-template-columns: repeat(2, 1fr); }
     }
 
     input, select, textarea {
@@ -449,13 +436,13 @@
       .summary-card { margin-bottom: 10px; border-radius: 8px; }
       .summary-table { font-size: 0.75rem; min-width: 320px; }
       .summary-table th, .summary-table td { padding: 6px 8px; }
-      .charts-card { padding: 10px; margin-bottom: 10px; border-radius: 8px; }
-      .charts-title { font-size: 0.85rem; }
-      .period-btn { padding: 4px 7px; font-size: 0.7rem; }
+      .service-chart-section { margin-bottom: 10px; }
+      .chart-date-controls select { min-width: 82px; padding: 5px 7px; font-size: 0.72rem; }
+      .charts-card { padding: 10px; border-radius: 8px; }
+      .charts-title { font-size: 0.86rem; }
       .metric-select { padding: 5px 7px; font-size: 0.72rem; }
-      canvas.chart-canvas { height: 175px; }
-      .filters, .date-filters { gap: 6px; margin-bottom: 8px; }
-      .date-filters { margin-bottom: 10px; }
+      canvas.service-chart-canvas { height: 220px; min-width: 620px; }
+      .filters { gap: 6px; margin-bottom: 10px; }
       input, select, textarea { padding: 7px 9px; font-size: 0.8rem; border-radius: 7px; }
       .main-grid { gap: 10px; }
       .detail-box { padding: 10px; border-radius: 8px; }
@@ -544,45 +531,62 @@
       </table>
     </section>
 
-    <!-- Gráficas debajo de la tabla de resumen -->
-    <section class="charts-card" aria-label="Gráficas de entregas">
-      <div class="charts-header">
-        <h2 class="charts-title">📈 Gráficas por Tiempo</h2>
-        <div class="charts-controls">
-          <div id="periodTabs" class="period-tabs" role="tablist">
-            <button type="button" class="period-btn active" data-period="mes">Mensual</button>
-            <button type="button" class="period-btn" data-period="semana">Por Semana</button>
-            <button type="button" class="period-btn" data-period="dia">Día</button>
-            <button type="button" class="period-btn" data-period="numdia">Número de Día</button>
-          </div>
-          <select id="chartMetric" class="metric-select" aria-label="Métrica de gráfica">
-            <option value="cantidad">Cantidad Entregada</option>
-            <option value="registros">N° de Registros</option>
+    <!-- Filtros de Año, Mes y Día arriba del cuadro + Gráfica agrupada por Servicio -->
+    <section class="service-chart-section" aria-label="Gráfica por Servicio agrupando herramientas">
+      <div class="chart-top-bar">
+        <div class="chart-date-controls">
+          <select id="filterAno" aria-label="Filtrar por Año">
+            <option value="">Año (Todos)</option>
           </select>
+          <select id="filterMes" aria-label="Filtrar por Mes">
+            <option value="">Mes (Todos)</option>
+            <option value="01">Enero</option>
+            <option value="02">Febrero</option>
+            <option value="03">Marzo</option>
+            <option value="04">Abril</option>
+            <option value="05">Mayo</option>
+            <option value="06">Junio</option>
+            <option value="07">Julio</option>
+            <option value="08">Agosto</option>
+            <option value="09">Septiembre</option>
+            <option value="10">Octubre</option>
+            <option value="11">Noviembre</option>
+            <option value="12">Diciembre</option>
+          </select>
+          <select id="filterDia" aria-label="Filtrar por Día de la semana">
+            <option value="">Día (Todos)</option>
+            <option value="1">Lunes</option>
+            <option value="2">Martes</option>
+            <option value="3">Miércoles</option>
+            <option value="4">Jueves</option>
+            <option value="5">Viernes</option>
+            <option value="6">Sábado</option>
+            <option value="0">Domingo</option>
+          </select>
+          <select id="filterNumDia" aria-label="Filtrar por Número de Día">
+            <option value="">N° Día (Todos)</option>
+          </select>
+          <button id="btnClearDate" class="btn-clear-date" type="button">✕ Todo tiempo</button>
         </div>
+
+        <select id="chartMetric" class="metric-select" aria-label="Métrica de gráfica">
+          <option value="cantidad">Cantidad Entregada</option>
+          <option value="registros">N° de Registros</option>
+        </select>
       </div>
 
-      <div class="charts-grid">
-        <div class="chart-box">
-          <div class="chart-box-title">
-            <span id="timeChartLabel">Distribución Mensual</span>
-            <span id="timeChartTotal">Total: 0</span>
-          </div>
-          <canvas id="timeChartCanvas" class="chart-canvas"></canvas>
-          <div class="chart-legend">
-            <span><i class="legend-dot" style="background:#10b981"></i>Bolsa</span>
-            <span><i class="legend-dot" style="background:#ef4444"></i>Lutocar</span>
-            <span><i class="legend-dot" style="background:#3b82f6"></i>Herramientas</span>
-            <span><i class="legend-dot" style="background:#f59e0b"></i>Otro</span>
-          </div>
+      <div class="charts-card">
+        <div class="charts-header">
+          <h2 class="charts-title">
+            📊 Herramientas por Servicio (1 al 10)
+            <span id="serviceChartScope" class="charts-sub">· Todo el periodo</span>
+          </h2>
+          <span id="serviceChartSummary" class="status-text">Total: 0</span>
         </div>
 
         <div class="chart-box">
-          <div class="chart-box-title">
-            <span id="toolChartLabel">Por Herramienta en vista Mensual</span>
-            <span id="toolChartPeak">Máx: 0</span>
-          </div>
-          <canvas id="toolChartCanvas" class="chart-canvas"></canvas>
+          <canvas id="serviceChartCanvas" class="service-chart-canvas"></canvas>
+          <div id="serviceChartLegend" class="chart-legend"></div>
         </div>
       </div>
     </section>
@@ -621,44 +625,7 @@
       <select id="filterSupervisor">
         <option value="">Todos los Supervisores</option>
       </select>
-    </section>
-
-    <section class="date-filters" aria-label="Filtros de Año, Mes, Días y Número de Día">
-      <select id="filterAno" aria-label="Filtrar por Año">
-        <option value="">Todos los Años</option>
-      </select>
-      <select id="filterMes" aria-label="Filtrar por Mes">
-        <option value="">Todos los Meses</option>
-        <option value="01">Enero</option>
-        <option value="02">Febrero</option>
-        <option value="03">Marzo</option>
-        <option value="04">Abril</option>
-        <option value="05">Mayo</option>
-        <option value="06">Junio</option>
-        <option value="07">Julio</option>
-        <option value="08">Agosto</option>
-        <option value="09">Septiembre</option>
-        <option value="10">Octubre</option>
-        <option value="11">Noviembre</option>
-        <option value="12">Diciembre</option>
-      </select>
-      <select id="filterMesEspecifico" aria-label="Mes específico Año-Mes">
-        <option value="">Mes específico (A-M)</option>
-      </select>
-      <select id="filterDia" aria-label="Filtrar por Días de la semana">
-        <option value="">Todos los Días</option>
-        <option value="1">Lunes</option>
-        <option value="2">Martes</option>
-        <option value="3">Miércoles</option>
-        <option value="4">Jueves</option>
-        <option value="5">Viernes</option>
-        <option value="6">Sábado</option>
-        <option value="0">Domingo</option>
-      </select>
-      <select id="filterNumDia" aria-label="Filtrar por Número de Día">
-        <option value="">N° de Día (Todos)</option>
-      </select>
-      <select id="filterFecha" aria-label="Filtrar por Fecha exacta">
+      <select id="filterFecha">
         <option value="">Todas las Fechas</option>
       </select>
     </section>
@@ -802,6 +769,15 @@
     const PENDING_KEY = 'control_herramientas_pending_v1';
     const STAFF_CACHE_KEY = 'control_herramientas_staff_v1';
     const HERRAMIENTAS = ['Bolsa', 'Lutocar', 'Escobillón', 'Rastrillo', 'Pala', 'Carretilla', 'Otro'];
+    const TOOL_COLORS = {
+      'Bolsa': '#10b981',
+      'Lutocar': '#ef4444',
+      'Escobillón': '#3b82f6',
+      'Rastrillo': '#a855f7',
+      'Pala': '#f59e0b',
+      'Carretilla': '#06b6d4',
+      'Otro': '#94a3b8'
+    };
     const SERVICIOS_OFICIALES = [
       '1 - Barrido (Km)',
       '2 - Desempapelado (Km)',
@@ -814,11 +790,14 @@
       '9 - Puntos Limpios (m3)',
       '10 - Patológico CI (Kg)'
     ];
-    const DIAS_SEMANA = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     const MESES_NOMBRES = {
       '01': 'Enero', '02': 'Febrero', '03': 'Marzo', '04': 'Abril',
       '05': 'Mayo', '06': 'Junio', '07': 'Julio', '08': 'Agosto',
       '09': 'Septiembre', '10': 'Octubre', '11': 'Noviembre', '12': 'Diciembre'
+    };
+    const DIAS_NOMBRES = {
+      '1': 'Lunes', '2': 'Martes', '3': 'Miércoles',
+      '4': 'Jueves', '5': 'Viernes', '6': 'Sábado', '0': 'Domingo'
     };
 
     let entries = [];
@@ -829,7 +808,6 @@
     let lastRawSample = null;
     let isAdminUnlocked = false;
     let isSyncingStaffFields = false;
-    let currentPeriod = 'mes';
     let lastFilteredEntries = [];
 
     function parseLocalDate(dateStr) {
@@ -861,227 +839,6 @@
       return null;
     }
 
-    function getIsoWeekKey(dt) {
-      const utc = new Date(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate()));
-      const dayNum = utc.getUTCDay() || 7;
-      utc.setUTCDate(utc.getUTCDate() + 4 - dayNum);
-      const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
-      const weekNo = Math.ceil((((utc - yearStart) / 86400000) + 1) / 7);
-      return {
-        sortKey: `${utc.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`,
-        label: `Sem ${String(weekNo).padStart(2, '0')}`
-      };
-    }
-
-    function getEntryBucket(entry, period) {
-      const dt = parseLocalDate(entry.fecha);
-      if (!dt) {
-        return { sortKey: 'zzzz', label: 'Sin fecha' };
-      }
-      if (period === 'mes') {
-        const y = dt.getFullYear();
-        const m = String(dt.getMonth() + 1).padStart(2, '0');
-        return { sortKey: `${y}-${m}`, label: `${y}-${m}` };
-      }
-      if (period === 'semana') {
-        return getIsoWeekKey(dt);
-      }
-      if (period === 'dia') {
-        const dow = dt.getDay();
-        const orderMap = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 0: '07' };
-        return { sortKey: orderMap[dow], label: DIAS_SEMANA[dow] };
-      }
-      const dayNum = String(dt.getDate()).padStart(2, '0');
-      return { sortKey: dayNum, label: `Día ${dayNum}` };
-    }
-
-    function getMetricValue(list, metric) {
-      if (metric === 'registros') return list.length;
-      return list.reduce((acc, item) => acc + (Number(item.cantidad) || 0), 0);
-    }
-
-    function getToolGroup(herr) {
-      if (herr === 'Bolsa') return 'bolsa';
-      if (herr === 'Lutocar') return 'lutocar';
-      if (herr === 'Escobillón' || herr === 'Rastrillo' || herr === 'Pala' || herr === 'Carretilla') return 'herramienta';
-      return 'otro';
-    }
-
-    function prepareCanvas(canvas) {
-      const rect = canvas.getBoundingClientRect();
-      const width = Math.max(240, Math.floor(rect.width || canvas.parentElement.clientWidth - 20 || 300));
-      const height = Math.max(150, Math.floor(rect.height || 200));
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-      }
-      const ctx = canvas.getContext('2d');
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, width, height);
-      return { ctx, width, height };
-    }
-
-    function renderCharts(filtered) {
-      lastFilteredEntries = filtered;
-      const metric = document.getElementById('chartMetric').value || 'cantidad';
-      const periodTitles = {
-        mes: 'Mensual',
-        semana: 'Por Semana',
-        dia: 'Día de la Semana',
-        numdia: 'Número de Día'
-      };
-
-      document.getElementById('timeChartLabel').textContent = `Distribución · ${periodTitles[currentPeriod]}`;
-      document.getElementById('toolChartLabel').textContent = `Por Herramienta · ${periodTitles[currentPeriod]}`;
-
-      const bucketMap = new Map();
-      filtered.forEach(item => {
-        const b = getEntryBucket(item, currentPeriod);
-        if (!bucketMap.has(b.sortKey)) {
-          bucketMap.set(b.sortKey, {
-            sortKey: b.sortKey,
-            label: b.label,
-            bolsa: 0,
-            lutocar: 0,
-            herramienta: 0,
-            otro: 0,
-            total: 0
-          });
-        }
-        const row = bucketMap.get(b.sortKey);
-        const val = metric === 'registros' ? 1 : (Number(item.cantidad) || 0);
-        const grp = getToolGroup(item.herramienta);
-        row[grp] += val;
-        row.total += val;
-      });
-
-      const buckets = Array.from(bucketMap.values()).sort((a, b) => a.sortKey.localeCompare(b.sortKey));
-      const grandTotal = buckets.reduce((s, r) => s + r.total, 0);
-      document.getElementById('timeChartTotal').textContent = `${metric === 'registros' ? 'Regs' : 'Total'}: ${grandTotal}`;
-
-      const tCanvas = document.getElementById('timeChartCanvas');
-      const { ctx: tCtx, width: tW, height: tH } = prepareCanvas(tCanvas);
-
-      if (!buckets.length) {
-        tCtx.fillStyle = '#94a3b8';
-        tCtx.font = '12px system-ui, sans-serif';
-        tCtx.textAlign = 'center';
-        tCtx.fillText('Sin datos para graficar en este filtro', tW / 2, tH / 2);
-      } else {
-        const padLeft = 36;
-        const padRight = 10;
-        const padTop = 18;
-        const padBottom = 28;
-        const plotW = Math.max(40, tW - padLeft - padRight);
-        const plotH = Math.max(40, tH - padTop - padBottom);
-        const maxVal = Math.max(1, ...buckets.map(b => b.total));
-
-        tCtx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
-        tCtx.lineWidth = 1;
-        tCtx.fillStyle = '#94a3b8';
-        tCtx.font = '10px system-ui, sans-serif';
-        tCtx.textAlign = 'right';
-        for (let i = 0; i <= 3; i++) {
-          const frac = i / 3;
-          const y = padTop + plotH - frac * plotH;
-          tCtx.beginPath();
-          tCtx.moveTo(padLeft, y);
-          tCtx.lineTo(tW - padRight, y);
-          tCtx.stroke();
-          const tickVal = Math.round(maxVal * frac);
-          tCtx.fillText(String(tickVal), padLeft - 5, y + 3);
-        }
-
-        const step = plotW / buckets.length;
-        const barW = Math.max(8, Math.min(34, step * 0.62));
-        const labelEvery = Math.max(1, Math.ceil(buckets.length / 8));
-
-        buckets.forEach((b, idx) => {
-          const x = padLeft + idx * step + (step - barW) / 2;
-          const segs = [
-            { val: b.bolsa, color: '#10b981' },
-            { val: b.lutocar, color: '#ef4444' },
-            { val: b.herramienta, color: '#3b82f6' },
-            { val: b.otro, color: '#f59e0b' }
-          ];
-          let curBottom = padTop + plotH;
-          segs.forEach(s => {
-            if (s.val <= 0) return;
-            const h = (s.val / maxVal) * plotH;
-            curBottom -= h;
-            tCtx.fillStyle = s.color;
-            tCtx.fillRect(x, curBottom, barW, Math.max(1.5, h));
-          });
-
-          if (b.total > 0 && buckets.length <= 16) {
-            tCtx.fillStyle = '#e2e8f0';
-            tCtx.font = 'bold 10px system-ui, sans-serif';
-            tCtx.textAlign = 'center';
-            tCtx.fillText(String(b.total), x + barW / 2, curBottom - 4);
-          }
-
-          if (idx % labelEvery === 0 || idx === buckets.length - 1) {
-            tCtx.fillStyle = '#94a3b8';
-            tCtx.font = '10px system-ui, sans-serif';
-            tCtx.textAlign = 'center';
-            tCtx.fillText(b.label, x + barW / 2, tH - 8);
-          }
-        });
-      }
-
-      const hCanvas = document.getElementById('toolChartCanvas');
-      const { ctx: hCtx, width: hW, height: hH } = prepareCanvas(hCanvas);
-      const toolColors = {
-        'Bolsa': '#10b981',
-        'Lutocar': '#ef4444',
-        'Escobillón': '#3b82f6',
-        'Rastrillo': '#60a5fa',
-        'Pala': '#38bdf8',
-        'Carretilla': '#818cf8',
-        'Otro': '#f59e0b'
-      };
-      const toolStats = HERRAMIENTAS.map(h => {
-        const list = filtered.filter(e => e.herramienta === h);
-        return { name: h, val: getMetricValue(list, metric), color: toolColors[h] || '#38bdf8' };
-      });
-      const maxTool = Math.max(1, ...toolStats.map(t => t.val));
-      document.getElementById('toolChartPeak').textContent = `Máx: ${maxTool === 1 && toolStats.every(t => t.val === 0) ? 0 : maxTool}`;
-
-      const hPadLeft = 68;
-      const hPadRight = 38;
-      const hPadTop = 8;
-      const hPadBottom = 8;
-      const hPlotW = Math.max(40, hW - hPadLeft - hPadRight);
-      const hPlotH = Math.max(40, hH - hPadTop - hPadBottom);
-      const rowH = hPlotH / toolStats.length;
-      const hBarH = Math.max(8, Math.min(18, rowH * 0.62));
-
-      toolStats.forEach((t, idx) => {
-        const yCenter = hPadTop + idx * rowH + rowH / 2;
-        const y = yCenter - hBarH / 2;
-        const w = (t.val / maxTool) * hPlotW;
-
-        hCtx.fillStyle = '#cbd5e1';
-        hCtx.font = '11px system-ui, sans-serif';
-        hCtx.textAlign = 'right';
-        hCtx.fillText(t.name, hPadLeft - 7, yCenter + 3.5);
-
-        hCtx.fillStyle = 'rgba(148, 163, 184, 0.12)';
-        hCtx.fillRect(hPadLeft, y, hPlotW, hBarH);
-
-        if (t.val > 0) {
-          hCtx.fillStyle = t.color;
-          hCtx.fillRect(hPadLeft, y, Math.max(3, w), hBarH);
-        }
-
-        hCtx.fillStyle = '#e2e8f0';
-        hCtx.font = 'bold 10px system-ui, sans-serif';
-        hCtx.textAlign = 'left';
-        hCtx.fillText(String(t.val), hPadLeft + Math.max(3, w) + 6, yCenter + 3.5);
-      });
-    }
-
     function normalizeSimple(str) {
       return String(str || '')
         .trim()
@@ -1106,6 +863,163 @@
       if (norm.includes('PUNTO') && norm.includes('LIMPIO')) return '9 - Puntos Limpios (m3)';
       if (norm.includes('PATOLOGICO')) return '10 - Patológico CI (Kg)';
       return '';
+    }
+
+    function prepareCanvas(canvas) {
+      const rect = canvas.getBoundingClientRect();
+      const parentW = canvas.parentElement ? canvas.parentElement.clientWidth - 20 : 680;
+      const width = Math.max(620, Math.floor(rect.width || parentW || 680));
+      const height = Math.max(180, Math.floor(rect.height || 270));
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+      }
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, width, height);
+      return { ctx, width, height };
+    }
+
+    function renderLegend() {
+      const legendEl = document.getElementById('serviceChartLegend');
+      legendEl.innerHTML = HERRAMIENTAS.map(h => `
+        <span class="legend-item">
+          <i class="legend-dot" style="background:${TOOL_COLORS[h] || '#94a3b8'}"></i>${h}
+        </span>
+      `).join('');
+    }
+
+    function renderServiceChart(filtered) {
+      lastFilteredEntries = filtered;
+      renderLegend();
+
+      const metric = document.getElementById('chartMetric').value || 'cantidad';
+      const ano = document.getElementById('filterAno').value;
+      const mes = document.getElementById('filterMes').value;
+      const dia = document.getElementById('filterDia').value;
+      const numDia = document.getElementById('filterNumDia').value;
+
+      const parts = [];
+      if (ano) parts.push(`Año ${ano}`);
+      if (mes) parts.push(MESES_NOMBRES[mes] || mes);
+      if (dia !== '') parts.push(DIAS_NOMBRES[dia] || dia);
+      if (numDia) parts.push(`Día ${numDia}`);
+      document.getElementById('serviceChartScope').textContent = parts.length
+        ? `· ${parts.join(' · ')}`
+        : '· Todo el periodo';
+
+      // Matriz de [10 servicios] x [7 herramientas]
+      const matrix = SERVICIOS_OFICIALES.map((srvFull, sIdx) => {
+        const numLabel = String(sIdx + 1);
+        const shortName = srvFull.replace(/^\d+\s*-\s*/, '').replace(/\s*\([^)]*\)$/, '');
+        const byTool = {};
+        HERRAMIENTAS.forEach(h => { byTool[h] = 0; });
+        return { srvFull, numLabel, shortName, byTool };
+      });
+
+      let totalMetric = 0;
+      filtered.forEach(item => {
+        const mapped = matchServicioOficial(item.servicio);
+        const sIdx = SERVICIOS_OFICIALES.findIndex(s => normalizeSimple(s) === normalizeSimple(mapped));
+        if (sIdx < 0) return;
+        const toolName = HERRAMIENTAS.includes(item.herramienta) ? item.herramienta : 'Otro';
+        const val = metric === 'registros' ? 1 : (Number(item.cantidad) || 0);
+        matrix[sIdx].byTool[toolName] += val;
+        totalMetric += val;
+      });
+
+      document.getElementById('serviceChartSummary').textContent =
+        `${metric === 'registros' ? 'Registros' : 'Cantidad total'}: ${totalMetric}`;
+
+      const canvas = document.getElementById('serviceChartCanvas');
+      const { ctx, width, height } = prepareCanvas(canvas);
+
+      const padLeft = 44;
+      const padRight = 14;
+      const padTop = 22;
+      const padBottom = 36;
+      const plotW = Math.max(120, width - padLeft - padRight);
+      const plotH = Math.max(80, height - padTop - padBottom);
+
+      let maxBarVal = 0;
+      matrix.forEach(row => {
+        HERRAMIENTAS.forEach(h => {
+          if (row.byTool[h] > maxBarVal) maxBarVal = row.byTool[h];
+        });
+      });
+      const yMax = Math.max(1, maxBarVal);
+
+      // Líneas horizontales y eje Y
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px system-ui, sans-serif';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 4; i++) {
+        const frac = i / 4;
+        const y = padTop + plotH - frac * plotH;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(width - padRight, y);
+        ctx.stroke();
+        const tick = maxBarVal === 0 && i > 0 ? 0 : Math.round(yMax * frac);
+        ctx.fillText(String(tick), padLeft - 6, y + 3.5);
+      }
+
+      const groupCount = matrix.length;
+      const groupSlotW = plotW / groupCount;
+      const clusterW = Math.min(groupSlotW * 0.84, 88);
+      const barCount = HERRAMIENTAS.length;
+      const gapW = 2;
+      const barW = Math.max(4, (clusterW - gapW * (barCount - 1)) / barCount);
+
+      matrix.forEach((row, gIdx) => {
+        const centerX = padLeft + gIdx * groupSlotW + groupSlotW / 2;
+        const startX = centerX - clusterW / 2;
+
+        // Separador suave entre servicios
+        if (gIdx > 0) {
+          const sepX = padLeft + gIdx * groupSlotW;
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.08)';
+          ctx.beginPath();
+          ctx.moveTo(sepX, padTop);
+          ctx.lineTo(sepX, padTop + plotH);
+          ctx.stroke();
+        }
+
+        HERRAMIENTAS.forEach((h, tIdx) => {
+          const val = row.byTool[h];
+          const x = startX + tIdx * (barW + gapW);
+          const baseY = padTop + plotH;
+
+          // Pequeña marca base para ver dónde va cada herramienta aunque sea 0
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.18)';
+          ctx.fillRect(x, baseY - 2, barW, 2);
+
+          if (val > 0) {
+            const hPx = Math.max(4, (val / yMax) * plotH);
+            const y = baseY - hPx;
+            ctx.fillStyle = TOOL_COLORS[h] || '#38bdf8';
+            ctx.fillRect(x, y, barW, hPx);
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = 'bold 9px system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(String(val), x + barW / 2, y - 3);
+          }
+        });
+
+        // Número del servicio (1..10) y nombre corto debajo
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = 'bold 11px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(row.numLabel, centerX, height - 18);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '9px system-ui, sans-serif';
+        ctx.fillText(row.shortName.slice(0, 10), centerX, height - 6);
+      });
     }
 
     function setServicioSelectValue(val, allowCreateOption = true) {
@@ -1631,24 +1545,9 @@
       const curAno = anoSel.value;
       const anos = [...new Set(parsedDates.map(dt => String(dt.getFullYear())))].sort().reverse();
       if (!anos.length) anos.push(String(new Date().getFullYear()));
-      anoSel.innerHTML = '<option value="">Todos los Años</option>' +
+      anoSel.innerHTML = '<option value="">Año (Todos)</option>' +
         anos.map(a => `<option value="${a}">${a}</option>`).join('');
       anoSel.value = curAno;
-
-      const mesEspSel = document.getElementById('filterMesEspecifico');
-      const curMesEsp = mesEspSel.value;
-      const ymKeys = [...new Set(parsedDates.map(dt => {
-        const y = dt.getFullYear();
-        const m = String(dt.getMonth() + 1).padStart(2, '0');
-        return `${y}-${m}`;
-      }))].sort().reverse();
-      mesEspSel.innerHTML = '<option value="">Mes específico (A-M)</option>' +
-        ymKeys.map(ym => {
-          const [y, m] = ym.split('-');
-          const mLabel = MESES_NOMBRES[m] || m;
-          return `<option value="${ym}">${mLabel} ${y} (${ym})</option>`;
-        }).join('');
-      mesEspSel.value = curMesEsp;
 
       const numDiaSel = document.getElementById('filterNumDia');
       const curNumDia = numDiaSel.value;
@@ -1656,7 +1555,7 @@
       const dayList = existingDays.length
         ? existingDays
         : Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
-      numDiaSel.innerHTML = '<option value="">N° de Día (Todos)</option>' +
+      numDiaSel.innerHTML = '<option value="">N° Día (Todos)</option>' +
         dayList.map(d => `<option value="${d}">Día ${d}</option>`).join('');
       numDiaSel.value = curNumDia;
 
@@ -1687,7 +1586,6 @@
       const sup = document.getElementById('filterSupervisor').value;
       const ano = document.getElementById('filterAno').value;
       const mes = document.getElementById('filterMes').value;
-      const mesEsp = document.getElementById('filterMesEspecifico').value;
       const dia = document.getElementById('filterDia').value;
       const numDia = document.getElementById('filterNumDia').value;
       const fec = document.getElementById('filterFecha').value;
@@ -1699,16 +1597,12 @@
         if (sup && (e.supervisor || '').trim() !== sup) return false;
         if (fec && (e.fecha || '').trim() !== fec) return false;
 
-        if (ano || mes || mesEsp || dia || numDia) {
+        if (ano || mes || dia !== '' || numDia) {
           const dt = parseLocalDate(e.fecha);
           if (!dt) return false;
-          const yStr = String(dt.getFullYear());
-          const mStr = String(dt.getMonth() + 1).padStart(2, '0');
-          const ymStr = `${yStr}-${mStr}`;
-          if (ano && yStr !== ano) return false;
-          if (mes && mStr !== mes) return false;
-          if (mesEsp && ymStr !== mesEsp) return false;
-          if (dia && String(dt.getDay()) !== dia) return false;
+          if (ano && String(dt.getFullYear()) !== ano) return false;
+          if (mes && String(dt.getMonth() + 1).padStart(2, '0') !== mes) return false;
+          if (dia !== '' && String(dt.getDay()) !== dia) return false;
           if (numDia && String(dt.getDate()).padStart(2, '0') !== numDia) return false;
         }
 
@@ -1775,14 +1669,7 @@
       updateFilterOptions();
       const filtered = getFiltered();
       renderSummary(filtered);
-      renderCharts(filtered);
-
-      const mesSel = document.getElementById('filterMes').value;
-      const mesEspSel = document.getElementById('filterMesEspecifico').value;
-      if (filtered.length === 0 && (mesSel || mesEspSel)) {
-        const etiqueta = mesEspSel || (MESES_NOMBRES[mesSel] || mesSel);
-        setStatus(`Sin registros para ${etiqueta}. Cambia el filtro de mes o selecciona "Todos los Meses".`);
-      }
+      renderServiceChart(filtered);
 
       const totalEntregas = filtered.length;
       const uniqueOps = new Set(filtered.map(e => `${(e.codigo || '').trim()}|${(e.nombre || '').trim().toLowerCase()}`)).size;
@@ -1871,21 +1758,21 @@
       document.getElementById('modalBackdrop').classList.remove('open');
     }
 
-    document.querySelectorAll('#periodTabs .period-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('#periodTabs .period-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentPeriod = btn.dataset.period || 'mes';
-        renderCharts(lastFilteredEntries);
-      });
+    document.getElementById('btnClearDate').addEventListener('click', () => {
+      document.getElementById('filterAno').value = '';
+      document.getElementById('filterMes').value = '';
+      document.getElementById('filterDia').value = '';
+      document.getElementById('filterNumDia').value = '';
+      document.getElementById('filterFecha').value = '';
+      render();
     });
 
     document.getElementById('chartMetric').addEventListener('change', () => {
-      renderCharts(lastFilteredEntries);
+      renderServiceChart(lastFilteredEntries);
     });
 
     window.addEventListener('resize', () => {
-      renderCharts(lastFilteredEntries);
+      renderServiceChart(lastFilteredEntries);
     });
 
     document.getElementById('fCodigo').addEventListener('input', () => handleCodeInput(true));
@@ -2024,7 +1911,6 @@
       'filterSupervisor',
       'filterAno',
       'filterMes',
-      'filterMesEspecifico',
       'filterDia',
       'filterNumDia',
       'filterFecha'
