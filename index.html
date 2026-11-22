@@ -308,7 +308,7 @@
 
     .filters {
       display: grid;
-      grid-template-columns: 1.4fr repeat(5, 1fr);
+      grid-template-columns: 1.4fr repeat(6, 1fr);
       gap: 10px;
       margin-bottom: 16px;
     }
@@ -662,16 +662,21 @@
       <select id="filterHerramienta">
         <option value="">Todas las Herramientas</option>
         <option value="Bolsa">Bolsa</option>
-        <option value="Lutocar">Lutocar</option>
-        <option value="Escobillón">Escobillón</option>
-        <option value="Rastrillo">Rastrillo</option>
         <option value="Pala">Pala</option>
+        <option value="Rastrillo">Rastrillo</option>
+        <option value="Detergente Pinol">Detergente Pinol</option>
+        <option value="Escobillón">Escobillón</option>
+        <option value="Lutocar">Lutocar</option>
         <option value="Carretilla">Carretilla</option>
         <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
         <option value="Cepillo central de acero">Cepillo central de acero</option>
-        <option value="Pinol">Pinol</option>
         <option value="Líquidos espumantes">Líquidos espumantes</option>
         <option value="Otro">Otro</option>
+      </select>
+      <select id="filterTurno" aria-label="Filtrar por Turno">
+        <option value="">Todos los Turnos</option>
+        <option value="Día">Día</option>
+        <option value="Noche">Noche</option>
       </select>
       <select id="filterEstado">
         <option value="">Todos los Estados</option>
@@ -700,6 +705,7 @@
               <th>Fecha</th>
               <th>Cód.</th>
               <th>Personal Operativo</th>
+              <th>Turno</th>
               <th>Herramienta / Insumo</th>
               <th>Cant.</th>
               <th>Estado</th>
@@ -733,14 +739,14 @@
             <label>Herramienta / Insumo</label>
             <select id="fHerramienta" required>
               <option value="Bolsa">Bolsa</option>
-              <option value="Lutocar">Lutocar</option>
-              <option value="Escobillón">Escobillón</option>
-              <option value="Rastrillo">Rastrillo</option>
               <option value="Pala">Pala</option>
+              <option value="Rastrillo">Rastrillo</option>
+              <option value="Detergente Pinol">Detergente Pinol</option>
+              <option value="Escobillón">Escobillón</option>
+              <option value="Lutocar">Lutocar</option>
               <option value="Carretilla">Carretilla</option>
               <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
               <option value="Cepillo central de acero">Cepillo central de acero</option>
-              <option value="Pinol">Pinol</option>
               <option value="Líquidos espumantes">Líquidos espumantes</option>
               <option value="Otro">Otro</option>
             </select>
@@ -754,6 +760,13 @@
           <div>
             <label>Cantidad</label>
             <input id="fCantidad" type="number" min="1" value="1" required />
+          </div>
+          <div>
+            <label>Turno</label>
+            <select id="fTurno" required>
+              <option value="Día">Día</option>
+              <option value="Noche">Noche</option>
+            </select>
           </div>
           <div>
             <label>Estado</label>
@@ -780,16 +793,10 @@
               <label>Servicio</label>
               <select id="fServicio">
                 <option value="">— Seleccionar servicio —</option>
-                <option value="1 - Barrido (Km)">1 - Barrido (Km)</option>
-                <option value="2 - Desempapelado (Km)">2 - Desempapelado (Km)</option>
-                <option value="3 - Areas Verdes (Ha)">3 - Areas Verdes (Ha)</option>
-                <option value="4 - Ferias y Eventos (EQ)">4 - Ferias y Eventos (EQ)</option>
-                <option value="5 - Áridos (m3)">5 - Áridos (m3)</option>
-                <option value="6 - Lavado (EQ)">6 - Lavado (EQ)</option>
-                <option value="7 - Recolección (Ton)">7 - Recolección (Ton)</option>
-                <option value="8 - Microbasural (EQ)">8 - Microbasural (EQ)</option>
-                <option value="9 - Puntos Limpios (m3)">9 - Puntos Limpios (m3)</option>
-                <option value="10 - Patológico CI (Kg)">10 - Patológico CI (Kg)</option>
+                <option value="Barrido">Barrido</option>
+                <option value="Servicio 2">Servicio 2</option>
+                <option value="Serv. 3">Serv. 3</option>
+                <option value="Ser. 4, 5, 6, 7, 8, 9, 10">Ser. 4, 5, 6, 7, 8, 9, 10</option>
               </select>
             </div>
             <div>
@@ -803,31 +810,30 @@
             </div>
           </div>
 
-          <!-- Sub-panel específico cuando el servicio es 1 - Barrido (Km) -->
-          <div id="barridoSubbox" class="barrido-subbox">
-            <div>
-              <label>Modalidad de Barrido</label>
-              <select id="fBarridoModalidad">
-                <option value="Sector en la ciudad">Sector en la ciudad (por persona)</option>
-                <option value="Mercados">Mercados (por persona)</option>
-                <option value="Barrido mecanizado">Barrido mecanizado (camiones / minicargador)</option>
-                <option value="Barrido por escuadras">Barrido por escuadras (5 personas)</option>
+          <!-- Flujo en cascada según el esquema del usuario -->
+          <div id="cascadeFlowBox" class="barrido-subbox active" style="display:grid;">
+            <div id="cascadeStep2Wrap">
+              <label id="cascadeStep2Label">Subtipo / Modalidad / Grupo</label>
+              <select id="fCascadeSubtipo">
+                <option value="">— Seleccionar —</option>
               </select>
             </div>
-            <div>
-              <label id="fBarridoEquipoLabel">Equipo / Escuadra / Detalle</label>
-              <select id="fBarridoEquipo" style="display:none">
-                <option value="">— Seleccionar equipo —</option>
-                <option value="Camión Barredora 1">Camión Barredora 1 (Pala, Cepillo lateral de acero, Cepillo central de acero)</option>
-                <option value="Camión Barredora 2">Camión Barredora 2 (Pala, Cepillo lateral de acero, Cepillo central de acero)</option>
-                <option value="Minicargador Barredora">Minicargador Barredora (Cepillo central de acero)</option>
+            <div id="cascadeStep3Wrap">
+              <label id="cascadeStep3Label">Sector / Equipo / Dotación</label>
+              <select id="fCascadeDetalleSelect" style="display:none">
+                <option value="">— Seleccionar —</option>
               </select>
-              <input id="fBarridoDetalle" placeholder="Ej: Escuadra 01 (5 pers.) / Tramo..." />
+              <input id="fCascadeDetalleInput" list="sectorBarridoList" placeholder="Escoja o escriba el sector..." autocomplete="off" style="display:none" />
             </div>
-          </div>
-
-          <div class="full">
-            <div id="serviceRuleHint" class="rule-banner info-rule" style="display:none"></div>
+            <div id="cascadeStep4Wrap" class="full" style="display:none">
+              <label id="cascadeStep4Label">Herramienta / Bolsa / Cepillo a Dotar</label>
+              <select id="fCascadeDotacion">
+                <option value="">— Seleccionar dotación —</option>
+              </select>
+            </div>
+            <div class="full">
+              <div id="serviceRuleHint" class="rule-banner info-rule" style="display:block">Selecciona el Servicio para activar el flujo en cascada.</div>
+            </div>
           </div>
 
           <div class="full">
@@ -885,27 +891,27 @@
     ];
     const HERRAMIENTAS = [
       'Bolsa',
-      'Lutocar',
-      'Escobillón',
-      'Rastrillo',
       'Pala',
+      'Rastrillo',
+      'Detergente Pinol',
+      'Escobillón',
+      'Lutocar',
       'Carretilla',
       'Cepillo lateral de acero',
       'Cepillo central de acero',
-      'Pinol',
       'Líquidos espumantes',
       'Otro'
     ];
     const TOOL_COLORS = {
       'Bolsa': '#10b981',
-      'Lutocar': '#ef4444',
-      'Escobillón': '#3b82f6',
-      'Rastrillo': '#a855f7',
       'Pala': '#f59e0b',
+      'Rastrillo': '#a855f7',
+      'Detergente Pinol': '#22c55e',
+      'Escobillón': '#3b82f6',
+      'Lutocar': '#ef4444',
       'Carretilla': '#06b6d4',
       'Cepillo lateral de acero': '#ec4899',
       'Cepillo central de acero': '#f97316',
-      'Pinol': '#22c55e',
       'Líquidos espumantes': '#38bdf8',
       'Otro': '#94a3b8'
     };
@@ -967,6 +973,21 @@
       const clean = String(rawTool || '').trim();
       if (!clean) return 'Otro';
       const norm = normalizeSimple(clean);
+      if (norm === 'BOLSA' || norm === 'BOLSAS') {
+        return 'Bolsa';
+      }
+      if (norm === 'PALA' || norm === 'PALAS') {
+        return 'Pala';
+      }
+      if (norm === 'RASTRILLO' || norm === 'RASTRILLOS') {
+        return 'Rastrillo';
+      }
+      if (norm === 'PINOL' || norm === 'DETERGENTE PINOL' || norm === 'DETERGENTE' || norm.includes('PINOL')) {
+        return 'Detergente Pinol';
+      }
+      if (norm === 'ESCOBILLON' || norm === 'ESCOBILLONES' || norm === 'ESCOBA' || norm === 'ESCOBAS') {
+        return 'Escobillón';
+      }
       if (norm === 'CEPILLO LATERAL' || norm === 'CEPILLO LATERAL DE ACERO') {
         return 'Cepillo lateral de acero';
       }
@@ -1330,9 +1351,9 @@
       } else if (mappedSrv === '6 - Lavado (EQ)') {
         sectorLabel.textContent = 'Lugar de Trabajo';
         sectorInput.placeholder = 'Lugar o punto de lavado...';
-        if (herrEl.value !== 'Pinol' && herrEl.value !== 'Líquidos espumantes') {
+        if (herrEl.value !== 'Detergente Pinol' && herrEl.value !== 'Líquidos espumantes') {
           isWarn = true;
-          hintText = 'Lavado ocupa pinol o líquidos espumantes: selecciona "Pinol" o "Líquidos espumantes".';
+          hintText = 'Lavado ocupa pinol o líquidos espumantes: selecciona "Detergente Pinol" o "Líquidos espumantes".';
         } else {
           hintText = `Lavado: insumo ${herrEl.value} seleccionado.`;
         }
@@ -1476,6 +1497,11 @@
         celularEl.value = match.celular;
         celularEl.dataset.autofilled = '1';
       }
+      const turnoEl = document.getElementById('fTurno');
+      if (turnoEl && match.turno && (forceOverwrite || turnoEl.dataset.autofilled === '1')) {
+        turnoEl.value = normalizeTurno(match.turno);
+        turnoEl.dataset.autofilled = '1';
+      }
       applyServiceAndToolRules();
     }
 
@@ -1602,6 +1628,15 @@
       el.style.color = isError ? '#f87171' : '#94a3b8';
     }
 
+    function normalizeTurno(val) {
+      const clean = String(val || '').trim();
+      const norm = normalizeSimple(clean);
+      if (!norm) return 'Día';
+      if (norm.includes('NOCHE') || norm.includes('NOCTUR')) return 'Noche';
+      if (norm.includes('DIA') || norm.includes('DIUR')) return 'Día';
+      return clean;
+    }
+
     function normalizeEstado(val) {
       const raw = String(val || '').trim().toLowerCase();
       if (!raw) return 'Entregado / Operativo';
@@ -1635,6 +1670,7 @@
         fecha,
         codigo: String(raw.codigo ?? raw.CODIGO ?? '').trim(),
         nombre: String(raw.nombre ?? raw.NOMBRE ?? '').trim().toUpperCase(),
+        turno: normalizeTurno(raw.turno ?? raw.TURNO),
         herramienta: matchedTool,
         cantidad: Number.isNaN(cantNum) ? 0 : cantNum,
         estado: normalizeEstado(raw.estado ?? raw.ESTADO),
@@ -1949,6 +1985,7 @@
       const q = document.getElementById('searchInput').value.trim().toLowerCase();
       const srv = document.getElementById('filterServicio').value;
       const herr = document.getElementById('filterHerramienta').value;
+      const turnoFilter = document.getElementById('filterTurno').value;
       const est = document.getElementById('filterEstado').value;
       const sup = document.getElementById('filterSupervisor').value;
       const ano = document.getElementById('filterAno').value;
@@ -1960,6 +1997,7 @@
       return entries.filter(e => {
         if (!matchesServicioFilter(e.servicio, srv)) return false;
         if (herr && normalizeHerramientaName(e.herramienta) !== normalizeHerramientaName(herr)) return false;
+        if (turnoFilter && normalizeTurno(e.turno) !== normalizeTurno(turnoFilter)) return false;
         if (est && e.estado !== est) return false;
         if (sup && (e.supervisor || '').trim() !== sup) return false;
         if (fec && (e.fecha || '').trim() !== fec) return false;
@@ -1992,7 +2030,7 @@
       const imgHtml = item.foto ? `<img src="${item.foto}" alt="${item.nombre}" onerror="this.style.display='none'" />` : '';
       box.innerHTML = `
         <h3>[${item.codigo || 'S/C'}] ${item.nombre}</h3>
-        <div class="status-text">Fecha: ${item.fecha || '-'} · <strong>${item.herramienta}</strong> (${item.cantidad}) · Estado: <strong>${item.estado}</strong></div>
+        <div class="status-text">Fecha: ${item.fecha || '-'} · Turno: <strong>${normalizeTurno(item.turno)}</strong> · <strong>${item.herramienta}</strong> (${item.cantidad}) · Estado: <strong>${item.estado}</strong></div>
         <div style="margin-top:8px; font-size:0.86rem; line-height:1.55;">
           <strong>Servicio:</strong> ${item.servicio || '-'}<br/>
           <strong>Sector / Lugar:</strong> ${item.sector || '-'}<br/>
@@ -2062,6 +2100,7 @@
           <td>${e.fecha || '-'}</td>
           <td><strong>${e.codigo || 'S/C'}</strong></td>
           <td>${e.nombre || '-'}</td>
+          <td><strong>${normalizeTurno(e.turno)}</strong></td>
           <td><span class="pill ${getToolPillClass(e.herramienta)}">${e.herramienta}</span></td>
           <td><strong>${e.cantidad}</strong></td>
           <td><span class="pill ${getEstadoClass(e.estado)}">${e.estado}</span></td>
@@ -2107,6 +2146,7 @@
       const sectorEl = document.getElementById('fSector');
       const supervisorEl = document.getElementById('fSupervisor');
       const celularEl = document.getElementById('fCelular');
+      const turnoEl = document.getElementById('fTurno');
 
       codigoEl.dataset.autofilled = item ? '0' : '1';
       nombreEl.dataset.autofilled = item ? '0' : '1';
@@ -2114,6 +2154,7 @@
       sectorEl.dataset.autofilled = item ? '0' : '1';
       supervisorEl.dataset.autofilled = item ? '0' : '1';
       celularEl.dataset.autofilled = item ? '0' : '1';
+      turnoEl.dataset.autofilled = item ? '0' : '1';
 
       const isSingleUnitTool = (defaultTool === 'Lutocar' || defaultTool === 'Carretilla');
 
@@ -2122,6 +2163,7 @@
       document.getElementById('fHerramienta').value = item ? normalizeHerramientaName(item.herramienta) : defaultTool;
       codigoEl.value = item ? item.codigo : '';
       document.getElementById('fCantidad').value = item ? item.cantidad : (isSingleUnitTool ? 1 : 100);
+      turnoEl.value = item ? normalizeTurno(item.turno) : (lastEntry ? normalizeTurno(lastEntry.turno) : 'Día');
       document.getElementById('fEstado').value = item ? item.estado : 'Entregado / Operativo';
       nombreEl.value = item ? item.nombre : '';
       supervisorEl.value = item ? item.supervisor : (lastEntry?.supervisor || '');
@@ -2212,6 +2254,7 @@
     document.getElementById('fSector').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
     document.getElementById('fSupervisor').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
     document.getElementById('fCelular').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
+    document.getElementById('fTurno').addEventListener('change', (e) => { e.target.dataset.autofilled = '0'; });
 
     document.getElementById('btnAdminToggle').addEventListener('click', handleAdminToggle);
     document.getElementById('btnNewEntrega').addEventListener('click', () => openModal('', 'Bolsa'));
@@ -2282,6 +2325,7 @@
         fecha: document.getElementById('fFecha').value,
         codigo: document.getElementById('fCodigo').value.trim(),
         nombre: document.getElementById('fNombre').value.trim().toUpperCase(),
+        turno: normalizeTurno(document.getElementById('fTurno').value),
         herramienta: herrVal,
         cantidad: Number(document.getElementById('fCantidad').value) || 0,
         estado: document.getElementById('fEstado').value,
@@ -2318,9 +2362,9 @@
 
     document.getElementById('btnExportCsv').addEventListener('click', () => {
       if (!isAdminUnlocked) return;
-      const headers = ['UID', 'FECHA', 'CODIGO', 'NOMBRE', 'HERRAMIENTA', 'CANTIDAD', 'ESTADO', 'SERVICIO', 'SECTOR_LUGAR', 'TELEFONO', 'SUPERVISOR', 'OBSERVACIONES'];
+      const headers = ['UID', 'FECHA', 'CODIGO', 'NOMBRE', 'TURNO', 'HERRAMIENTA', 'CANTIDAD', 'ESTADO', 'SERVICIO', 'SECTOR_LUGAR', 'TELEFONO', 'SUPERVISOR', 'OBSERVACIONES'];
       const rows = entries.map(e => [
-        e.uid, e.fecha, e.codigo, e.nombre, e.herramienta, e.cantidad, e.estado, e.servicio, e.sector, e.celular, e.supervisor, e.observaciones
+        e.uid, e.fecha, e.codigo, e.nombre, normalizeTurno(e.turno), e.herramienta, e.cantidad, e.estado, e.servicio, e.sector, e.celular, e.supervisor, e.observaciones
       ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
       const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv;charset=utf-8;' });
       const a = document.createElement('a');
@@ -2367,6 +2411,7 @@
       'searchInput',
       'filterServicio',
       'filterHerramienta',
+      'filterTurno',
       'filterEstado',
       'filterSupervisor',
       'filterAno',
@@ -2388,6 +2433,400 @@
     saveEntries();
     render();
     syncFromSheets();
+
+    const BARRIDO_CATALOG = [{"c":"1-001","f":"MERCADO 7 CALLES","a":"CASCO VIEJO","d":"11","u":"CIV","t":"DIURNO-MANTENIMIENTO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":6},{"c":"1-002","f":"MERCADO LOS POZOS","a":"CASCO VIEJO","d":"11","u":"CII","t":"DIURNO-MANTENIMIENTO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":8},{"c":"1-003","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CIV","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-004","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CIII-CIV","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-005","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CIII","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-006","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CIII","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-007","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CIII","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-008","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CII-CIII","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-009","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CII-CIII","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-010","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CI-CII","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-011","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CI-CII","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-012","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CI","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-013","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CI","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-014","f":"CV A 1ER ANILLO","a":"CASCO VIEJO","d":"11","u":"CI-CIV","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-015","f":"AV. 1ER ANILLO MEC","a":"CASCO VIEJO","d":"11","u":"1-2-3-4-5-7-8","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-016","f":"AV. 1ER ANILLO MEC","a":"CASCO VIEJO","d":"11","u":"9-10-11-12-13-14-CI-CIV","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"1-017","f":"AV. 1ER ANILLO MEC","a":"CASCO VIEJO","d":"11","u":"CI-CII-CIII-CIV","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":2},{"c":"2-018","f":"MERCADO RAMADA ANT.","a":"1ERO A 2DO","d":"11","u":"9-10","t":"DIURNO-MANTENIMIENTO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":19},{"c":"2-019","f":"AV. 1ER A 2DO MEC","a":"1ERO A 2DO","d":"11","u":"10-11-12-13-14","t":"DIURNO-NOCTURNO","s":"LUNES A SABADO","p":2},{"c":"2-020","f":"AV. 1ER A 2DO MEC","a":"1ERO A 2DO","d":"11","u":"1-2-3-4-5-14","t":"DIURNO-NOCTURNO","s":"LUNES A SABADO","p":2},{"c":"2-021","f":"AV. 1ER A 2DO MEC","a":"1ERO A 2DO","d":"11","u":"5-6-7-PU","t":"DIURNO-NOCTURNO","s":"LUNES A SABADO","p":2},{"c":"2-022","f":"AV. 1ER A 2DO MEC","a":"1ERO A 2DO","d":"11","u":"7-8-9.","t":"DIURNO-NOCTURNO","s":"LUNES A SABADO","p":2},{"c":"2-023","f":"AV. 1ER A 2DO MEC","a":"1ERO A 2DO","d":"11-2-3-4","u":"9-21-23-24-25-27-28-ET","t":"DIURNO-NOCTURNO","s":"LUNES A SABADO","p":2},{"c":"2-024","f":"AV. 1ER A 2DO MEC","a":"1ERO A 2DO","d":"11-2-4-1","u":"15-16-17-18-19-20-21-29-30-31-32-33-34-35-36","t":"DIURNO-NOCTURNO","s":"LUNES A SABADO","p":2},{"c":"2-025","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"9","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-026","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"8-9","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-027","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"7-8","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-028","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"7","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-029","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"6","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-030","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"5-7","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-031","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"5","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-032","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"4-5","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-033","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"3-4","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-034","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"3-4","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-035","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"3","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-036","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"2-3","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-037","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"2","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-038","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"1-2","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-039","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"1","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-040","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"1-14","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-041","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"13-14","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-042","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"13","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-043","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"12-13","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-044","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"11-12","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-045","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"11","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"2-046","f":"1ERO A 2DO","a":"1ERO A 2DO","d":"11","u":"10-11","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-047","f":"MERCADO ABASTO","a":"2DO A 3ERO","d":"4","u":"29-52-ET14","t":"DIURNO-MANTENIMIENTO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":8},{"c":"3-048","f":"MERCADO MUTUALISTA","a":"2DO A 3ERO","d":"2","u":"ET3","t":"DIURNO-MANTENIMIENTO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":5},{"c":"3-049","f":"AV. 2DO A 3ERO MEC","a":"2DO A 3ERO","d":"2-3","u":"21-22-23-24-ED-ET59","t":"DIURNO-NOCTURNO","s":"LUNES A DOMINGOS Y FERIADOS","p":3},{"c":"3-050","f":"AV. 2DO A 3ERO MEC","a":"2DO A 3ERO","d":"2","u":"19-20-21-ET5-ET6","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-051","f":"AV. 2DO A 3ERO MEC","a":"2DO A 3ERO","d":"2","u":"18-19-ET4-ET5","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-052","f":"AV. CON ESCUADRA","a":"2DO A 3ERO","d":"2","u":"16-17-ET2-ET3","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-053","f":"AV. CON ESCUADRA","a":"2DO A 3ERO","d":"2","u":"15-16-ET1-ET2","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-054","f":"AV. CON ESCUADRA","a":"2DO A 3ERO","d":"1","u":"35-36-ET22-ET23-ET24","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-055","f":"AV. 2DO A 3ERO MEC","a":"2DO A 3ERO","d":"1","u":"33-34-35-ET20-ET21-ET22","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-056","f":"AV. CON ESCUADRA","a":"2DO A 3ERO","d":"1","u":"32-33-ET17-ET18-ET19-ET20","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-057","f":"AV. 2DO A 3ERO MEC","a":"2DO A 3ERO","d":"1","u":"30-31-32-ET16-ET17","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-058","f":"AV. 2DO A 3ERO MEC","a":"2DO A 3ERO","d":"1-4","u":"29-30-ET14-ET15-ET16","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-059","f":"AV. CON ESCUADRA","a":"2DO A 3ERO","d":"4","u":"28-29-ET12-ET13-ET14","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-060","f":"AV. 2DO A 3ERO MEC","a":"2DO A 3ERO","d":"4","u":"26-27-ET10-ET11-ET12-ET","t":"NOCTURNO","s":"LUNES A SABADO","p":1},{"c":"3-061","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"3-4","u":"25-ET","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-062","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"3","u":"25","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-063","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"3-4","u":"25-ET","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-064","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"3","u":"25","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-065","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"3","u":"25-ET7-ET8","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-066","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"3","u":"24-ET59","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-067","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"3","u":"24-ET7","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-068","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"3","u":"24","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-069","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"3","u":"23-24","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-070","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2-3","u":"21-23","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-071","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"21","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-072","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"20-21","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-073","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"20-ET5-ET6-ET4","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-074","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"20","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-075","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"19-20","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-076","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"19","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-077","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"19","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-078","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"18-19","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-079","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"18","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-080","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"18","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-081","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"17-18","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-082","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"17","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-083","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"17","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-084","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"17","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-085","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"16-17","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-086","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"16","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-087","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"16","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-088","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"16","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-089","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"16","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-090","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"15-16","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-091","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"15","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-092","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"2","u":"15-ET1-ET2","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-093","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"ET20-ET21-ET22-ET23-ET24","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-094","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"36","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-095","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"36","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-096","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"36","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-097","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"35-36","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-098","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"35","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-099","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"34-35","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-100","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"33-34-ET21","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-101","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"33-34","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-102","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"33","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-103","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"33","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-104","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"32-33","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-105","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"56-57-ET18-ET19-ET20","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-106","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"31-32","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-107","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"31","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-108","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"31","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-109","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"31","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-110","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"31","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"3-111","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"55-56-ET17-ET18","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-112","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"30-31-ET15-ET16-ET17","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-113","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"30","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-114","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"30","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-115","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"30","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-116","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1","u":"30","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-117","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"1-4","u":"29-30","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-118","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"29","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-119","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"29","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-120","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"29","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-121","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"29","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-122","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"28-29","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-123","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"28","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-124","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"ET12-ET13","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-125","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"49-50-ET11-ET12","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-126","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"28","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-127","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"28-27","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-128","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"28","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-129","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"27","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-130","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"27","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-131","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"27-28","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-132","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"26-ET9-ET10","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-133","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"26-27-ET10","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-134","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"27","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-135","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"27","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"3-136","f":"2DO A 3ERO","a":"2DO A 3ERO","d":"4","u":"27","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-137","f":"MERCADO FERIA BARRIO L.","a":"3ERO A 4TO","d":"3","u":"ED","t":"DIURNO-MANTENIMIENTO-NOCTURNO","s":"MIERCOLES-JUEVES-SABADO-DOMINGO","p":10},{"c":"4-138","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"4","u":"47-48-49","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-139","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"4","u":"49-50-51","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-140","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"4","u":"106-107-VO-108-109-110-ET74-111","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-141","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"1-4","u":"51-52-53","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-142","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"1-10","u":"111-112-113-55A-ET45","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-143","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"1","u":"55A-59A","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-144","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"1","u":"53-54-55","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-145","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"1","u":"56-57-58","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-146","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"1","u":"58-59-60","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-147","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"1","u":"60-61-62","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-148","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"1-5","u":"63-64-PSU5-65","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-149","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"5-6-PI","u":"66-67-ET56-PI-140","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-150","f":"AV. 4TO A 5TO MEC","a":"3ERO A 4TO","d":"3","u":"80-91-91A-92-ET60","t":"DIURNO","s":"LUNES A SABADO","p":2},{"c":"4-151","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"2","u":"37-38-39","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-152","f":"AV. CON ESCUADRA","a":"3ERO A 4TO","d":"2","u":"39-40-41","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-153","f":"AV. CON ESCUADRA","a":"3ERO A 4TO","d":"2","u":"41-42-43-22-ET6","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-154","f":"AV. CON ESCUADRA","a":"3ERO A 4TO","d":"3","u":"ED-43B-24-44","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-155","f":"AV. 3ERO A 4TO MEC","a":"3ERO A 4TO","d":"3","u":"44-45-46-103-ET7-ET8","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"4-156","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"47","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-157","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"47","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-158","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"47","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-159","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"47-48","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-160","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"48","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-161","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"48","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-162","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"48","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-163","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"48-49","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-164","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"49","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-165","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"49","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-166","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"49","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-167","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"50","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-168","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"50","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-169","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"50","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-170","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"50","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-171","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"50-51","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-172","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"51","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-173","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"51","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-174","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"51","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-175","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"51","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-176","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"51-52","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-177","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"52","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-178","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"52","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-179","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"52","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-180","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"52","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-181","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"52","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-182","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"4","u":"52","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-183","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1-4","u":"52-53","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-184","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"53","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-185","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"53","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-186","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"53-54","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-187","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"54","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-188","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"54","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-189","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"54","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-190","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"54-55","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-191","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"55","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-192","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"55","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-193","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"55","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-194","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"55-56","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-195","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"56","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-196","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"56","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-197","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"56","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-198","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"56-57","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-199","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"57-58","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-200","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"58","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-201","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"58","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-202","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"58-59","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-203","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"59","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-204","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"59","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-205","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"59","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-206","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"59-60","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-207","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"60","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-208","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"60-61","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-209","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"61","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-210","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"61","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-211","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"61-62","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-212","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1","u":"62","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-213","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"1-2","u":"37-62","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-214","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"37","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-215","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"37","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-216","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"37-38","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-217","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"38","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-218","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"38","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-219","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"38-39","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-220","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"39","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-221","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"39","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-222","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"39","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-223","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"39-40","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-224","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"40","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-225","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"40","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-226","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"40","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-227","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"40","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-228","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"40","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-229","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"41","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-230","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"41","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-231","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"41","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-232","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"41","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-233","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"42","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-234","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"42-43","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-235","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"43","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-236","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"2","u":"43-22","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"4-237","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"43B-ED","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-238","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"43B","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-239","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"43B","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-240","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"43B-44","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-241","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"44","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-242","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"44","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-243","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"44","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-244","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"44-45","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-245","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"45","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-246","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"45","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-247","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"45-46","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-248","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"46","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"4-249","f":"3ERO A 4TO","a":"3ERO A 4TO","d":"3","u":"46","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"5-250","f":"AV. 3ERO A 4TO MEC","a":"4TO A 5TO","d":"1-5","u":"63-64-65-66-69-ET30","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"5-251","f":"AV. 4TO A 5TO MEC","a":"4TO A 5TO","d":"5","u":"66-67-70-71-ET56","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"5-252","f":"AV. 4TO A 5TO MEC","a":"4TO A 5TO","d":"9","u":"106-107","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"5-253","f":"AV. 4TO A 5TO MEC","a":"4TO A 5TO","d":"3-9","u":"103-114-115","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"5-254","f":"AV. 4TO A 5TO MEC","a":"4TO A 5TO","d":"9-10","u":"115-116-117-118A-VO","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"5-255","f":"AV. 4TO A 5TO MEC","a":"4TO A 5TO","d":"10","u":"109-110-111-119-120-121-ET74-ET76","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"5-256","f":"AV. 4TO A 5TO MEC","a":"4TO A 5TO","d":"3","u":"80-91-91A-92","t":"DIURNO","s":"LUNES A SABADO","p":1},{"c":"5-257","f":"4TO A 5TO","a":"4TO A 5TO","d":"1","u":"59A","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-258","f":"4TO A 5TO","a":"4TO A 5TO","d":"1","u":"PSU 5-59A","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-259","f":"4TO A 5TO","a":"4TO A 5TO","d":"1","u":"PSU 5","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-260","f":"4TO A 5TO","a":"4TO A 5TO","d":"1","u":"PSU 5","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-261","f":"4TO A 5TO","a":"4TO A 5TO","d":"1","u":"PSU 5","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-262","f":"4TO A 5TO","a":"4TO A 5TO","d":"1-5","u":"63-64","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-263","f":"4TO A 5TO","a":"4TO A 5TO","d":"1","u":"63","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-264","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"64","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-265","f":"4TO A 5TO","a":"4TO A 5TO","d":"1","u":"63","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-266","f":"4TO A 5TO","a":"4TO A 5TO","d":"1-5","u":"63-64","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-267","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"64","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-268","f":"4TO A 5TO","a":"4TO A 5TO","d":"1","u":"63","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-269","f":"4TO A 5TO","a":"4TO A 5TO","d":"1-5","u":"63-64","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-270","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"64","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-271","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"65","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-272","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"65","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-273","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"66","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-274","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"66","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-275","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"67","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-276","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"67-ET56","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-277","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"67","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-278","f":"4TO A 5TO","a":"4TO A 5TO","d":"5","u":"67","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-279","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"80","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-280","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"80","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-281","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"80","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-282","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"91","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-283","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"91","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-284","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"91","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-285","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"91A","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-286","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"91A-92","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-287","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"91A","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-288","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"91A","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-289","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"92","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-290","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"92-103-ET60","t":"DIURNO","s":"LUNES-JUEVES","p":0.3},{"c":"5-291","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"92","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-292","f":"4TO A 5TO","a":"4TO A 5TO","d":"3","u":"92","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-293","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"106","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-294","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"106","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-295","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"106","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-296","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"106","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-297","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"106","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-298","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"106-107","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-299","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"107","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-300","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"107","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-301","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"107","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-302","f":"4TO A 5TO","a":"4TO A 5TO","d":"9","u":"107","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-303","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"108","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-304","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"108","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-305","f":"AV. 4TO A 5TO MEC","a":"4TO A 5TO","d":"9-10","u":"108-VO","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"5-306","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"108","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-307","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"108","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-308","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"108","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-309","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"108-109","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-310","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"109","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-311","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"110-ET74","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-312","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"110","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-313","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"110-111","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-314","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"111","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-315","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"111-ET45","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-316","f":"4TO A 5TO","a":"4TO A 5TO","d":"1-10","u":"111-112","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-317","f":"4TO A 5TO","a":"4TO A 5TO","d":"10","u":"111","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"5-318","f":"4TO A 5TO","a":"4TO A 5TO","d":"1","u":"112-113","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"6-319","f":"AV. 5TO A 6TO MEC","a":"5TO A 6TO","d":"5","u":"68-69-70-73-74 -ET29-ET30-ET90-ET91","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"6-320","f":"AV. 5TO A 6TO MEC","a":"5TO A 6TO","d":"5","u":"71-71A-75","t":"DIURNO","s":"LUNES-MIERCOLES-VIERNES","p":0.5},{"c":"6-321","f":"AV. 5TO A 6TO MEC","a":"5TO A 6TO","d":"4-10","u":"51-52-109-119 -ET74-ET76","t":"DIURNO","s":"MARTES-JUEVES-SABADO","p":0.5},{"c":"6-322","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"68","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"6-323","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"68","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"6-324","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"68-72","t":"DIURNO","s":"MARTES-SABADO","p":0.3},{"c":"6-325","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"69","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-326","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"69-ET30","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-327","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"70-ET30","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-328","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"70","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-329","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"70-71","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-330","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"71","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-331","f":"5TO A 6TO","a":"5TO A 6TO","d":"5","u":"71","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-332","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"114","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-333","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"114","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-334","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"114","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-335","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"114","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-336","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"114-115","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-337","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"115","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-338","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"115","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-339","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"116","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-340","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"116","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-341","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"116","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-342","f":"5TO A 6TO","a":"5TO A 4TO","d":"9","u":"116","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-343","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"116","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-344","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"116-117","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-345","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"116-117","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-346","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"117","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-347","f":"5TO A 6TO","a":"5TO A 6TO","d":"9","u":"117-ET42","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-348","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"118A","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-349","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"118-118A","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-350","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"118-118A","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-351","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"118","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-352","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"119","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-353","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"119","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-354","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"119","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-355","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"120-ET76","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-356","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"120","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-357","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"120-121","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3},{"c":"6-358","f":"5TO A 6TO","a":"5TO A 6TO","d":"10","u":"121","t":"DIURNO","s":"MIERCOLES-VIERNES","p":0.3}];
+
+    function getBarridoSectorOptions() {
+      const fromJson = BARRIDO_CATALOG.map(r => {
+        const cod = String(r.c || '').trim();
+        const freq = String(r.f || '').trim();
+        const anillo = String(r.a || '').trim();
+        const uv = String(r.u || '').trim();
+        const parts = [cod, freq].filter(Boolean).join(' - ');
+        return anillo || uv ? `${parts} (${[anillo, uv].filter(Boolean).join(' · ')})` : parts;
+      }).filter(Boolean);
+      const fromStaff = staffList.map(s => (s.sector || '').trim()).filter(Boolean);
+      const fromEntries = entries.map(e => (e.sector || '').trim()).filter(Boolean);
+      return [...new Set([...fromJson, ...fromStaff, ...fromEntries])];
+    }
+
+    function normalizeCascadeServicio(rawVal) {
+      const s = String(rawVal || '').trim();
+      const norm = normalizeSimple(s);
+      if (!norm) return '';
+      if (norm === 'BARRIDO' || norm.startsWith('1 - BARRIDO')) return 'Barrido';
+      if (norm === 'SERVICIO 2' || norm.startsWith('2 - DESEMPAPEL')) return 'Servicio 2';
+      if (norm === 'SERV. 3' || norm === 'SERVICIO 3' || norm.startsWith('3 - AREAS VERDE')) return 'Serv. 3';
+      if (
+        norm.startsWith('SER. 4, 5, 6') ||
+        norm.startsWith('SERVICIO 4') ||
+        norm.startsWith('SERVICIO 5') ||
+        norm.startsWith('SERVICIO 6') ||
+        norm.startsWith('SERVICIO 7') ||
+        norm.startsWith('SERVICIO 8') ||
+        norm.startsWith('SERVICIO 9') ||
+        norm.startsWith('SERVICIO 10') ||
+        /^[456789]|^10\s*-/.test(norm)
+      ) {
+        return 'Ser. 4, 5, 6, 7, 8, 9, 10';
+      }
+      return s;
+    }
+
+    function syncCascadeFromService(preserveValues = false) {
+      const srvRaw = document.getElementById('fServicio').value;
+      const srv = normalizeCascadeServicio(srvRaw);
+      const step2Wrap = document.getElementById('cascadeStep2Wrap');
+      const step2Label = document.getElementById('cascadeStep2Label');
+      const subSel = document.getElementById('fCascadeSubtipo');
+      const step3Wrap = document.getElementById('cascadeStep3Wrap');
+      const step3Label = document.getElementById('cascadeStep3Label');
+      const detSel = document.getElementById('fCascadeDetalleSelect');
+      const detInp = document.getElementById('fCascadeDetalleInput');
+      const step4Wrap = document.getElementById('cascadeStep4Wrap');
+      const step4Label = document.getElementById('cascadeStep4Label');
+      const dotSel = document.getElementById('fCascadeDotacion');
+      const herrSel = document.getElementById('fHerramienta');
+      const sectorInp = document.getElementById('fSector');
+      const hint = document.getElementById('serviceRuleHint');
+
+      const prevSub = preserveValues ? subSel.value : '';
+      const prevDetSel = preserveValues ? detSel.value : '';
+      const prevDetInp = preserveValues ? detInp.value : '';
+      const prevDot = preserveValues ? dotSel.value : '';
+
+      detSel.style.display = 'none';
+      detInp.style.display = 'none';
+      step4Wrap.style.display = 'none';
+      step2Wrap.style.display = 'block';
+      step3Wrap.style.display = 'block';
+
+      if (!srv) {
+        step2Wrap.style.display = 'none';
+        step3Wrap.style.display = 'none';
+        hint.className = 'rule-banner info-rule';
+        hint.textContent = 'Selecciona el Servicio para activar el flujo en cascada.';
+        return;
+      }
+
+      if (srv === 'Barrido') {
+        step2Label.textContent = 'Tipo de Barrido';
+        subSel.innerHTML = `
+          <option value="">— Seleccionar tipo de barrido —</option>
+          <option value="Manual">Manual</option>
+          <option value="Mecanizado">Mecanizado</option>
+          <option value="Escuadras">Escuadras</option>
+        `;
+        if (prevSub && Array.from(subSel.options).some(o => o.value === prevSub)) {
+          subSel.value = prevSub;
+        } else if (!preserveValues) {
+          subSel.value = 'Manual';
+        }
+
+        const tipo = subSel.value;
+        if (tipo === 'Manual') {
+          step3Label.textContent = 'Escoja el Sector';
+          detInp.style.display = 'block';
+          detInp.placeholder = 'Escoja o escriba el sector de barrido manual...';
+          const secs = getBarridoSectorOptions();
+          document.getElementById('sectorBarridoList').innerHTML = secs
+            .slice(0, 1500)
+            .map(sc => `<option value="${sc.replace(/"/g, '&quot;')}">${sc}</option>`)
+            .join('');
+          if (prevDetInp) detInp.value = prevDetInp;
+          else if (sectorInp.value) detInp.value = sectorInp.value;
+
+          step4Wrap.style.display = 'block';
+          step4Label.textContent = 'Herramientas (Manual)';
+          dotSel.innerHTML = `
+            <option value="">— Seleccionar herramienta —</option>
+            <option value="Escobillón">Escobillón</option>
+            <option value="Rastrillo">Rastrillo</option>
+            <option value="Pala">Pala</option>
+            <option value="Lutocar">Lutocar</option>
+            <option value="Carretilla">Carretilla</option>
+            <option value="Bolsa">Bolsa</option>
+            <option value="Otro">Otro</option>
+          `;
+          if (prevDot) dotSel.value = prevDot;
+          else if (herrSel.value) dotSel.value = herrSel.value;
+
+          hint.className = 'rule-banner info-rule';
+          hint.textContent = 'Barrido Manual → Escoja el Sector → Herramientas.';
+        } else if (tipo === 'Mecanizado') {
+          step3Label.textContent = 'Equipo Mecanizado';
+          detSel.style.display = 'block';
+          detSel.innerHTML = `
+            <option value="">— Seleccionar equipo —</option>
+            <option value="Barredora 1011">Barredora 1011</option>
+            <option value="Barredora 1017">Barredora 1017</option>
+            <option value="Minicargador 02">Minicargador 02</option>
+          `;
+          if (prevDetSel) detSel.value = prevDetSel;
+
+          step4Wrap.style.display = 'block';
+          step4Label.textContent = 'Cepillo a Dotar';
+          dotSel.innerHTML = `
+            <option value="">— Seleccionar cepillo —</option>
+            <option value="Cepillo lateral de acero">Cepillo Lateral</option>
+            <option value="Cepillo central de acero">Cepillo Central</option>
+          `;
+          if (prevDot) dotSel.value = prevDot;
+          else if (['Cepillo lateral de acero', 'Cepillo central de acero'].includes(herrSel.value)) {
+            dotSel.value = herrSel.value;
+          }
+
+          hint.className = 'rule-banner info-rule';
+          hint.textContent = 'Barrido Mecanizado → Barredora 1011 / Barredora 1017 / Minicargador 02 → Cepillo Lateral / Cepillo Central.';
+        } else if (tipo === 'Escuadras') {
+          step3Label.textContent = 'Dotación a Entregar (Herramienta o Bolsa)';
+          detSel.style.display = 'block';
+          detSel.innerHTML = `
+            <option value="Herramientas">Herramientas</option>
+            <option value="Bolsas">Bolsas</option>
+          `;
+          if (prevDetSel) detSel.value = prevDetSel;
+          else detSel.value = herrSel.value === 'Bolsa' ? 'Bolsas' : 'Herramientas';
+
+          step4Wrap.style.display = 'block';
+          if (detSel.value === 'Bolsas') {
+            step4Label.textContent = 'Bolsas';
+            dotSel.innerHTML = `<option value="Bolsa">Bolsa</option>`;
+            dotSel.value = 'Bolsa';
+          } else {
+            step4Label.textContent = 'Herramienta a Dotar';
+            dotSel.innerHTML = `
+              <option value="Escobillón">Escobillón</option>
+              <option value="Rastrillo">Rastrillo</option>
+              <option value="Pala">Pala</option>
+              <option value="Lutocar">Lutocar</option>
+              <option value="Carretilla">Carretilla</option>
+              <option value="Otro">Otro</option>
+            `;
+            if (prevDot && prevDot !== 'Bolsa') dotSel.value = prevDot;
+          }
+
+          hint.className = 'rule-banner info-rule';
+          hint.textContent = 'Barrido Escuadras → Se elige la Herramienta o Bolsa que se dote.';
+        } else {
+          step3Wrap.style.display = 'none';
+          hint.className = 'rule-banner info-rule';
+          hint.textContent = 'Elige Manual, Mecanizado o Escuadras para continuar.';
+        }
+      } else if (srv === 'Servicio 2') {
+        step2Label.textContent = 'Dotación del Servicio 2';
+        subSel.innerHTML = `
+          <option value="Herramientas">Herramientas</option>
+          <option value="Bolsas">Bolsas</option>
+        `;
+        if (prevSub && Array.from(subSel.options).some(o => o.value === prevSub)) {
+          subSel.value = prevSub;
+        } else {
+          subSel.value = herrSel.value === 'Bolsa' ? 'Bolsas' : 'Herramientas';
+        }
+
+        step3Label.textContent = 'Ítem Específico';
+        detSel.style.display = 'block';
+        if (subSel.value === 'Bolsas') {
+          detSel.innerHTML = `<option value="Bolsa">Bolsa</option>`;
+          detSel.value = 'Bolsa';
+        } else {
+          detSel.innerHTML = `
+            <option value="Escobillón">Escobillón</option>
+            <option value="Rastrillo">Rastrillo</option>
+            <option value="Pala">Pala</option>
+            <option value="Carretilla">Carretilla</option>
+            <option value="Lutocar">Lutocar</option>
+            <option value="Otro">Otro</option>
+          `;
+          if (prevDetSel && prevDetSel !== 'Bolsa') detSel.value = prevDetSel;
+        }
+
+        hint.className = 'rule-banner info-rule';
+        hint.textContent = 'Servicio 2 → Herramientas / Bolsas.';
+      } else if (srv === 'Serv. 3') {
+        step2Label.textContent = 'Grupo (Serv. 3)';
+        subSel.innerHTML = `
+          <option value="Grupo Móvil">Grupo Móvil</option>
+          <option value="Grupo Fijo">Grupo Fijo</option>
+        `;
+        if (prevSub && Array.from(subSel.options).some(o => o.value === prevSub)) {
+          subSel.value = prevSub;
+        } else {
+          subSel.value = 'Grupo Móvil';
+        }
+
+        step3Label.textContent = 'Dotación del Grupo';
+        detSel.style.display = 'block';
+        detSel.innerHTML = `
+          <option value="Herramientas">Herramientas</option>
+          <option value="Bolsas">Bolsas</option>
+        `;
+        if (prevDetSel) detSel.value = prevDetSel;
+        else detSel.value = herrSel.value === 'Bolsa' ? 'Bolsas' : 'Herramientas';
+
+        step4Wrap.style.display = 'block';
+        if (detSel.value === 'Bolsas') {
+          step4Label.textContent = 'Bolsas';
+          dotSel.innerHTML = `<option value="Bolsa">Bolsa</option>`;
+          dotSel.value = 'Bolsa';
+        } else {
+          step4Label.textContent = 'Herramienta';
+          dotSel.innerHTML = `
+            <option value="Escobillón">Escobillón</option>
+            <option value="Rastrillo">Rastrillo</option>
+            <option value="Pala">Pala</option>
+            <option value="Carretilla">Carretilla</option>
+            <option value="Lutocar">Lutocar</option>
+            <option value="Otro">Otro</option>
+          `;
+          if (prevDot && prevDot !== 'Bolsa') dotSel.value = prevDot;
+        }
+
+        hint.className = 'rule-banner info-rule';
+        hint.textContent = 'Serv. 3 → Grupo Móvil / Grupo Fijo → Herramientas / Bolsas.';
+      } else if (srv === 'Ser. 4, 5, 6, 7, 8, 9, 10') {
+        step2Label.textContent = 'Dotación (Ser. 4, 5, 6, 7, 8, 9, 10)';
+        subSel.innerHTML = `
+          <option value="Herramientas">Herramientas</option>
+          <option value="Bolsas">Bolsas</option>
+        `;
+        if (prevSub && Array.from(subSel.options).some(o => o.value === prevSub)) {
+          subSel.value = prevSub;
+        } else {
+          subSel.value = herrSel.value === 'Bolsa' ? 'Bolsas' : 'Herramientas';
+        }
+
+        step3Label.textContent = 'Ítem Específico';
+        detSel.style.display = 'block';
+        if (subSel.value === 'Bolsas') {
+          detSel.innerHTML = `<option value="Bolsa">Bolsa</option>`;
+          detSel.value = 'Bolsa';
+        } else {
+          detSel.innerHTML = `
+            <option value="Escobillón">Escobillón</option>
+            <option value="Rastrillo">Rastrillo</option>
+            <option value="Pala">Pala</option>
+            <option value="Carretilla">Carretilla</option>
+            <option value="Lutocar">Lutocar</option>
+            <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
+            <option value="Cepillo central de acero">Cepillo central de acero</option>
+            <option value="Detergente Pinol">Detergente Pinol</option>
+            <option value="Líquidos espumantes">Líquidos espumantes</option>
+            <option value="Otro">Otro</option>
+          `;
+          if (prevDetSel && prevDetSel !== 'Bolsa') detSel.value = prevDetSel;
+        }
+
+        hint.className = 'rule-banner info-rule';
+        hint.textContent = 'Ser. 4, 5, 6, 7, 8, 9, 10 → Herramientas / Bolsas.';
+      }
+
+      applyCascadeSelectionToForm();
+    }
+
+    function applyCascadeSelectionToForm() {
+      const srv = normalizeCascadeServicio(document.getElementById('fServicio').value);
+      const sub = document.getElementById('fCascadeSubtipo').value;
+      const detSel = document.getElementById('fCascadeDetalleSelect').value;
+      const detInp = document.getElementById('fCascadeDetalleInput').value.trim();
+      const dot = document.getElementById('fCascadeDotacion').value;
+      const herrSel = document.getElementById('fHerramienta');
+      const sectorInp = document.getElementById('fSector');
+
+      if (srv === 'Barrido') {
+        if (sub === 'Manual') {
+          if (detInp) sectorInp.value = detInp;
+          if (dot && HERRAMIENTAS.includes(dot)) herrSel.value = dot;
+        } else if (sub === 'Mecanizado') {
+          if (detSel) sectorInp.value = detSel;
+          if (dot && HERRAMIENTAS.includes(dot)) herrSel.value = dot;
+        } else if (sub === 'Escuadras') {
+          if (detSel === 'Bolsas') {
+            herrSel.value = 'Bolsa';
+          } else if (dot && HERRAMIENTAS.includes(dot)) {
+            herrSel.value = dot;
+          }
+        }
+      } else if (srv === 'Servicio 2' || srv === 'Ser. 4, 5, 6, 7, 8, 9, 10') {
+        if (sub === 'Bolsas') {
+          herrSel.value = 'Bolsa';
+        } else if (detSel && HERRAMIENTAS.includes(detSel)) {
+          herrSel.value = detSel;
+        }
+      } else if (srv === 'Serv. 3') {
+        if (detSel === 'Bolsas') {
+          herrSel.value = 'Bolsa';
+        } else if (dot && HERRAMIENTAS.includes(dot)) {
+          herrSel.value = dot;
+        }
+      }
+    }
+
+    document.getElementById('fServicio').addEventListener('change', () => syncCascadeFromService(false));
+    document.getElementById('fCascadeSubtipo').addEventListener('change', () => syncCascadeFromService(false));
+    document.getElementById('fCascadeDetalleSelect').addEventListener('change', () => syncCascadeFromService(false));
+    document.getElementById('fCascadeDetalleInput').addEventListener('input', applyCascadeSelectionToForm);
+    document.getElementById('fCascadeDotacion').addEventListener('change', applyCascadeSelectionToForm);
+
+    const _origOpenModal = openModal;
+    openModal = function(uid = '', defaultTool = 'Bolsa') {
+      _origOpenModal(uid, defaultTool);
+      const item = uid ? entries.find(e => e.uid === uid) : null;
+      const srvEl = document.getElementById('fServicio');
+      const mapped = normalizeCascadeServicio(srvEl.value);
+      if (mapped && Array.from(srvEl.options).some(o => o.value === mapped)) {
+        srvEl.value = mapped;
+      }
+      if (item) {
+        const obs = String(item.observaciones || '');
+        if (mapped === 'Barrido') {
+          if (obs.includes('Mecanizado')) {
+            document.getElementById('fCascadeSubtipo').value = 'Mecanizado';
+          } else if (obs.includes('Escuadras')) {
+            document.getElementById('fCascadeSubtipo').value = 'Escuadras';
+          } else {
+            document.getElementById('fCascadeSubtipo').value = 'Manual';
+          }
+        } else if (mapped === 'Serv. 3') {
+          document.getElementById('fCascadeSubtipo').value = obs.includes('Grupo Fijo') ? 'Grupo Fijo' : 'Grupo Móvil';
+        }
+        if (item.sector) {
+          document.getElementById('fCascadeDetalleInput').value = item.sector;
+        }
+      }
+      syncCascadeFromService(Boolean(item));
+    };
+
+    const _origFormSubmitHandler = document.getElementById('entregaForm').onsubmit;
+    document.getElementById('entregaForm').addEventListener('submit', () => {
+      applyCascadeSelectionToForm();
+      const srv = normalizeCascadeServicio(document.getElementById('fServicio').value);
+      const sub = document.getElementById('fCascadeSubtipo').value;
+      const detSel = document.getElementById('fCascadeDetalleSelect').value;
+      const detInp = document.getElementById('fCascadeDetalleInput').value.trim();
+      const dot = document.getElementById('fCascadeDotacion').value;
+      const obsEl = document.getElementById('fObservaciones');
+      const secEl = document.getElementById('fSector');
+
+      const tags = [];
+      if (srv === 'Barrido' && sub) tags.push(`Barrido ${sub}`);
+      else if (sub) tags.push(sub);
+      if (srv === 'Barrido' && sub === 'Mecanizado' && detSel) {
+        tags.push(detSel);
+        if (!secEl.value.trim()) secEl.value = detSel;
+      }
+      if (dot) tags.push(dot);
+      if (detInp && !secEl.value.trim()) secEl.value = detInp;
+
+      if (tags.length) {
+        const tagText = `[${tags.join(' · ')}]`;
+        if (!obsEl.value.includes(tagText)) {
+          obsEl.value = obsEl.value.trim() ? `${tagText} ${obsEl.value.trim()}` : tagText;
+        }
+      }
+    }, true);
+
   </script>
 </body>
 </html>
