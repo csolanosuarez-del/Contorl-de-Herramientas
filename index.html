@@ -135,6 +135,16 @@
       border-color: #22d3ee;
     }
 
+    button.btn-danger {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(248, 113, 113, 0.55);
+      color: #fca5a5;
+      margin-right: auto;
+    }
+    button.btn-danger:hover {
+      background: rgba(239, 68, 68, 0.28);
+    }
+
     button.btn-admin-toggle {
       background: rgba(245, 158, 11, 0.12);
       border-color: rgba(245, 158, 11, 0.4);
@@ -158,7 +168,7 @@
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -272,8 +282,8 @@
     }
     canvas.service-chart-canvas {
       width: 100%;
-      min-width: 680px;
-      height: 270px;
+      min-width: 720px;
+      height: 280px;
       display: block;
     }
     .chart-legend {
@@ -393,7 +403,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       width: 100%;
-      max-width: 640px;
+      max-width: 660px;
       max-height: 90vh;
       overflow-y: auto;
       padding: 18px;
@@ -401,11 +411,22 @@
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .form-grid .full { grid-column: 1 / -1; }
     .form-grid .triple { grid-column: 1 / -1; display: grid; grid-template-columns: 1.2fr 1.2fr 0.9fr; gap: 10px; }
+    .barrido-subbox {
+      grid-column: 1 / -1;
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 9px;
+      padding: 10px;
+    }
+    .barrido-subbox.active { display: grid; }
     @media (max-width: 640px) {
-      .form-grid .triple { grid-template-columns: 1fr; }
+      .form-grid .triple, .barrido-subbox { grid-template-columns: 1fr; }
     }
     label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+    .modal-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 14px; }
     .msg-hint { font-size: 0.74rem; color: #93c5fd; margin-top: 4px; }
     .rule-banner {
       font-size: 0.75rem;
@@ -414,7 +435,7 @@
       border: 1px solid rgba(245, 158, 11, 0.35);
       border-radius: 7px;
       padding: 7px 10px;
-      margin-top: 6px;
+      margin-top: 4px;
     }
     .rule-banner.info-rule {
       color: #93c5fd;
@@ -468,7 +489,7 @@
       .charts-card { padding: 10px; border-radius: 8px; }
       .charts-title { font-size: 0.86rem; }
       .metric-select { padding: 5px 7px; font-size: 0.72rem; }
-      canvas.service-chart-canvas { height: 220px; min-width: 620px; }
+      canvas.service-chart-canvas { height: 230px; min-width: 640px; }
       .filters { gap: 6px; margin-bottom: 10px; }
       input, select, textarea { padding: 7px 9px; font-size: 0.8rem; border-radius: 7px; }
       .main-grid { gap: 10px; }
@@ -533,6 +554,11 @@
         <div class="label">Carros Lutocar</div>
         <div id="kpiLutocar" class="val" style="color:#f87171">0</div>
         <div class="sub">Carros de barrido asignados</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Carretillas</div>
+        <div id="kpiCarretillas" class="val" style="color:#22d3ee">0</div>
+        <div class="sub">Carretillas asignadas</div>
       </div>
       <div class="kpi">
         <div class="label">Dañados / Repuesto</div>
@@ -641,6 +667,8 @@
         <option value="Rastrillo">Rastrillo</option>
         <option value="Pala">Pala</option>
         <option value="Carretilla">Carretilla</option>
+        <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
+        <option value="Cepillo central de acero">Cepillo central de acero</option>
         <option value="Pinol">Pinol</option>
         <option value="Líquidos espumantes">Líquidos espumantes</option>
         <option value="Otro">Otro</option>
@@ -693,7 +721,7 @@
   <!-- Modal Registro / Edición -->
   <div id="modalBackdrop" class="modal-backdrop">
     <div class="modal">
-      <h3 id="modalTitle" style="margin-top:0">Registrar Entrega de Herramienta / Dotación</h3>
+      <h3 id="modalTitle" style="margin-top:0">Registrar Entrega de Herramienta / Insumo</h3>
       <form id="entregaForm">
         <input type="hidden" id="fUid" />
         <div class="form-grid">
@@ -710,6 +738,8 @@
               <option value="Rastrillo">Rastrillo</option>
               <option value="Pala">Pala</option>
               <option value="Carretilla">Carretilla</option>
+              <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
+              <option value="Cepillo central de acero">Cepillo central de acero</option>
               <option value="Pinol">Pinol</option>
               <option value="Líquidos espumantes">Líquidos espumantes</option>
               <option value="Otro">Otro</option>
@@ -764,11 +794,35 @@
             </div>
             <div>
               <label id="fSectorLabel">Sector / Lugar de Trabajo</label>
-              <input id="fSector" placeholder="Ej: S.2.045 o lugar asignado..." />
+              <input id="fSector" list="sectorBarridoList" placeholder="Ej: S.2.045 o lugar asignado..." autocomplete="off" />
+              <datalist id="sectorBarridoList"></datalist>
             </div>
             <div>
               <label>Teléfono</label>
               <input id="fCelular" placeholder="Ej: 75078399" />
+            </div>
+          </div>
+
+          <!-- Sub-panel específico cuando el servicio es 1 - Barrido (Km) -->
+          <div id="barridoSubbox" class="barrido-subbox">
+            <div>
+              <label>Modalidad de Barrido</label>
+              <select id="fBarridoModalidad">
+                <option value="Sector en la ciudad">Sector en la ciudad (por persona)</option>
+                <option value="Mercados">Mercados (por persona)</option>
+                <option value="Barrido mecanizado">Barrido mecanizado (camiones / minicargador)</option>
+                <option value="Barrido por escuadras">Barrido por escuadras (5 personas)</option>
+              </select>
+            </div>
+            <div>
+              <label id="fBarridoEquipoLabel">Equipo / Escuadra / Detalle</label>
+              <select id="fBarridoEquipo" style="display:none">
+                <option value="">— Seleccionar equipo —</option>
+                <option value="Camión Barredora 1">Camión Barredora 1 (Pala, Cepillo lateral de acero, Cepillo central de acero)</option>
+                <option value="Camión Barredora 2">Camión Barredora 2 (Pala, Cepillo lateral de acero, Cepillo central de acero)</option>
+                <option value="Minicargador Barredora">Minicargador Barredora (Cepillo central de acero)</option>
+              </select>
+              <input id="fBarridoDetalle" placeholder="Ej: Escuadra 01 (5 pers.) / Tramo..." />
             </div>
           </div>
 
@@ -788,6 +842,7 @@
           </div>
         </div>
         <div class="modal-actions">
+          <button id="btnDeleteEntry" class="btn-danger" type="button" style="display:none">🗑️ Eliminar</button>
           <button id="btnCancel" type="button">Cancelar</button>
           <button class="btn-primary" type="submit">Guardar y Sincronizar</button>
         </div>
@@ -812,8 +867,35 @@
     const ADMIN_SESSION_KEY = 'herramientas_admin_unlocked_v1';
     const STORAGE_KEY = 'control_herramientas_v1';
     const PENDING_KEY = 'control_herramientas_pending_v1';
+    const DELETED_KEY = 'control_herramientas_deleted_v1';
     const STAFF_CACHE_KEY = 'control_herramientas_staff_v1';
-    const HERRAMIENTAS = ['Bolsa', 'Lutocar', 'Escobillón', 'Rastrillo', 'Pala', 'Carretilla', 'Pinol', 'Líquidos espumantes', 'Otro'];
+    const SECTORES_MERCADOS_BASE = [
+      'Mercado Abasto',
+      'Mercado Mutualista',
+      'Mercado Ramada',
+      'Mercado Los Pozos',
+      'Mercado 7 Calles',
+      'Mercado Campesino',
+      'Mercado Modelo',
+      'Mercado Plan 3000',
+      'Mercado Villa 1° de Mayo',
+      'Mercado Santos Dumont',
+      'Mercado Bolívar',
+      'Mercado Tobago'
+    ];
+    const HERRAMIENTAS = [
+      'Bolsa',
+      'Lutocar',
+      'Escobillón',
+      'Rastrillo',
+      'Pala',
+      'Carretilla',
+      'Cepillo lateral de acero',
+      'Cepillo central de acero',
+      'Pinol',
+      'Líquidos espumantes',
+      'Otro'
+    ];
     const TOOL_COLORS = {
       'Bolsa': '#10b981',
       'Lutocar': '#ef4444',
@@ -821,6 +903,8 @@
       'Rastrillo': '#a855f7',
       'Pala': '#f59e0b',
       'Carretilla': '#06b6d4',
+      'Cepillo lateral de acero': '#ec4899',
+      'Cepillo central de acero': '#f97316',
       'Pinol': '#22c55e',
       'Líquidos espumantes': '#38bdf8',
       'Otro': '#94a3b8'
@@ -852,10 +936,49 @@
     let staffByCode = new Map();
     let staffByName = new Map();
     let pendingMap = {};
+    let deletedMap = {};
     let lastRawSample = null;
     let isAdminUnlocked = false;
     let isSyncingStaffFields = false;
     let lastFilteredEntries = [];
+
+    function refreshSectorDatalist() {
+      const dl = document.getElementById('sectorBarridoList');
+      if (!dl) return;
+      const mod = document.getElementById('fBarridoModalidad')?.value || 'Sector en la ciudad';
+      const fromStaff = staffList.map(s => (s.sector || '').trim()).filter(Boolean);
+      const fromEntries = entries.map(e => (e.sector || '').trim()).filter(Boolean);
+      const combined = [...new Set([...SECTORES_MERCADOS_BASE, ...fromStaff, ...fromEntries])];
+
+      const isMarketMode = mod === 'Mercados';
+      const filtered = combined.filter(item => {
+        const isMercado = normalizeSimple(item).includes('MERCADO');
+        return isMarketMode ? isMercado : !isMercado;
+      });
+      const listToShow = filtered.length ? filtered : combined;
+
+      dl.innerHTML = listToShow
+        .slice(0, 1500)
+        .map(sec => `<option value="${sec.replace(/"/g, '&quot;')}">${sec}</option>`)
+        .join('');
+    }
+
+    function normalizeHerramientaName(rawTool) {
+      const clean = String(rawTool || '').trim();
+      if (!clean) return 'Otro';
+      const norm = normalizeSimple(clean);
+      if (norm === 'CEPILLO LATERAL' || norm === 'CEPILLO LATERAL DE ACERO') {
+        return 'Cepillo lateral de acero';
+      }
+      if (
+        norm === 'CEPILLO CENTRAL' ||
+        norm === 'CEPILLO DE ACERO CENTRAL' ||
+        norm === 'CEPILLO CENTRAL DE ACERO'
+      ) {
+        return 'Cepillo central de acero';
+      }
+      return HERRAMIENTAS.find(h => normalizeSimple(h) === norm) || clean;
+    }
 
     function parseLocalDate(dateStr) {
       const raw = String(dateStr || '').trim();
@@ -912,7 +1035,7 @@
       return '';
     }
 
-    function splitServicioYSector(rawServicio, rawSector, rawObs) {
+    function splitServicioYSector(rawServicio, rawSector) {
       const explicitSector = String(rawSector || '').trim();
       const rawSrv = String(rawServicio || '').trim();
       if (explicitSector) {
@@ -927,9 +1050,9 @@
 
     function prepareCanvas(canvas) {
       const rect = canvas.getBoundingClientRect();
-      const parentW = canvas.parentElement ? canvas.parentElement.clientWidth - 20 : 680;
-      const width = Math.max(620, Math.floor(rect.width || parentW || 680));
-      const height = Math.max(180, Math.floor(rect.height || 270));
+      const parentW = canvas.parentElement ? canvas.parentElement.clientWidth - 20 : 720;
+      const width = Math.max(640, Math.floor(rect.width || parentW || 720));
+      const height = Math.max(180, Math.floor(rect.height || 280));
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
         canvas.width = width * dpr;
@@ -997,7 +1120,7 @@
       const padLeft = 44;
       const padRight = 14;
       const padTop = 22;
-      const padBottom = 36;
+      const padBottom = 38;
       const plotW = Math.max(120, width - padLeft - padRight);
       const plotH = Math.max(80, height - padTop - padBottom);
 
@@ -1027,10 +1150,10 @@
 
       const groupCount = matrix.length;
       const groupSlotW = plotW / groupCount;
-      const clusterW = Math.min(groupSlotW * 0.86, 94);
+      const clusterW = Math.min(groupSlotW * 0.88, 106);
       const barCount = HERRAMIENTAS.length;
-      const gapW = 2;
-      const barW = Math.max(4, (clusterW - gapW * (barCount - 1)) / barCount);
+      const gapW = 1.5;
+      const barW = Math.max(3.5, (clusterW - gapW * (barCount - 1)) / barCount);
 
       matrix.forEach((row, gIdx) => {
         const centerX = padLeft + gIdx * groupSlotW + groupSlotW / 2;
@@ -1060,7 +1183,7 @@
             ctx.fillRect(x, y, barW, hPx);
 
             ctx.fillStyle = '#f8fafc';
-            ctx.font = 'bold 9px system-ui, sans-serif';
+            ctx.font = 'bold 8.5px system-ui, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(String(val), x + barW / 2, y - 3);
           }
@@ -1073,7 +1196,7 @@
 
         ctx.fillStyle = '#94a3b8';
         ctx.font = '9px system-ui, sans-serif';
-        ctx.fillText(row.shortName.slice(0, 10), centerX, height - 6);
+        ctx.fillText(row.shortName.slice(0, 11), centerX, height - 6);
       });
     }
 
@@ -1100,6 +1223,56 @@
       }
     }
 
+    function syncBarridoModalidadUi() {
+      const srvVal = document.getElementById('fServicio').value;
+      const mappedSrv = matchServicioOficial(srvVal);
+      const barridoBox = document.getElementById('barridoSubbox');
+      const modalidad = document.getElementById('fBarridoModalidad').value;
+      const eqLabel = document.getElementById('fBarridoEquipoLabel');
+      const eqSel = document.getElementById('fBarridoEquipo');
+      const detInp = document.getElementById('fBarridoDetalle');
+      const sectorLabel = document.getElementById('fSectorLabel');
+      const sectorInput = document.getElementById('fSector');
+
+      refreshSectorDatalist();
+
+      if (mappedSrv !== '1 - Barrido (Km)') {
+        barridoBox.classList.remove('active');
+        return;
+      }
+
+      barridoBox.classList.add('active');
+
+      if (modalidad === 'Sector en la ciudad') {
+        sectorLabel.textContent = 'Sector Asignado (por persona)';
+        sectorInput.placeholder = 'Selecciona o escribe sector (ej: S.2.045)...';
+        eqSel.style.display = 'none';
+        detInp.style.display = 'block';
+        eqLabel.textContent = 'Detalle / Tramo';
+        detInp.placeholder = 'Ej: Calle / Avenida / Referencia...';
+      } else if (modalidad === 'Mercados') {
+        sectorLabel.textContent = 'Mercado Asignado (por persona)';
+        sectorInput.placeholder = 'Selecciona o escribe mercado (ej: Mercado Abasto)...';
+        eqSel.style.display = 'none';
+        detInp.style.display = 'block';
+        eqLabel.textContent = 'Puesto / Sector de Mercado';
+        detInp.placeholder = 'Ej: Pasillo / Nave / Ingreso...';
+      } else if (modalidad === 'Barrido mecanizado') {
+        sectorLabel.textContent = 'Ruta / Recorrido Mecanizado';
+        sectorInput.placeholder = 'Ej: Anillo / Avenida principal...';
+        eqSel.style.display = 'block';
+        detInp.style.display = 'none';
+        eqLabel.textContent = 'Equipo de Barrido Mecanizado';
+      } else if (modalidad === 'Barrido por escuadras') {
+        sectorLabel.textContent = 'Tramo / Frecuencia de Barrido Mecanizado';
+        sectorInput.placeholder = 'Tramo o vía de la frecuencia mecanizada...';
+        eqSel.style.display = 'none';
+        detInp.style.display = 'block';
+        eqLabel.textContent = 'N° de Escuadra (5 personas)';
+        detInp.placeholder = 'Ej: Escuadra 1 (5 personas)';
+      }
+    }
+
     function applyServiceAndToolRules() {
       const srvVal = document.getElementById('fServicio').value;
       const herrEl = document.getElementById('fHerramienta');
@@ -1108,13 +1281,31 @@
       const ruleHint = document.getElementById('serviceRuleHint');
       const mappedSrv = matchServicioOficial(srvVal);
 
+      syncBarridoModalidadUi();
+
       let hintText = '';
       let isWarn = false;
 
       if (mappedSrv === '1 - Barrido (Km)') {
-        sectorLabel.textContent = 'Sector Asignado';
-        sectorInput.placeholder = 'Ej: S.2.045 (único con sector asignado)';
-        hintText = 'Barrido: es el único servicio que lleva sector asignado.';
+        const mod = document.getElementById('fBarridoModalidad').value;
+        const eq = document.getElementById('fBarridoEquipo').value;
+        if (mod === 'Sector en la ciudad') {
+          hintText = 'Barrido · Sector en la ciudad: el sector es por persona (elige de la lista o escríbelo).';
+        } else if (mod === 'Mercados') {
+          hintText = 'Barrido · Mercados: asignación por persona en el mercado (elige de la lista o escríbelo).';
+        } else if (mod === 'Barrido mecanizado') {
+          if (eq === 'Minicargador Barredora') {
+            hintText = 'Minicargador Barredora: ocupa Cepillo central de acero.';
+            if (herrEl.value !== 'Cepillo central de acero') isWarn = true;
+          } else {
+            hintText = 'Camiones barredoras (2 unidades): ocupan Pala, Cepillo lateral de acero y Cepillo central de acero. (Minicargador ocupa Cepillo central de acero).';
+            if (!['Pala', 'Cepillo lateral de acero', 'Cepillo central de acero'].includes(herrEl.value)) {
+              isWarn = true;
+            }
+          }
+        } else if (mod === 'Barrido por escuadras') {
+          hintText = 'Barrido por escuadras: escuadras de 5 personas que barren la frecuencia del barrido mecanizado.';
+        }
       } else if (mappedSrv === '2 - Desempapelado (Km)') {
         sectorLabel.textContent = 'Lugar Asignado (Grupo)';
         sectorInput.placeholder = 'Lugar asignado para el grupo...';
@@ -1132,7 +1323,7 @@
         sectorInput.placeholder = 'Lugar o frente de áridos...';
         if (herrEl.value === 'Bolsa') {
           isWarn = true;
-          hintText = 'Áridos no ocupa bolsas: selecciona otra herramienta o insumo (ej. Pala, Carretilla, Escobillón).';
+          hintText = 'Áridos no ocupa bolsas: elige otra herramienta o insumo (ej. Pala, Carretilla, Escobillón).';
         } else {
           hintText = 'Áridos: no ocupa bolsas.';
         }
@@ -1141,17 +1332,13 @@
         sectorInput.placeholder = 'Lugar o punto de lavado...';
         if (herrEl.value !== 'Pinol' && herrEl.value !== 'Líquidos espumantes') {
           isWarn = true;
-          hintText = 'Lavado ocupa pinol o líquidos espumantes: puedes seleccionar "Pinol" o "Líquidos espumantes" en Herramienta / Insumo.';
+          hintText = 'Lavado ocupa pinol o líquidos espumantes: selecciona "Pinol" o "Líquidos espumantes".';
         } else {
           hintText = `Lavado: insumo ${herrEl.value} seleccionado.`;
         }
       } else {
         sectorLabel.textContent = 'Sector / Lugar de Trabajo';
         sectorInput.placeholder = 'Sector o lugar de trabajo...';
-      }
-
-      if (herrEl.value === 'Bolsa' && mappedSrv === '5 - Áridos (m3)') {
-        isWarn = true;
       }
 
       if (hintText) {
@@ -1223,6 +1410,8 @@
           .map(s => `<option value="${s.nombre.replace(/"/g, '&quot;')}">${s.codigo ? `Cód: ${s.codigo}` : 'Sin código'}</option>`)
           .join('');
       }
+
+      refreshSectorDatalist();
     }
 
     function loadCachedStaff() {
@@ -1274,7 +1463,8 @@
         servicioEl.dataset.autofilled = '1';
       }
       const mappedSrv = matchServicioOficial(match.servicio || servicioEl.value);
-      if (mappedSrv === '1 - Barrido (Km)' && match.sector && (forceOverwrite || !sectorEl.value.trim() || sectorEl.dataset.autofilled === '1')) {
+      const mod = document.getElementById('fBarridoModalidad').value;
+      if (mappedSrv === '1 - Barrido (Km)' && (mod === 'Sector en la ciudad' || mod === 'Mercados') && match.sector && (forceOverwrite || !sectorEl.value.trim() || sectorEl.dataset.autofilled === '1')) {
         sectorEl.value = match.sector;
         sectorEl.dataset.autofilled = '1';
       }
@@ -1434,7 +1624,7 @@
         ? `${parsedDt.getFullYear()}-${String(parsedDt.getMonth() + 1).padStart(2, '0')}-${String(parsedDt.getDate()).padStart(2, '0')}`
         : (rawFecha.includes('T') ? rawFecha.slice(0, 10) : rawFecha);
       const herrRaw = String(raw.herramienta ?? raw.HERRAMIENTA ?? 'Bolsa').trim();
-      const matchedTool = HERRAMIENTAS.find(h => h.toLowerCase() === herrRaw.toLowerCase()) || (herrRaw || 'Otro');
+      const matchedTool = normalizeHerramientaName(herrRaw);
       const cantNum = Number(String(raw.cantidad ?? raw.CANTIDAD ?? 0).replace(',', '.'));
       const rawSrv = String(raw.servicio ?? raw.SERVICIO ?? raw.SERVICIO_SECTOR ?? '').trim();
       const rawSec = String(raw.sector ?? raw.SECTOR ?? raw.LUGAR ?? raw.LUGAR_TRABAJO ?? '').trim();
@@ -1505,18 +1695,48 @@
       } catch (e) {}
     }
 
+    function loadDeleted() {
+      try {
+        const raw = localStorage.getItem(DELETED_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        const now = Date.now();
+        const cleaned = {};
+        if (parsed && typeof parsed === 'object') {
+          Object.keys(parsed).forEach(k => {
+            if (parsed[k] > now) cleaned[k] = parsed[k];
+          });
+        }
+        return cleaned;
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveDeleted() {
+      try {
+        localStorage.setItem(DELETED_KEY, JSON.stringify(deletedMap));
+      } catch (e) {}
+    }
+
     function mergeServerAndLocal(serverList, localList) {
       const mapByUid = new Map();
+      const now = Date.now();
+
       localList.forEach(item => {
         const norm = normalizeEntry(item);
+        if (deletedMap[norm.uid] && deletedMap[norm.uid] > now) return;
         mapByUid.set(norm.uid, norm);
       });
 
-      const now = Date.now();
-      let changed = false;
+      let changedPending = false;
+      let changedDeleted = false;
 
       serverList.forEach(item => {
         const norm = normalizeEntry(item);
+        if (deletedMap[norm.uid] && deletedMap[norm.uid] > now) {
+          return;
+        }
         const prev = mapByUid.get(norm.uid);
         const pEntry = pendingMap[norm.uid];
         const pRec = (pEntry && pEntry.expiresAt > now) ? normalizeEntry(pEntry.record) : null;
@@ -1529,7 +1749,7 @@
 
         if (pRec && norm.cantidad === pRec.cantidad && norm.herramienta === pRec.herramienta && norm.estado === pRec.estado) {
           delete pendingMap[norm.uid];
-          changed = true;
+          changedPending = true;
         }
       });
 
@@ -1537,7 +1757,7 @@
         const pEntry = pendingMap[uid];
         if (!pEntry || pEntry.expiresAt <= now) {
           delete pendingMap[uid];
-          changed = true;
+          changedPending = true;
           return;
         }
         if (!mapByUid.has(uid)) {
@@ -1545,7 +1765,15 @@
         }
       });
 
-      if (changed) savePending();
+      Object.keys(deletedMap).forEach(uid => {
+        if (deletedMap[uid] <= now) {
+          delete deletedMap[uid];
+          changedDeleted = true;
+        }
+      });
+
+      if (changedPending) savePending();
+      if (changedDeleted) saveDeleted();
       return Array.from(mapByUid.values());
     }
 
@@ -1626,7 +1854,9 @@
     function getToolPillClass(herr) {
       if (herr === 'Bolsa') return 'pill-bolsa';
       if (herr === 'Lutocar') return 'pill-lutocar';
-      if (herr === 'Escobillón' || herr === 'Pala' || herr === 'Rastrillo' || herr === 'Carretilla') return 'pill-escobillon';
+      if (['Escobillón', 'Pala', 'Rastrillo', 'Carretilla', 'Cepillo lateral de acero', 'Cepillo central de acero'].includes(herr)) {
+        return 'pill-escobillon';
+      }
       return 'pill-otro';
     }
 
@@ -1729,7 +1959,7 @@
 
       return entries.filter(e => {
         if (!matchesServicioFilter(e.servicio, srv)) return false;
-        if (herr && e.herramienta !== herr) return false;
+        if (herr && normalizeHerramientaName(e.herramienta) !== normalizeHerramientaName(herr)) return false;
         if (est && e.estado !== est) return false;
         if (sup && (e.supervisor || '').trim() !== sup) return false;
         if (fec && (e.fecha || '').trim() !== fec) return false;
@@ -1780,7 +2010,7 @@
       let totalCant = 0;
 
       const rows = HERRAMIENTAS.map(h => {
-        const list = filtered.filter(e => e.herramienta === h);
+        const list = filtered.filter(e => normalizeHerramientaName(e.herramienta) === h);
         const regs = list.length;
         const cant = list.reduce((acc, e) => acc + (Number(e.cantidad) || 0), 0);
         totalRegs += regs;
@@ -1805,6 +2035,7 @@
 
     function render() {
       updateFilterOptions();
+      refreshSectorDatalist();
       const filtered = getFiltered();
       renderSummary(filtered);
       renderServiceChart(filtered);
@@ -1813,6 +2044,7 @@
       const uniqueOps = new Set(filtered.map(e => `${(e.codigo || '').trim()}|${(e.nombre || '').trim().toLowerCase()}`)).size;
       const bolsas = filtered.filter(e => e.herramienta === 'Bolsa').reduce((a, b) => a + (Number(b.cantidad) || 0), 0);
       const lutocar = filtered.filter(e => e.herramienta === 'Lutocar').reduce((a, b) => a + (Number(b.cantidad) || 0), 0);
+      const carretillas = filtered.filter(e => e.herramienta === 'Carretilla').reduce((a, b) => a + (Number(b.cantidad) || 0), 0);
       const danados = filtered.filter(e => e.estado === 'Dañado / Repuesto').reduce((a, b) => a + (Number(b.cantidad) || 0), 0);
       const conFotos = filtered.filter(e => Boolean(e.foto)).length;
 
@@ -1820,6 +2052,7 @@
       document.getElementById('kpiOperarios').textContent = `${uniqueOps} operarios únicos`;
       document.getElementById('kpiBolsas').textContent = bolsas;
       document.getElementById('kpiLutocar').textContent = lutocar;
+      document.getElementById('kpiCarretillas').textContent = carretillas;
       document.getElementById('kpiDanados').textContent = danados;
       document.getElementById('kpiFotos').textContent = conFotos;
 
@@ -1855,7 +2088,7 @@
       const lastEntry = entries.length > 0 ? entries[entries.length - 1] : null;
       const today = new Date().toISOString().slice(0, 10);
 
-      let modalHeading = 'Nueva Entrega de Herramienta / Dotación';
+      let modalHeading = 'Nueva Entrega de Herramienta / Insumo';
       if (item) {
         modalHeading = `Editar Entrega — ${item.nombre}`;
       } else if (defaultTool === 'Lutocar') {
@@ -1864,6 +2097,9 @@
         modalHeading = 'Asignar Carretilla';
       }
       document.getElementById('modalTitle').textContent = modalHeading;
+
+      const btnDelete = document.getElementById('btnDeleteEntry');
+      btnDelete.style.display = item ? 'inline-flex' : 'none';
 
       const codigoEl = document.getElementById('fCodigo');
       const nombreEl = document.getElementById('fNombre');
@@ -1883,7 +2119,7 @@
 
       document.getElementById('fUid').value = item ? item.uid : '';
       document.getElementById('fFecha').value = item ? item.fecha : (lastEntry?.fecha || today);
-      document.getElementById('fHerramienta').value = item ? item.herramienta : defaultTool;
+      document.getElementById('fHerramienta').value = item ? normalizeHerramientaName(item.herramienta) : defaultTool;
       codigoEl.value = item ? item.codigo : '';
       document.getElementById('fCantidad').value = item ? item.cantidad : (isSingleUnitTool ? 1 : 100);
       document.getElementById('fEstado').value = item ? item.estado : 'Entregado / Operativo';
@@ -1892,6 +2128,12 @@
       setServicioSelectValue(item ? item.servicio : (lastEntry?.servicio || ''), true);
       sectorEl.value = item ? (item.sector || '') : '';
       celularEl.value = item ? (item.celular || '') : '';
+      const initialSectorVal = item ? (item.sector || '') : '';
+      document.getElementById('fBarridoModalidad').value = normalizeSimple(initialSectorVal).includes('MERCADO')
+        ? 'Mercados'
+        : 'Sector en la ciudad';
+      document.getElementById('fBarridoEquipo').value = '';
+      document.getElementById('fBarridoDetalle').value = '';
       document.getElementById('fObservaciones').value = item ? item.observaciones : '';
       document.getElementById('fFoto').value = item ? item.foto : '';
       document.getElementById('fFotoFile').value = '';
@@ -1911,6 +2153,33 @@
     function closeModal() {
       document.getElementById('modalBackdrop').classList.remove('open');
     }
+
+    document.getElementById('btnDeleteEntry').addEventListener('click', async () => {
+      const uid = document.getElementById('fUid').value;
+      if (!uid) return;
+      const target = entries.find(x => x.uid === uid);
+      const label = target ? `${target.nombre} (${target.herramienta})` : uid;
+      const ok = confirm(`¿Eliminar el registro de ${label}?`);
+      if (!ok) return;
+
+      entries = entries.filter(x => x.uid !== uid);
+      delete pendingMap[uid];
+      deletedMap[uid] = Date.now() + 300000;
+      savePending();
+      saveDeleted();
+      saveEntries();
+      render();
+      renderDetail(null);
+      closeModal();
+
+      setStatus(`Registro eliminado localmente (${label}). Enviando a Google Sheets...`);
+      try {
+        await postToSheets({ action: 'delete', uid });
+        setTimeout(syncFromSheets, 4000);
+      } catch (err) {
+        setStatus(`Eliminado localmente; error al sincronizar: ${err.message}`, true);
+      }
+    });
 
     document.getElementById('btnClearDate').addEventListener('click', () => {
       document.getElementById('filterAno').value = '';
@@ -1937,6 +2206,8 @@
       e.target.dataset.autofilled = '0';
       applyServiceAndToolRules();
     });
+    document.getElementById('fBarridoModalidad').addEventListener('change', applyServiceAndToolRules);
+    document.getElementById('fBarridoEquipo').addEventListener('change', applyServiceAndToolRules);
     document.getElementById('fHerramienta').addEventListener('change', applyServiceAndToolRules);
     document.getElementById('fSector').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
     document.getElementById('fSupervisor').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
@@ -1956,6 +2227,7 @@
         totalLocal: entries.length,
         totalPersonal: staffList.length,
         pendientes: Object.keys(pendingMap).length,
+        eliminadosRecientes: Object.keys(deletedMap).length,
         primerRegistroNube: lastRawSample
       }, null, 2);
       document.getElementById('debugBackdrop').classList.add('open');
@@ -1981,12 +2253,27 @@
     document.getElementById('entregaForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const srvVal = document.getElementById('fServicio').value.trim();
-      const herrVal = document.getElementById('fHerramienta').value;
+      const herrVal = normalizeHerramientaName(document.getElementById('fHerramienta').value);
       const mappedSrv = matchServicioOficial(srvVal);
 
       if (mappedSrv === '5 - Áridos (m3)' && herrVal === 'Bolsa') {
         const goOn = confirm('El servicio de Áridos no ocupa bolsas. ¿Deseas guardar de todas formas?');
         if (!goOn) return;
+      }
+
+      let obsFinal = document.getElementById('fObservaciones').value.trim();
+      if (mappedSrv === '1 - Barrido (Km)') {
+        const mod = document.getElementById('fBarridoModalidad').value;
+        const extraBarrido = mod === 'Barrido mecanizado'
+          ? document.getElementById('fBarridoEquipo').value.trim()
+          : document.getElementById('fBarridoDetalle').value.trim();
+        const tagParts = [mod];
+        if (mod === 'Barrido por escuadras') tagParts.push('5 pers.');
+        if (extraBarrido) tagParts.push(extraBarrido);
+        const tagStr = `[${tagParts.join(' · ')}]`;
+        if (!obsFinal.includes(tagStr)) {
+          obsFinal = obsFinal ? `${tagStr} ${obsFinal}` : tagStr;
+        }
       }
 
       const uid = document.getElementById('fUid').value || ('id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6));
@@ -2002,7 +2289,7 @@
         sector: document.getElementById('fSector').value.trim(),
         supervisor: document.getElementById('fSupervisor').value.trim(),
         celular: document.getElementById('fCelular').value.trim(),
-        observaciones: document.getElementById('fObservaciones').value.trim(),
+        observaciones: obsFinal,
         foto: document.getElementById('fFoto').value.trim(),
         ultimaActualizacion: new Date().toLocaleString()
       });
@@ -2011,6 +2298,8 @@
       if (idx >= 0) entries[idx] = record;
       else entries.push(record);
 
+      delete deletedMap[uid];
+      saveDeleted();
       pendingMap[uid] = { record, expiresAt: Date.now() + 300000 };
       savePending();
       saveEntries();
@@ -2094,6 +2383,7 @@
     applyAdminUiState();
     rebuildStaffIndex(loadCachedStaff());
     pendingMap = loadPending();
+    deletedMap = loadDeleted();
     entries = mergeServerAndLocal([], loadEntries());
     saveEntries();
     render();
