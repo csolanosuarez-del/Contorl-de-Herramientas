@@ -806,10 +806,9 @@
             <div>
               <label>Modalidad de Barrido</label>
               <select id="fBarridoModalidad">
-                <option value="Sector en la ciudad">Sector en la ciudad (por persona)</option>
-                <option value="Mercados">Mercados (por persona)</option>
-                <option value="Barrido mecanizado">Barrido mecanizado (camiones / minicargador)</option>
-                <option value="Barrido por escuadras">Barrido por escuadras (5 personas)</option>
+                <option value="(Sector/Mercados)">(Sector/Mercados)</option>
+                <option value="Barrido mecanizado">Barrido mecanizado</option>
+                <option value="Barrido por escuadras">Barrido por escuadras</option>
               </select>
             </div>
             <div>
@@ -820,7 +819,7 @@
                 <option value="Camión Barredora 2">Camión Barredora 2 (Pala, Cepillo lateral de acero, Cepillo central de acero)</option>
                 <option value="Minicargador Barredora">Minicargador Barredora (Cepillo central de acero)</option>
               </select>
-              <input id="fBarridoDetalle" placeholder="Ej: Escuadra 01 (5 pers.) / Tramo..." />
+              <input id="fBarridoDetalle" placeholder="Ej: Calle / Avenida / Referencia..." />
             </div>
           </div>
 
@@ -941,19 +940,11 @@
     function refreshSectorDatalist() {
       const dl = document.getElementById('sectorBarridoList');
       if (!dl) return;
-      const mod = document.getElementById('fBarridoModalidad')?.value || 'Sector en la ciudad';
       const fromStaff = staffList.map(s => (s.sector || '').trim()).filter(Boolean);
       const fromEntries = entries.map(e => (e.sector || '').trim()).filter(Boolean);
       const combined = [...new Set([...SECTORES_MERCADOS_BASE, ...fromStaff, ...fromEntries])];
 
-      const isMarketMode = mod === 'Mercados';
-      const filtered = combined.filter(item => {
-        const isMercado = normalizeSimple(item).includes('MERCADO');
-        return isMarketMode ? isMercado : !isMercado;
-      });
-      const listToShow = filtered.length ? filtered : combined;
-
-      dl.innerHTML = listToShow
+      dl.innerHTML = combined
         .slice(0, 1500)
         .map(sec => `<option value="${sec.replace(/"/g, '&quot;')}">${sec}</option>`)
         .join('');
@@ -1242,20 +1233,13 @@
 
       barridoBox.classList.add('active');
 
-      if (modalidad === 'Sector en la ciudad') {
-        sectorLabel.textContent = 'Sector Asignado (por persona)';
-        sectorInput.placeholder = 'Selecciona o escribe sector (ej: S.2.045)...';
+      if (modalidad === '(Sector/Mercados)') {
+        sectorLabel.textContent = 'Sector / Mercado Asignado (por persona)';
+        sectorInput.placeholder = 'Selecciona o escribe sector o mercado...';
         eqSel.style.display = 'none';
         detInp.style.display = 'block';
-        eqLabel.textContent = 'Detalle / Tramo';
-        detInp.placeholder = 'Ej: Calle / Avenida / Referencia...';
-      } else if (modalidad === 'Mercados') {
-        sectorLabel.textContent = 'Mercado Asignado (por persona)';
-        sectorInput.placeholder = 'Selecciona o escribe mercado (ej: Mercado Abasto)...';
-        eqSel.style.display = 'none';
-        detInp.style.display = 'block';
-        eqLabel.textContent = 'Puesto / Sector de Mercado';
-        detInp.placeholder = 'Ej: Pasillo / Nave / Ingreso...';
+        eqLabel.textContent = 'Detalle / Tramo / Puesto';
+        detInp.placeholder = 'Ej: Calle / Avenida / Pasillo / Referencia...';
       } else if (modalidad === 'Barrido mecanizado') {
         sectorLabel.textContent = 'Ruta / Recorrido Mecanizado';
         sectorInput.placeholder = 'Ej: Anillo / Avenida principal...';
@@ -1288,10 +1272,8 @@
       if (mappedSrv === '1 - Barrido (Km)') {
         const mod = document.getElementById('fBarridoModalidad').value;
         const eq = document.getElementById('fBarridoEquipo').value;
-        if (mod === 'Sector en la ciudad') {
-          hintText = 'Barrido · Sector en la ciudad: el sector es por persona (elige de la lista o escríbelo).';
-        } else if (mod === 'Mercados') {
-          hintText = 'Barrido · Mercados: asignación por persona en el mercado (elige de la lista o escríbelo).';
+        if (mod === '(Sector/Mercados)') {
+          hintText = 'Barrido · (Sector/Mercados): asignación por persona en sector o mercado (elige de la lista o escríbelo).';
         } else if (mod === 'Barrido mecanizado') {
           if (eq === 'Minicargador Barredora') {
             hintText = 'Minicargador Barredora: ocupa Cepillo central de acero.';
@@ -1463,7 +1445,7 @@
       }
       const mappedSrv = matchServicioOficial(match.servicio || servicioEl.value);
       const mod = document.getElementById('fBarridoModalidad').value;
-      if (mappedSrv === '1 - Barrido (Km)' && (mod === 'Sector en la ciudad' || mod === 'Mercados') && match.sector && (forceOverwrite || !sectorEl.value.trim() || sectorEl.dataset.autofilled === '1')) {
+      if (mappedSrv === '1 - Barrido (Km)' && mod === '(Sector/Mercados)' && match.sector && (forceOverwrite || !sectorEl.value.trim() || sectorEl.dataset.autofilled === '1')) {
         sectorEl.value = match.sector;
         sectorEl.dataset.autofilled = '1';
       }
@@ -2127,10 +2109,7 @@
       setServicioSelectValue(item ? item.servicio : (lastEntry?.servicio || ''), true);
       sectorEl.value = item ? (item.sector || '') : '';
       celularEl.value = item ? (item.celular || '') : '';
-      const initialSectorVal = item ? (item.sector || '') : '';
-      document.getElementById('fBarridoModalidad').value = normalizeSimple(initialSectorVal).includes('MERCADO')
-        ? 'Mercados'
-        : 'Sector en la ciudad';
+      document.getElementById('fBarridoModalidad').value = '(Sector/Mercados)';
       document.getElementById('fBarridoEquipo').value = '';
       document.getElementById('fBarridoDetalle').value = '';
       document.getElementById('fObservaciones').value = item ? item.observaciones : '';
