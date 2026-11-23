@@ -815,9 +815,10 @@
               <label id="fBarridoEquipoLabel">Equipo / Escuadra / Detalle</label>
               <select id="fBarridoEquipo" style="display:none">
                 <option value="">— Seleccionar equipo —</option>
-                <option value="Camión Barredora 1">Camión Barredora 1 (Pala, Cepillo lateral de acero, Cepillo central de acero)</option>
-                <option value="Camión Barredora 2">Camión Barredora 2 (Pala, Cepillo lateral de acero, Cepillo central de acero)</option>
-                <option value="Minicargador Barredora">Minicargador Barredora (Cepillo central de acero)</option>
+                <option value="BARREDORA 1011">BARREDORA 1011</option>
+                <option value="BARREDORA 1017">BARREDORA 1017</option>
+                <option value="MINICARGADOR 1">MINICARGADOR 1</option>
+                <option value="MINICARGADOR 2">MINICARGADOR 2</option>
               </select>
               <input id="fBarridoDetalle" placeholder="Ej: Calle / Avenida / Referencia..." />
             </div>
@@ -1275,14 +1276,12 @@
         if (mod === '(Sector/Mercados)') {
           hintText = 'Barrido · (Sector/Mercados): asignación por persona en sector o mercado (elige de la lista o escríbelo).';
         } else if (mod === 'Barrido mecanizado') {
-          if (eq === 'Minicargador Barredora') {
-            hintText = 'Minicargador Barredora: ocupa Cepillo central de acero.';
-            if (herrEl.value !== 'Cepillo central de acero') isWarn = true;
+          if (eq === 'MINICARGADOR 1' || eq === 'MINICARGADOR 2') {
+            hintText = `${eq}: equipo de barrido mecanizado seleccionado.`;
+          } else if (eq === 'BARREDORA 1011' || eq === 'BARREDORA 1017') {
+            hintText = `${eq}: equipo de barrido mecanizado seleccionado.`;
           } else {
-            hintText = 'Camiones barredoras (2 unidades): ocupan Pala, Cepillo lateral de acero y Cepillo central de acero. (Minicargador ocupa Cepillo central de acero).';
-            if (!['Pala', 'Cepillo lateral de acero', 'Cepillo central de acero'].includes(herrEl.value)) {
-              isWarn = true;
-            }
+            hintText = 'Barrido mecanizado: selecciona BARREDORA 1011, BARREDORA 1017, MINICARGADOR 1 o MINICARGADOR 2.';
           }
         } else if (mod === 'Barrido por escuadras') {
           hintText = 'Barrido por escuadras: escuadras de 5 personas que barren la frecuencia del barrido mecanizado.';
