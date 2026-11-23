@@ -434,7 +434,7 @@
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .form-grid .full { grid-column: 1 / -1; }
     .form-grid .triple { grid-column: 1 / -1; display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 10px; }
-    .barrido-subbox {
+    .service-subbox {
       grid-column: 1 / -1;
       display: none;
       grid-template-columns: 1fr 1fr;
@@ -444,9 +444,10 @@
       border-radius: 9px;
       padding: 10px;
     }
-    .barrido-subbox.active { display: grid; }
+    .service-subbox.active { display: grid; }
+    .service-subbox.single-col { grid-template-columns: 1fr; }
     @media (max-width: 640px) {
-      .form-grid .triple, .barrido-subbox { grid-template-columns: 1fr; }
+      .form-grid .triple, .service-subbox { grid-template-columns: 1fr; }
     }
     label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 4px; }
     .modal-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 14px; }
@@ -750,7 +751,7 @@
 
         <!-- Encabezado inicial: Fecha, Servicio, Turno -->
         <div class="form-top-header">
-          <div class="form-top-header-title">Paso 1 · Datos iniciales del registro</div>
+          <div class="form-top-header-title">Encabezado · Datos iniciales del registro</div>
           <div class="form-top-grid">
             <div>
               <label>Fecha</label>
@@ -823,22 +824,8 @@
             <div id="staffNameHint" class="staff-warn"></div>
           </div>
 
-          <!-- Fila de Sector / Lugar de Trabajo y Teléfono -->
-          <div class="triple">
-            <div>
-              <label id="fSectorLabel">Sector / Lugar de Trabajo</label>
-              <input id="fSector" list="sectorBarridoList" placeholder="Ej: S.2.045 o lugar asignado..." autocomplete="off" />
-              <datalist id="sectorBarridoList"></datalist>
-              <datalist id="sectorCodigoBarridoList"></datalist>
-            </div>
-            <div>
-              <label>Teléfono</label>
-              <input id="fCelular" placeholder="Ej: 75078399" />
-            </div>
-          </div>
-
-          <!-- Sub-panel específico cuando el servicio es 1 - Barrido (Km) -->
-          <div id="barridoSubbox" class="barrido-subbox">
+          <!-- Sub-panel para Servicio 1 (Barrido) -->
+          <div id="barridoSubbox" class="service-subbox">
             <div>
               <label>Modalidad de Barrido</label>
               <select id="fBarridoModalidad">
@@ -857,6 +844,55 @@
                 <option value="MINICARGADOR 2">MINICARGADOR 2</option>
               </select>
               <input id="fBarridoDetalle" placeholder="Ej: Calle / Avenida / Referencia..." />
+            </div>
+          </div>
+
+          <!-- Sub-panel para Servicio 3 (3.1 CUADRILLA / 3.2 ZONAS FIJAS) -->
+          <div id="areasVerdesSubbox" class="service-subbox single-col">
+            <div>
+              <label>Tipo de Servicio — Áreas Verdes</label>
+              <select id="fAreaVerdeModo">
+                <option value="3.1 CUADRILLA">3.1 CUADRILLA</option>
+                <option value="3.2 ZONAS FIJAS">3.2 ZONAS FIJAS</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Sub-panel para Servicio 4 (Grupo 1 / Grupo 2 - 10 personas) -->
+          <div id="feriasSubbox" class="service-subbox single-col">
+            <div>
+              <label>Grupo de Ferias y Eventos (10 personas por grupo)</label>
+              <select id="fFeriaGrupo">
+                <option value="Grupo 1">Grupo 1</option>
+                <option value="Grupo 2">Grupo 2</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Sub-panel para Servicio 6 (Cisternas de Lavado) -->
+          <div id="lavadoSubbox" class="service-subbox single-col">
+            <div>
+              <label>Cisterna de Lavado</label>
+              <select id="fCisternaLavado">
+                <option value="Cisterna 10000 L 6006-GTE">Cisterna 10000 L 6006-GTE</option>
+                <option value="Cisterna 6004 (3000 L 6006-GTE)">Cisterna 6004 (3000 L 6006-GTE)</option>
+                <option value="Cisterna 6006 (3000 L 6012-YUA)">Cisterna 6006 (3000 L 6012-YUA)</option>
+                <option value="Cisterna 6002 (3000 L 6006-GSB)">Cisterna 6002 (3000 L 6006-GSB)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Fila de Sector / Lugar de Trabajo y Teléfono -->
+          <div class="triple">
+            <div>
+              <label id="fSectorLabel">Sector / Lugar de Trabajo</label>
+              <input id="fSector" list="sectorBarridoList" placeholder="Ej: 1-001 o lugar asignado..." autocomplete="off" />
+              <datalist id="sectorBarridoList"></datalist>
+              <datalist id="sectorCodigoBarridoList"></datalist>
+            </div>
+            <div>
+              <label>Teléfono</label>
+              <input id="fCelular" placeholder="Ej: 75078399" />
             </div>
           </div>
 
@@ -910,15 +946,10 @@
     const STAFF_CACHE_KEY = 'control_herramientas_staff_v1';
 
     const CODIGOS_SECTOR_BARRIDO_BASE = [
-      'S.1.001', 'S.1.002', 'S.1.003', 'S.1.004', 'S.1.005',
-      'S.2.010', 'S.2.020', 'S.2.030', 'S.2.045', 'S.2.050',
-      'S.3.001', 'S.3.002', 'S.3.003', 'S.3.004', 'S.3.005',
-      'S.4.001', 'S.4.002', 'S.4.003', 'S.4.004', 'S.4.005',
-      'S.5.001', 'S.5.002', 'S.5.003', 'S.5.004', 'S.5.005',
-      'S.6.001', 'S.6.002', 'S.6.003', 'S.6.004', 'S.6.005',
-      'S.7.001', 'S.7.002', 'S.7.003', 'S.7.004', 'S.7.005',
-      'S.8.001', 'S.8.002', 'S.8.003', 'S.8.004', 'S.8.005',
-      'S.9.001', 'S.9.002', 'S.9.003', 'S.9.004', 'S.9.005'
+      '1-001', '1-002', '1-003', '1-004', '1-005', '1-006', '1-007', '1-008', '1-009', '1-010',
+      '2-001', '2-002', '2-003', '2-004', '2-005', '2-006', '2-007', '2-008', '2-009', '2-010',
+      '3-001', '3-002', '3-003', '3-004', '3-005', '4-001', '4-002', '4-003', '4-004', '4-005',
+      '5-001', '5-002', '5-003', '5-004', '5-005', '6-001', '6-002', '6-003', '6-004', '6-005'
     ];
 
     const SECTORES_MERCADOS_BASE = [
@@ -996,7 +1027,7 @@
     function extractSectorCodeOnly(rawVal) {
       const s = String(rawVal || '').trim();
       if (!s) return '';
-      const m = s.match(/^(S\.\d+\.\d+|S-\d+-\d+|SEC[-_\s]?\d+)/i);
+      const m = s.match(/^(\d+-\d+|S\.\d+\.\d+|S-\d+-\d+|SEC[-_\s]?\d+)/i);
       return m ? m[1].toUpperCase() : '';
     }
 
@@ -1018,7 +1049,7 @@
       const codesFromData = [...fromStaff, ...fromEntries]
         .map(extractSectorCodeOnly)
         .filter(Boolean);
-      const combinedCodes = [...new Set([...CODIGOS_SECTOR_BARRIDO_BASE, ...codesFromData])].sort();
+      const combinedCodes = [...new Set([...CODIGOS_SECTOR_BARRIDO_BASE, ...codesFromData])];
 
       if (dlCodigo) {
         dlCodigo.innerHTML = combinedCodes
@@ -1302,51 +1333,11 @@
       }
     }
 
-    function syncBarridoModalidadUi() {
-      const srvVal = document.getElementById('fServicio').value;
-      const mappedSrv = matchServicioOficial(srvVal);
-      const barridoBox = document.getElementById('barridoSubbox');
-      const modalidad = document.getElementById('fBarridoModalidad').value;
-      const eqLabel = document.getElementById('fBarridoEquipoLabel');
-      const eqSel = document.getElementById('fBarridoEquipo');
-      const detInp = document.getElementById('fBarridoDetalle');
-      const sectorLabel = document.getElementById('fSectorLabel');
-      const sectorInput = document.getElementById('fSector');
-
-      refreshSectorDatalist();
-
-      if (mappedSrv !== '1 - Barrido (Km)') {
-        barridoBox.classList.remove('active');
-        sectorInput.setAttribute('list', 'sectorBarridoList');
-        return;
-      }
-
-      barridoBox.classList.add('active');
-
-      if (modalidad === '(Sector/Mercados)') {
-        sectorLabel.textContent = 'Código de Sector (Barrido)';
-        sectorInput.setAttribute('list', 'sectorCodigoBarridoList');
-        sectorInput.placeholder = 'Ej: S.2.045';
-        eqSel.style.display = 'none';
-        detInp.style.display = 'block';
-        eqLabel.textContent = 'Detalle / Tramo / Puesto';
-        detInp.placeholder = 'Ej: Calle / Avenida / Pasillo / Referencia...';
-      } else if (modalidad === 'Barrido mecanizado') {
-        sectorLabel.textContent = 'Ruta / Recorrido Mecanizado';
-        sectorInput.setAttribute('list', 'sectorBarridoList');
-        sectorInput.placeholder = 'Ej: Anillo / Avenida principal...';
-        eqSel.style.display = 'block';
-        detInp.style.display = 'none';
-        eqLabel.textContent = 'Equipo de Barrido Mecanizado';
-      } else if (modalidad === 'Barrido por escuadras') {
-        sectorLabel.textContent = 'Tramo / Frecuencia de Barrido Mecanizado';
-        sectorInput.setAttribute('list', 'sectorBarridoList');
-        sectorInput.placeholder = 'Tramo o vía de la frecuencia mecanizada...';
-        eqSel.style.display = 'none';
-        detInp.style.display = 'block';
-        eqLabel.textContent = 'N° de Escuadra (5 personas)';
-        detInp.placeholder = 'Ej: Escuadra 1 (5 personas)';
-      }
+    function hideAllServiceSubboxes() {
+      document.getElementById('barridoSubbox').classList.remove('active');
+      document.getElementById('areasVerdesSubbox').classList.remove('active');
+      document.getElementById('feriasSubbox').classList.remove('active');
+      document.getElementById('lavadoSubbox').classList.remove('active');
     }
 
     function applyServiceAndToolRules() {
@@ -1357,57 +1348,87 @@
       const ruleHint = document.getElementById('serviceRuleHint');
       const mappedSrv = matchServicioOficial(srvVal);
 
-      syncBarridoModalidadUi();
+      hideAllServiceSubboxes();
+      sectorInput.setAttribute('list', 'sectorBarridoList');
 
       let hintText = '';
       let isWarn = false;
 
       if (mappedSrv === '1 - Barrido (Km)') {
-        const mod = document.getElementById('fBarridoModalidad').value;
-        const eq = document.getElementById('fBarridoEquipo').value;
-        if (mod === '(Sector/Mercados)') {
-          hintText = 'Barrido · (Sector/Mercados): selecciona o escribe solo el código de sector (ej. S.2.045).';
-        } else if (mod === 'Barrido mecanizado') {
-          if (eq === 'MINICARGADOR 1' || eq === 'MINICARGADOR 2') {
-            hintText = `${eq}: equipo de barrido mecanizado seleccionado.`;
-          } else if (eq === 'BARREDORA 1011' || eq === 'BARREDORA 1017') {
-            hintText = `${eq}: equipo de barrido mecanizado seleccionado.`;
-          } else {
-            hintText = 'Barrido mecanizado: selecciona BARREDORA 1011, BARREDORA 1017, MINICARGADOR 1 o MINICARGADOR 2.';
-          }
-        } else if (mod === 'Barrido por escuadras') {
+        const barridoBox = document.getElementById('barridoSubbox');
+        const modalidad = document.getElementById('fBarridoModalidad').value;
+        const eqLabel = document.getElementById('fBarridoEquipoLabel');
+        const eqSel = document.getElementById('fBarridoEquipo');
+        const detInp = document.getElementById('fBarridoDetalle');
+        const eq = eqSel.value;
+
+        barridoBox.classList.add('active');
+
+        if (modalidad === '(Sector/Mercados)') {
+          sectorLabel.textContent = 'Código de Sector (Barrido)';
+          sectorInput.setAttribute('list', 'sectorCodigoBarridoList');
+          sectorInput.placeholder = 'Ej: 1-001, 1-002...';
+          eqSel.style.display = 'none';
+          detInp.style.display = 'block';
+          eqLabel.textContent = 'Detalle / Tramo / Puesto';
+          detInp.placeholder = 'Ej: Calle / Avenida / Pasillo / Referencia...';
+          hintText = 'Barrido · (Sector/Mercados): selecciona o escribe el código de sector (ej. 1-001, 1-002).';
+        } else if (modalidad === 'Barrido mecanizado') {
+          sectorLabel.textContent = 'Ruta / Recorrido Mecanizado';
+          sectorInput.placeholder = 'Ej: Anillo / Avenida principal...';
+          eqSel.style.display = 'block';
+          detInp.style.display = 'none';
+          eqLabel.textContent = 'Equipo de Barrido Mecanizado';
+          hintText = eq
+            ? `${eq}: equipo de barrido mecanizado seleccionado.`
+            : 'Barrido mecanizado: selecciona BARREDORA 1011, BARREDORA 1017, MINICARGADOR 1 o MINICARGADOR 2.';
+        } else {
+          sectorLabel.textContent = 'Tramo / Frecuencia de Barrido Mecanizado';
+          sectorInput.placeholder = 'Tramo o vía de la frecuencia mecanizada...';
+          eqSel.style.display = 'none';
+          detInp.style.display = 'block';
+          eqLabel.textContent = 'N° de Escuadra (5 personas)';
+          detInp.placeholder = 'Ej: Escuadra 1 (5 personas)';
           hintText = 'Barrido por escuadras: escuadras de 5 personas que barren la frecuencia del barrido mecanizado.';
         }
       } else if (mappedSrv === '2 - Desempapelado (Km)') {
-        sectorLabel.textContent = 'Lugar Asignado (Grupo)';
-        sectorInput.placeholder = 'Lugar asignado para el grupo...';
-        hintText = 'Desempapelado: trabaja en grupo en lugares asignados.';
+        sectorLabel.textContent = 'Lugar de Tarea (Grupo)';
+        sectorInput.placeholder = 'Lugar de tarea del grupo...';
+        hintText = 'Servicio 2 (Desempapelado): se trabaja en grupo, ingresa el lugar de tarea.';
       } else if (mappedSrv === '3 - Areas Verdes (Ha)') {
-        sectorLabel.textContent = 'Zona Fija (Cuadrilla)';
-        sectorInput.placeholder = 'Zona fija de la cuadrilla...';
-        hintText = 'Áreas Verdes: trabaja en cuadrilla y en zonas fijas.';
+        document.getElementById('areasVerdesSubbox').classList.add('active');
+        const avModo = document.getElementById('fAreaVerdeModo').value;
+        if (avModo === '3.2 ZONAS FIJAS') {
+          sectorLabel.textContent = 'Código de Persona a Dotar (Zona Fija)';
+          sectorInput.setAttribute('list', 'staffCodeList');
+          sectorInput.placeholder = 'Ej: 894 o MA-532...';
+          hintText = '3.2 ZONAS FIJAS: coloca el código de la persona a dotar.';
+        } else {
+          sectorLabel.textContent = 'Lugares a Realizar (Cuadrilla)';
+          sectorInput.placeholder = 'Ej: Plaza / Parque / Camellón...';
+          hintText = '3.1 CUADRILLA: coloca los lugares a realizar.';
+        }
       } else if (mappedSrv === '4 - Ferias y Eventos (EQ)') {
-        sectorLabel.textContent = 'Lugar Asignado (Grupo)';
-        sectorInput.placeholder = 'Feria o evento asignado al grupo...';
-        hintText = 'Ferias y Eventos: trabaja en grupo en lugares asignados (igual que desempapelado).';
+        document.getElementById('feriasSubbox').classList.add('active');
+        const grupoFeria = document.getElementById('fFeriaGrupo').value;
+        sectorLabel.textContent = 'Lugar de Feria / Evento';
+        sectorInput.placeholder = 'Feria o evento asignado...';
+        hintText = `Servicio 4 (${grupoFeria}): se divide en Grupo 1 y Grupo 2, trabajando en grupos de 10 personas.`;
       } else if (mappedSrv === '5 - Áridos (m3)') {
-        sectorLabel.textContent = 'Lugar de Trabajo';
+        sectorLabel.textContent = 'Sector / Lugar de Trabajo';
         sectorInput.placeholder = 'Lugar o frente de áridos...';
         if (herrEl.value === 'Bolsa') {
           isWarn = true;
           hintText = 'Áridos no ocupa bolsas: elige otra herramienta o insumo (ej. Pala, Carretilla, Escobillón).';
         } else {
-          hintText = 'Áridos: no ocupa bolsas.';
+          hintText = 'Áridos: configurado como corresponde.';
         }
       } else if (mappedSrv === '6 - Lavado (EQ)') {
-        sectorLabel.textContent = 'Lugar de Trabajo';
+        document.getElementById('lavadoSubbox').classList.add('active');
+        const cisterna = document.getElementById('fCisternaLavado').value;
+        sectorLabel.textContent = 'Lugar de Lavado';
         sectorInput.placeholder = 'Lugar o punto de lavado...';
-        if (herrEl.value !== 'Detergente Pinol') {
-          isWarn = true;
-          hintText = 'Lavado ocupa Detergente Pinol: selecciona "Detergente Pinol".';
-        } else {
-          hintText = `Lavado: insumo ${herrEl.value} seleccionado.`;
-        }
+        hintText = `Servicio 6 (Lavado): cisterna seleccionada → ${cisterna}.`;
       } else {
         sectorLabel.textContent = 'Sector / Lugar de Trabajo';
         sectorInput.placeholder = 'Sector o lugar de trabajo...';
@@ -2215,6 +2236,9 @@
       document.getElementById('fBarridoModalidad').value = '(Sector/Mercados)';
       document.getElementById('fBarridoEquipo').value = '';
       document.getElementById('fBarridoDetalle').value = '';
+      document.getElementById('fAreaVerdeModo').value = '3.1 CUADRILLA';
+      document.getElementById('fFeriaGrupo').value = 'Grupo 1';
+      document.getElementById('fCisternaLavado').value = 'Cisterna 10000 L 6006-GTE';
       supervisorEl.value = item ? item.supervisor : (lastEntry?.supervisor || '');
       document.getElementById('fObservaciones').value = item ? item.observaciones : '';
       document.getElementById('fFoto').value = item ? item.foto : '';
@@ -2293,6 +2317,9 @@
     });
     document.getElementById('fBarridoModalidad').addEventListener('change', applyServiceAndToolRules);
     document.getElementById('fBarridoEquipo').addEventListener('change', applyServiceAndToolRules);
+    document.getElementById('fAreaVerdeModo').addEventListener('change', applyServiceAndToolRules);
+    document.getElementById('fFeriaGrupo').addEventListener('change', applyServiceAndToolRules);
+    document.getElementById('fCisternaLavado').addEventListener('change', applyServiceAndToolRules);
     document.getElementById('fHerramienta').addEventListener('change', applyServiceAndToolRules);
     document.getElementById('fSector').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
     document.getElementById('fSupervisor').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
@@ -2348,6 +2375,8 @@
       }
 
       let obsFinal = document.getElementById('fObservaciones').value.trim();
+      let tagStr = '';
+
       if (mappedSrv === '1 - Barrido (Km)') {
         const mod = document.getElementById('fBarridoModalidad').value;
         const extraBarrido = mod === 'Barrido mecanizado'
@@ -2356,10 +2385,20 @@
         const tagParts = [mod];
         if (mod === 'Barrido por escuadras') tagParts.push('5 pers.');
         if (extraBarrido) tagParts.push(extraBarrido);
-        const tagStr = `[${tagParts.join(' · ')}]`;
-        if (!obsFinal.includes(tagStr)) {
-          obsFinal = obsFinal ? `${tagStr} ${obsFinal}` : tagStr;
-        }
+        tagStr = `[${tagParts.join(' · ')}]`;
+      } else if (mappedSrv === '3 - Areas Verdes (Ha)') {
+        const avModo = document.getElementById('fAreaVerdeModo').value;
+        tagStr = `[${avModo}]`;
+      } else if (mappedSrv === '4 - Ferias y Eventos (EQ)') {
+        const grupoFeria = document.getElementById('fFeriaGrupo').value;
+        tagStr = `[${grupoFeria} · 10 pers.]`;
+      } else if (mappedSrv === '6 - Lavado (EQ)') {
+        const cisterna = document.getElementById('fCisternaLavado').value;
+        tagStr = `[${cisterna}]`;
+      }
+
+      if (tagStr && !obsFinal.includes(tagStr)) {
+        obsFinal = obsFinal ? `${tagStr} ${obsFinal}` : tagStr;
       }
 
       const uid = document.getElementById('fUid').value || ('id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6));
