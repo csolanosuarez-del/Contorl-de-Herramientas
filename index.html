@@ -408,9 +408,32 @@
       overflow-y: auto;
       padding: 18px;
     }
+    .form-top-header {
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 10px;
+      padding: 11px 12px;
+      margin-bottom: 12px;
+    }
+    .form-top-header-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #6ee7b7;
+      margin-bottom: 8px;
+    }
+    .form-top-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr 0.9fr;
+      gap: 10px;
+    }
+    @media (max-width: 640px) {
+      .form-top-grid { grid-template-columns: 1fr; }
+    }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .form-grid .full { grid-column: 1 / -1; }
-    .form-grid .triple { grid-column: 1 / -1; display: grid; grid-template-columns: 1.2fr 1.2fr 0.9fr; gap: 10px; }
+    .form-grid .triple { grid-column: 1 / -1; display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 10px; }
     .barrido-subbox {
       grid-column: 1 / -1;
       display: none;
@@ -697,6 +720,7 @@
           <thead>
             <tr>
               <th>Fecha</th>
+              <th>Turno</th>
               <th>Cód.</th>
               <th>Personal Operativo</th>
               <th>Herramienta / Insumo</th>
@@ -723,57 +747,15 @@
       <h3 id="modalTitle" style="margin-top:0">Registrar Entrega de Herramienta / Insumo</h3>
       <form id="entregaForm">
         <input type="hidden" id="fUid" />
-        <div class="form-grid">
-          <div>
-            <label>Fecha</label>
-            <input id="fFecha" type="date" required />
-          </div>
-          <div>
-            <label>Herramienta / Insumo</label>
-            <select id="fHerramienta" required>
-              <option value="Bolsa">Bolsa</option>
-              <option value="Lutocar">Lutocar</option>
-              <option value="Escobillón">Escobillón</option>
-              <option value="Rastrillo">Rastrillo</option>
-              <option value="Pala">Pala</option>
-              <option value="Carretilla">Carretilla</option>
-              <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
-              <option value="Cepillo central de acero">Cepillo central de acero</option>
-              <option value="Detergente Pinol">Detergente Pinol</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-          <div>
-            <label>Código Trabajador (o interno MA-001)</label>
-            <input id="fCodigo" list="staffCodeList" placeholder="Ej: 894 o MA-532" autocomplete="off" />
-            <datalist id="staffCodeList"></datalist>
-            <div id="staffCodeHint" class="staff-match"></div>
-          </div>
-          <div>
-            <label>Cantidad</label>
-            <input id="fCantidad" type="number" min="1" value="1" required />
-          </div>
-          <div>
-            <label>Estado</label>
-            <select id="fEstado" required>
-              <option value="Entregado / Operativo">Entregado / Operativo</option>
-              <option value="Devuelto">Devuelto</option>
-              <option value="Dañado / Repuesto">Dañado / Repuesto</option>
-            </select>
-          </div>
-          <div>
-            <label>Supervisor</label>
-            <input id="fSupervisor" placeholder="Ej: Marcial Rojas" />
-          </div>
-          <div class="full">
-            <label>Nombre y Apellido del Personal Operativo (búsqueda o escritura manual)</label>
-            <input id="fNombre" list="staffNameList" placeholder="Escribe o busca nombre para ubicar su código..." autocomplete="off" required />
-            <datalist id="staffNameList"></datalist>
-            <div id="staffNameHint" class="staff-warn"></div>
-          </div>
 
-          <!-- Fila de Servicio, Sector / Lugar de Trabajo y Teléfono -->
-          <div class="triple">
+        <!-- Encabezado inicial: Fecha, Servicio, Turno -->
+        <div class="form-top-header">
+          <div class="form-top-header-title">Paso 1 · Datos iniciales del registro</div>
+          <div class="form-top-grid">
+            <div>
+              <label>Fecha</label>
+              <input id="fFecha" type="date" required />
+            </div>
             <div>
               <label>Servicio</label>
               <select id="fServicio">
@@ -791,9 +773,63 @@
               </select>
             </div>
             <div>
+              <label>Turno</label>
+              <select id="fTurno" required>
+                <option value="Día">Día</option>
+                <option value="Noche">Noche</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label>Herramienta / Insumo</label>
+            <select id="fHerramienta" required>
+              <option value="Bolsa">Bolsa</option>
+              <option value="Lutocar">Lutocar</option>
+              <option value="Escobillón">Escobillón</option>
+              <option value="Rastrillo">Rastrillo</option>
+              <option value="Pala">Pala</option>
+              <option value="Carretilla">Carretilla</option>
+              <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
+              <option value="Cepillo central de acero">Cepillo central de acero</option>
+              <option value="Detergente Pinol">Detergente Pinol</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label>Cantidad</label>
+            <input id="fCantidad" type="number" min="1" value="1" required />
+          </div>
+          <div>
+            <label>Código Trabajador (o interno MA-001)</label>
+            <input id="fCodigo" list="staffCodeList" placeholder="Ej: 894 o MA-532" autocomplete="off" />
+            <datalist id="staffCodeList"></datalist>
+            <div id="staffCodeHint" class="staff-match"></div>
+          </div>
+          <div>
+            <label>Estado</label>
+            <select id="fEstado" required>
+              <option value="Entregado / Operativo">Entregado / Operativo</option>
+              <option value="Devuelto">Devuelto</option>
+              <option value="Dañado / Repuesto">Dañado / Repuesto</option>
+            </select>
+          </div>
+          <div class="full">
+            <label>Nombre y Apellido del Personal Operativo (búsqueda o escritura manual)</label>
+            <input id="fNombre" list="staffNameList" placeholder="Escribe o busca nombre para ubicar su código..." autocomplete="off" required />
+            <datalist id="staffNameList"></datalist>
+            <div id="staffNameHint" class="staff-warn"></div>
+          </div>
+
+          <!-- Fila de Sector / Lugar de Trabajo y Teléfono -->
+          <div class="triple">
+            <div>
               <label id="fSectorLabel">Sector / Lugar de Trabajo</label>
               <input id="fSector" list="sectorBarridoList" placeholder="Ej: S.2.045 o lugar asignado..." autocomplete="off" />
               <datalist id="sectorBarridoList"></datalist>
+              <datalist id="sectorCodigoBarridoList"></datalist>
             </div>
             <div>
               <label>Teléfono</label>
@@ -824,14 +860,19 @@
             </div>
           </div>
 
+          <div>
+            <label>Supervisor</label>
+            <input id="fSupervisor" placeholder="Ej: Marcial Rojas" />
+          </div>
+          <div>
+            <label>Observaciones / Ruta</label>
+            <input id="fObservaciones" placeholder="Ej: Grupo / Cuadrilla / Detalle de entrega..." />
+          </div>
+
           <div class="full">
             <div id="serviceRuleHint" class="rule-banner info-rule" style="display:none"></div>
           </div>
 
-          <div class="full">
-            <label>Observaciones / Ruta</label>
-            <input id="fObservaciones" placeholder="Ej: Grupo / Cuadrilla / Detalle de entrega..." />
-          </div>
           <div class="full">
             <label>Foto de Evidencia o Acta Firmada (Cámara o URL)</label>
             <input id="fFoto" placeholder="URL de imagen o captura desde cámara..." />
@@ -867,6 +908,19 @@
     const PENDING_KEY = 'control_herramientas_pending_v1';
     const DELETED_KEY = 'control_herramientas_deleted_v1';
     const STAFF_CACHE_KEY = 'control_herramientas_staff_v1';
+
+    const CODIGOS_SECTOR_BARRIDO_BASE = [
+      'S.1.001', 'S.1.002', 'S.1.003', 'S.1.004', 'S.1.005',
+      'S.2.010', 'S.2.020', 'S.2.030', 'S.2.045', 'S.2.050',
+      'S.3.001', 'S.3.002', 'S.3.003', 'S.3.004', 'S.3.005',
+      'S.4.001', 'S.4.002', 'S.4.003', 'S.4.004', 'S.4.005',
+      'S.5.001', 'S.5.002', 'S.5.003', 'S.5.004', 'S.5.005',
+      'S.6.001', 'S.6.002', 'S.6.003', 'S.6.004', 'S.6.005',
+      'S.7.001', 'S.7.002', 'S.7.003', 'S.7.004', 'S.7.005',
+      'S.8.001', 'S.8.002', 'S.8.003', 'S.8.004', 'S.8.005',
+      'S.9.001', 'S.9.002', 'S.9.003', 'S.9.004', 'S.9.005'
+    ];
+
     const SECTORES_MERCADOS_BASE = [
       'Mercado Abasto',
       'Mercado Mutualista',
@@ -881,6 +935,7 @@
       'Mercado Bolívar',
       'Mercado Tobago'
     ];
+
     const HERRAMIENTAS = [
       'Bolsa',
       'Lutocar',
@@ -938,17 +993,50 @@
     let isSyncingStaffFields = false;
     let lastFilteredEntries = [];
 
+    function extractSectorCodeOnly(rawVal) {
+      const s = String(rawVal || '').trim();
+      if (!s) return '';
+      const m = s.match(/^(S\.\d+\.\d+|S-\d+-\d+|SEC[-_\s]?\d+)/i);
+      return m ? m[1].toUpperCase() : '';
+    }
+
     function refreshSectorDatalist() {
-      const dl = document.getElementById('sectorBarridoList');
-      if (!dl) return;
+      const dlGeneral = document.getElementById('sectorBarridoList');
+      const dlCodigo = document.getElementById('sectorCodigoBarridoList');
+
       const fromStaff = staffList.map(s => (s.sector || '').trim()).filter(Boolean);
       const fromEntries = entries.map(e => (e.sector || '').trim()).filter(Boolean);
-      const combined = [...new Set([...SECTORES_MERCADOS_BASE, ...fromStaff, ...fromEntries])];
+      const combinedGeneral = [...new Set([...SECTORES_MERCADOS_BASE, ...fromStaff, ...fromEntries])];
 
-      dl.innerHTML = combined
-        .slice(0, 1500)
-        .map(sec => `<option value="${sec.replace(/"/g, '&quot;')}">${sec}</option>`)
-        .join('');
+      if (dlGeneral) {
+        dlGeneral.innerHTML = combinedGeneral
+          .slice(0, 1500)
+          .map(sec => `<option value="${sec.replace(/"/g, '&quot;')}">${sec}</option>`)
+          .join('');
+      }
+
+      const codesFromData = [...fromStaff, ...fromEntries]
+        .map(extractSectorCodeOnly)
+        .filter(Boolean);
+      const combinedCodes = [...new Set([...CODIGOS_SECTOR_BARRIDO_BASE, ...codesFromData])].sort();
+
+      if (dlCodigo) {
+        dlCodigo.innerHTML = combinedCodes
+          .slice(0, 1500)
+          .map(cod => `<option value="${cod.replace(/"/g, '&quot;')}">${cod}</option>`)
+          .join('');
+      }
+    }
+
+    function normalizeTurno(rawTurno, rawObs = '') {
+      const t = String(rawTurno || '').trim().toLowerCase();
+      if (t === 'noche' || t.includes('noch')) return 'Noche';
+      if (t === 'día' || t === 'dia' || t.includes('diurn')) return 'Día';
+      const obsMatch = String(rawObs || '').match(/\[[^\]]*turno\s*:\s*(d[ií]a|noche)[^\]]*\]/i);
+      if (obsMatch) {
+        return obsMatch[1].toLowerCase() === 'noche' ? 'Noche' : 'Día';
+      }
+      return 'Día';
     }
 
     function normalizeHerramientaName(rawTool) {
@@ -1229,26 +1317,30 @@
 
       if (mappedSrv !== '1 - Barrido (Km)') {
         barridoBox.classList.remove('active');
+        sectorInput.setAttribute('list', 'sectorBarridoList');
         return;
       }
 
       barridoBox.classList.add('active');
 
       if (modalidad === '(Sector/Mercados)') {
-        sectorLabel.textContent = 'Sector / Mercado Asignado (por persona)';
-        sectorInput.placeholder = 'Selecciona o escribe sector o mercado...';
+        sectorLabel.textContent = 'Código de Sector (Barrido)';
+        sectorInput.setAttribute('list', 'sectorCodigoBarridoList');
+        sectorInput.placeholder = 'Ej: S.2.045';
         eqSel.style.display = 'none';
         detInp.style.display = 'block';
         eqLabel.textContent = 'Detalle / Tramo / Puesto';
         detInp.placeholder = 'Ej: Calle / Avenida / Pasillo / Referencia...';
       } else if (modalidad === 'Barrido mecanizado') {
         sectorLabel.textContent = 'Ruta / Recorrido Mecanizado';
+        sectorInput.setAttribute('list', 'sectorBarridoList');
         sectorInput.placeholder = 'Ej: Anillo / Avenida principal...';
         eqSel.style.display = 'block';
         detInp.style.display = 'none';
         eqLabel.textContent = 'Equipo de Barrido Mecanizado';
       } else if (modalidad === 'Barrido por escuadras') {
         sectorLabel.textContent = 'Tramo / Frecuencia de Barrido Mecanizado';
+        sectorInput.setAttribute('list', 'sectorBarridoList');
         sectorInput.placeholder = 'Tramo o vía de la frecuencia mecanizada...';
         eqSel.style.display = 'none';
         detInp.style.display = 'block';
@@ -1274,7 +1366,7 @@
         const mod = document.getElementById('fBarridoModalidad').value;
         const eq = document.getElementById('fBarridoEquipo').value;
         if (mod === '(Sector/Mercados)') {
-          hintText = 'Barrido · (Sector/Mercados): asignación por persona en sector o mercado (elige de la lista o escríbelo).';
+          hintText = 'Barrido · (Sector/Mercados): selecciona o escribe solo el código de sector (ej. S.2.045).';
         } else if (mod === 'Barrido mecanizado') {
           if (eq === 'MINICARGADOR 1' || eq === 'MINICARGADOR 2') {
             hintText = `${eq}: equipo de barrido mecanizado seleccionado.`;
@@ -1434,6 +1526,7 @@
     function populateExtraStaffFields(match, forceOverwrite = false) {
       if (!match) return;
       const servicioEl = document.getElementById('fServicio');
+      const turnoEl = document.getElementById('fTurno');
       const sectorEl = document.getElementById('fSector');
       const supervisorEl = document.getElementById('fSupervisor');
       const celularEl = document.getElementById('fCelular');
@@ -1442,10 +1535,14 @@
         setServicioSelectValue(match.servicio, true);
         servicioEl.dataset.autofilled = '1';
       }
+      if (match.turno && (forceOverwrite || turnoEl.dataset.autofilled === '1')) {
+        turnoEl.value = normalizeTurno(match.turno);
+        turnoEl.dataset.autofilled = '1';
+      }
       const mappedSrv = matchServicioOficial(match.servicio || servicioEl.value);
       const mod = document.getElementById('fBarridoModalidad').value;
       if (mappedSrv === '1 - Barrido (Km)' && mod === '(Sector/Mercados)' && match.sector && (forceOverwrite || !sectorEl.value.trim() || sectorEl.dataset.autofilled === '1')) {
-        sectorEl.value = match.sector;
+        sectorEl.value = extractSectorCodeOnly(match.sector) || match.sector;
         sectorEl.dataset.autofilled = '1';
       }
       if (match.supervisor && (forceOverwrite || !supervisorEl.value.trim() || supervisorEl.dataset.autofilled === '1')) {
@@ -1609,10 +1706,13 @@
       const rawSrv = String(raw.servicio ?? raw.SERVICIO ?? raw.SERVICIO_SECTOR ?? '').trim();
       const rawSec = String(raw.sector ?? raw.SECTOR ?? raw.LUGAR ?? raw.LUGAR_TRABAJO ?? '').trim();
       const splitPair = splitServicioYSector(rawSrv, rawSec);
+      const obsRaw = String(raw.observaciones ?? raw.OBSERVACIONES ?? '').trim();
+      const turno = normalizeTurno(raw.turno ?? raw.TURNO ?? '', obsRaw);
 
       return {
         uid,
         fecha,
+        turno,
         codigo: String(raw.codigo ?? raw.CODIGO ?? '').trim(),
         nombre: String(raw.nombre ?? raw.NOMBRE ?? '').trim().toUpperCase(),
         herramienta: matchedTool,
@@ -1622,7 +1722,7 @@
         sector: splitPair.sector,
         supervisor: String(raw.supervisor ?? raw.SUPERVISOR ?? '').trim(),
         celular: String(raw.celular ?? raw.CELULAR ?? raw.TELEFONO ?? '').trim(),
-        observaciones: String(raw.observaciones ?? raw.OBSERVACIONES ?? '').trim(),
+        observaciones: obsRaw,
         foto: String(raw.foto ?? raw.FOTO ?? '').trim(),
         ultimaActualizacion: String(raw.ultimaActualizacion ?? raw.ACTUALIZADO ?? '').trim()
       };
@@ -1954,7 +2054,7 @@
         }
 
         if (q) {
-          const hay = [e.codigo, e.nombre, e.sector, e.observaciones, e.servicio, e.supervisor, e.celular, e.herramienta, e.estado, e.fecha]
+          const hay = [e.codigo, e.nombre, e.sector, e.observaciones, e.servicio, e.turno, e.supervisor, e.celular, e.herramienta, e.estado, e.fecha]
             .join(' ')
             .toLowerCase();
           if (!hay.includes(q)) return false;
@@ -1972,9 +2072,10 @@
       const imgHtml = item.foto ? `<img src="${item.foto}" alt="${item.nombre}" onerror="this.style.display='none'" />` : '';
       box.innerHTML = `
         <h3>[${item.codigo || 'S/C'}] ${item.nombre}</h3>
-        <div class="status-text">Fecha: ${item.fecha || '-'} · <strong>${item.herramienta}</strong> (${item.cantidad}) · Estado: <strong>${item.estado}</strong></div>
+        <div class="status-text">Fecha: ${item.fecha || '-'} · Turno: <strong>${item.turno || 'Día'}</strong> · <strong>${item.herramienta}</strong> (${item.cantidad}) · Estado: <strong>${item.estado}</strong></div>
         <div style="margin-top:8px; font-size:0.86rem; line-height:1.55;">
           <strong>Servicio:</strong> ${item.servicio || '-'}<br/>
+          <strong>Turno:</strong> ${item.turno || 'Día'}<br/>
           <strong>Sector / Lugar:</strong> ${item.sector || '-'}<br/>
           <strong>Teléfono:</strong> ${item.celular || '-'}<br/>
           <strong>Supervisor:</strong> ${item.supervisor || '-'}<br/>
@@ -2040,6 +2141,7 @@
       tbody.innerHTML = filtered.map(e => `
         <tr onclick="selectEntry('${e.uid}')" style="cursor:pointer">
           <td>${e.fecha || '-'}</td>
+          <td>${e.turno || 'Día'}</td>
           <td><strong>${e.codigo || 'S/C'}</strong></td>
           <td>${e.nombre || '-'}</td>
           <td><span class="pill ${getToolPillClass(e.herramienta)}">${e.herramienta}</span></td>
@@ -2084,6 +2186,7 @@
       const codigoEl = document.getElementById('fCodigo');
       const nombreEl = document.getElementById('fNombre');
       const servicioEl = document.getElementById('fServicio');
+      const turnoEl = document.getElementById('fTurno');
       const sectorEl = document.getElementById('fSector');
       const supervisorEl = document.getElementById('fSupervisor');
       const celularEl = document.getElementById('fCelular');
@@ -2091,6 +2194,7 @@
       codigoEl.dataset.autofilled = item ? '0' : '1';
       nombreEl.dataset.autofilled = item ? '0' : '1';
       servicioEl.dataset.autofilled = item ? '0' : '1';
+      turnoEl.dataset.autofilled = item ? '0' : '1';
       sectorEl.dataset.autofilled = item ? '0' : '1';
       supervisorEl.dataset.autofilled = item ? '0' : '1';
       celularEl.dataset.autofilled = item ? '0' : '1';
@@ -2099,18 +2203,19 @@
 
       document.getElementById('fUid').value = item ? item.uid : '';
       document.getElementById('fFecha').value = item ? item.fecha : (lastEntry?.fecha || today);
+      setServicioSelectValue(item ? item.servicio : (lastEntry?.servicio || ''), true);
+      turnoEl.value = item ? normalizeTurno(item.turno, item.observaciones) : (lastEntry ? normalizeTurno(lastEntry.turno, lastEntry.observaciones) : 'Día');
       document.getElementById('fHerramienta').value = item ? normalizeHerramientaName(item.herramienta) : defaultTool;
-      codigoEl.value = item ? item.codigo : '';
       document.getElementById('fCantidad').value = item ? item.cantidad : (isSingleUnitTool ? 1 : 100);
+      codigoEl.value = item ? item.codigo : '';
       document.getElementById('fEstado').value = item ? item.estado : 'Entregado / Operativo';
       nombreEl.value = item ? item.nombre : '';
-      supervisorEl.value = item ? item.supervisor : (lastEntry?.supervisor || '');
-      setServicioSelectValue(item ? item.servicio : (lastEntry?.servicio || ''), true);
       sectorEl.value = item ? (item.sector || '') : '';
       celularEl.value = item ? (item.celular || '') : '';
       document.getElementById('fBarridoModalidad').value = '(Sector/Mercados)';
       document.getElementById('fBarridoEquipo').value = '';
       document.getElementById('fBarridoDetalle').value = '';
+      supervisorEl.value = item ? item.supervisor : (lastEntry?.supervisor || '');
       document.getElementById('fObservaciones').value = item ? item.observaciones : '';
       document.getElementById('fFoto').value = item ? item.foto : '';
       document.getElementById('fFotoFile').value = '';
@@ -2124,7 +2229,7 @@
         handleCodeInput(false);
       }
       document.getElementById('modalBackdrop').classList.add('open');
-      setTimeout(() => codigoEl.focus(), 40);
+      setTimeout(() => document.getElementById('fFecha').focus(), 40);
     }
 
     function closeModal() {
@@ -2183,6 +2288,9 @@
       e.target.dataset.autofilled = '0';
       applyServiceAndToolRules();
     });
+    document.getElementById('fTurno').addEventListener('change', (e) => {
+      e.target.dataset.autofilled = '0';
+    });
     document.getElementById('fBarridoModalidad').addEventListener('change', applyServiceAndToolRules);
     document.getElementById('fBarridoEquipo').addEventListener('change', applyServiceAndToolRules);
     document.getElementById('fHerramienta').addEventListener('change', applyServiceAndToolRules);
@@ -2230,6 +2338,7 @@
     document.getElementById('entregaForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const srvVal = document.getElementById('fServicio').value.trim();
+      const turnoVal = normalizeTurno(document.getElementById('fTurno').value);
       const herrVal = normalizeHerramientaName(document.getElementById('fHerramienta').value);
       const mappedSrv = matchServicioOficial(srvVal);
 
@@ -2257,6 +2366,7 @@
       const record = normalizeEntry({
         uid,
         fecha: document.getElementById('fFecha').value,
+        turno: turnoVal,
         codigo: document.getElementById('fCodigo').value.trim(),
         nombre: document.getElementById('fNombre').value.trim().toUpperCase(),
         herramienta: herrVal,
@@ -2284,7 +2394,7 @@
       renderDetail(record);
       closeModal();
 
-      setStatus(`Guardado local de ${record.nombre} (${record.estado}). Enviando a Google Sheets...`);
+      setStatus(`Guardado local de ${record.nombre} (${record.turno} · ${record.estado}). Enviando a Google Sheets...`);
       try {
         await postToSheets({ action: 'upsert', record });
         setTimeout(syncFromSheets, 5000);
@@ -2295,9 +2405,9 @@
 
     document.getElementById('btnExportCsv').addEventListener('click', () => {
       if (!isAdminUnlocked) return;
-      const headers = ['UID', 'FECHA', 'CODIGO', 'NOMBRE', 'HERRAMIENTA', 'CANTIDAD', 'ESTADO', 'SERVICIO', 'SECTOR_LUGAR', 'TELEFONO', 'SUPERVISOR', 'OBSERVACIONES'];
+      const headers = ['UID', 'FECHA', 'TURNO', 'CODIGO', 'NOMBRE', 'HERRAMIENTA', 'CANTIDAD', 'ESTADO', 'SERVICIO', 'SECTOR_LUGAR', 'TELEFONO', 'SUPERVISOR', 'OBSERVACIONES'];
       const rows = entries.map(e => [
-        e.uid, e.fecha, e.codigo, e.nombre, e.herramienta, e.cantidad, e.estado, e.servicio, e.sector, e.celular, e.supervisor, e.observaciones
+        e.uid, e.fecha, e.turno, e.codigo, e.nombre, e.herramienta, e.cantidad, e.estado, e.servicio, e.sector, e.celular, e.supervisor, e.observaciones
       ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
       const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv;charset=utf-8;' });
       const a = document.createElement('a');
