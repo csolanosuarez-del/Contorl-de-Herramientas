@@ -217,32 +217,78 @@
     .summary-table tr.total-row td { background: #131d2e; font-weight: 700; color: #34d399; border-bottom: none; }
     .summary-table tr.total-row td:first-child { color: var(--text); }
 
+    /* Panel de filtros tipo chips estilo referencia */
     .service-chart-section {
       margin-bottom: 16px;
     }
-    .chart-top-bar {
+    .date-chips-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      align-items: flex-end;
+      gap: 16px;
     }
-    .chart-date-controls {
+    .date-chip-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .date-chip-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .date-chip-list {
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+    .chip-btn {
+      background: #0f172a;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 5px 10px;
+      border-radius: 7px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      line-height: 1.2;
+      cursor: pointer;
+    }
+    .chip-btn:hover {
+      border-color: #64748b;
+      color: #f8fafc;
+    }
+    .chip-btn.active {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #ffffff;
+    }
+    .chip-select-day {
+      width: auto;
+      min-width: 96px;
+      padding: 5px 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 7px;
+    }
+    .date-chips-actions {
+      margin-left: auto;
+      display: flex;
       align-items: center;
       gap: 6px;
     }
-    .chart-date-controls select {
-      width: auto;
-      min-width: 98px;
-      padding: 6px 9px;
-      font-size: 0.78rem;
-      background: var(--card);
-    }
     .btn-clear-date {
-      padding: 6px 9px;
+      padding: 6px 10px;
       font-size: 0.75rem;
       background: rgba(148, 163, 184, 0.12);
     }
@@ -275,6 +321,12 @@
       color: var(--muted);
       font-weight: 400;
     }
+    .chart-controls-right {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
     .metric-select {
       width: auto;
       padding: 6px 10px;
@@ -287,32 +339,23 @@
       border-radius: 8px;
       padding: 10px;
       min-width: 0;
-      overflow-x: auto;
+      overflow-x: hidden;
     }
     canvas.service-chart-canvas {
       width: 100%;
-      min-width: 720px;
-      height: 280px;
+      max-width: 100%;
+      height: 250px;
       display: block;
     }
-    .chart-legend {
+    .chart-footer-note {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 10px;
-      font-size: 0.74rem;
-      color: #cbd5e1;
-    }
-    .legend-item {
-      display: inline-flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 5px;
-    }
-    .legend-dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 0.73rem;
+      color: #94a3b8;
     }
 
     .filters {
@@ -518,11 +561,14 @@
       .summary-table { font-size: 0.75rem; min-width: 320px; }
       .summary-table th, .summary-table td { padding: 6px 8px; }
       .service-chart-section { margin-bottom: 10px; }
-      .chart-date-controls select { min-width: 82px; padding: 5px 7px; font-size: 0.72rem; }
+      .date-chips-panel { padding: 10px; gap: 10px; margin-bottom: 8px; }
+      .chip-btn { padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; }
+      .chip-select-day { min-width: 86px; padding: 4px 7px; font-size: 0.7rem; }
+      .date-chips-actions { margin-left: 0; width: 100%; justify-content: flex-end; }
       .charts-card { padding: 10px; border-radius: 8px; }
       .charts-title { font-size: 0.86rem; }
       .metric-select { padding: 5px 7px; font-size: 0.72rem; }
-      canvas.service-chart-canvas { height: 230px; min-width: 640px; }
+      canvas.service-chart-canvas { height: 215px; }
       .filters { gap: 6px; margin-bottom: 10px; }
       input, select, textarea { padding: 7px 9px; font-size: 0.8rem; border-radius: 7px; }
       .main-grid { gap: 10px; }
@@ -619,61 +665,71 @@
       </table>
     </section>
 
-    <section class="service-chart-section" aria-label="Gráfica por Servicio agrupando herramientas">
-      <div class="chart-top-bar">
-        <div class="chart-date-controls">
-          <select id="filterAno" aria-label="Filtrar por Año">
-            <option value="">Año (Todos)</option>
-          </select>
-          <select id="filterMes" aria-label="Filtrar por Mes">
-            <option value="">Mes (Todos)</option>
-            <option value="01">Enero</option>
-            <option value="02">Febrero</option>
-            <option value="03">Marzo</option>
-            <option value="04">Abril</option>
-            <option value="05">Mayo</option>
-            <option value="06">Junio</option>
-            <option value="07">Julio</option>
-            <option value="08">Agosto</option>
-            <option value="09">Septiembre</option>
-            <option value="10">Octubre</option>
-            <option value="11">Noviembre</option>
-            <option value="12">Diciembre</option>
-          </select>
-          <select id="filterDia" aria-label="Filtrar por Día de la semana">
-            <option value="">Día (Todos)</option>
-            <option value="1">Lunes</option>
-            <option value="2">Martes</option>
-            <option value="3">Miércoles</option>
-            <option value="4">Jueves</option>
-            <option value="5">Viernes</option>
-            <option value="6">Sábado</option>
-            <option value="0">Domingo</option>
-          </select>
-          <select id="filterNumDia" aria-label="Filtrar por Número de Día">
-            <option value="">N° Día (Todos)</option>
-          </select>
-          <button id="btnClearDate" class="btn-clear-date" type="button">✕ Todo tiempo</button>
+    <section class="service-chart-section" aria-label="Filtros de fecha y gráfico por herramienta">
+      <div class="date-chips-panel">
+        <div class="date-chip-group">
+          <span class="date-chip-label">AÑO</span>
+          <div id="anoChips" class="date-chip-list"></div>
         </div>
 
-        <select id="chartMetric" class="metric-select" aria-label="Métrica de gráfica">
-          <option value="cantidad">Cantidad Entregada</option>
-          <option value="registros">N° de Registros</option>
-        </select>
+        <div class="date-chip-group">
+          <span class="date-chip-label">MES</span>
+          <div id="mesChips" class="date-chip-list"></div>
+        </div>
+
+        <div class="date-chip-group">
+          <span class="date-chip-label">DÍA</span>
+          <div id="diaChips" class="date-chip-list"></div>
+        </div>
+
+        <div class="date-chip-group">
+          <span class="date-chip-label">N.° DE DÍA</span>
+          <div class="date-chip-list">
+            <select id="filterNumDia" class="chip-select-day" aria-label="Filtrar por Número de Día">
+              <option value="">Todos</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="date-chips-actions">
+          <button id="btnClearDate" class="btn-clear-date" type="button">✕ Todo tiempo</button>
+        </div>
       </div>
 
       <div class="charts-card">
         <div class="charts-header">
           <h2 class="charts-title">
-            📊 Herramientas por Servicio (1 al 10)
+            <span id="chartToolDot" style="display:inline-block;width:11px;height:11px;border-radius:3px;background:#10b981;"></span>
+            <span id="chartToolTitle">Bolsa · Servicios 1 al 10</span>
             <span id="serviceChartScope" class="charts-sub">· Todo el periodo</span>
           </h2>
-          <span id="serviceChartSummary" class="status-text">Total: 0</span>
+          <div class="chart-controls-right">
+            <select id="chartHerramienta" class="metric-select" aria-label="Elegir herramienta para el gráfico">
+              <option value="Bolsa">🛠️ Bolsa</option>
+              <option value="Lutocar">🛠️ Lutocar</option>
+              <option value="Escobillón">🛠️ Escobillón</option>
+              <option value="Rastrillo">🛠️ Rastrillo</option>
+              <option value="Pala">🛠️ Pala</option>
+              <option value="Carretilla">🛠️ Carretilla</option>
+              <option value="Cepillo lateral de acero">🛠️ Cepillo lateral de acero</option>
+              <option value="Cepillo central de acero">🛠️ Cepillo central de acero</option>
+              <option value="Detergente Pinol">🛠️ Detergente Pinol</option>
+              <option value="Otro">🛠️ Otro</option>
+            </select>
+            <select id="chartMetric" class="metric-select" aria-label="Métrica de gráfica">
+              <option value="cantidad">Cantidad Entregada</option>
+              <option value="registros">N° de Registros</option>
+            </select>
+            <span id="serviceChartSummary" class="status-text">Total herramienta: 0</span>
+          </div>
         </div>
 
         <div class="chart-box">
           <canvas id="serviceChartCanvas" class="service-chart-canvas"></canvas>
-          <div id="serviceChartLegend" class="chart-legend"></div>
+          <div class="chart-footer-note">
+            <span>Eje X: Servicios 1 a 10 (escala propia de la herramienta)</span>
+            <span id="chartTopService">Mayor servicio: —</span>
+          </div>
         </div>
       </div>
     </section>
@@ -1000,6 +1056,29 @@
       '9 - Puntos Limpios (m3)',
       '10 - Patológico CI (Kg)'
     ];
+    const MESES_CORTOS = [
+      { val: '01', lbl: 'Ene' },
+      { val: '02', lbl: 'Feb' },
+      { val: '03', lbl: 'Mar' },
+      { val: '04', lbl: 'Abr' },
+      { val: '05', lbl: 'May' },
+      { val: '06', lbl: 'Jun' },
+      { val: '07', lbl: 'Jul' },
+      { val: '08', lbl: 'Ago' },
+      { val: '09', lbl: 'Sep' },
+      { val: '10', lbl: 'Oct' },
+      { val: '11', lbl: 'Nov' },
+      { val: '12', lbl: 'Dic' }
+    ];
+    const DIAS_CORTOS = [
+      { val: '1', lbl: 'Lun' },
+      { val: '2', lbl: 'Mar' },
+      { val: '3', lbl: 'Mié' },
+      { val: '4', lbl: 'Jue' },
+      { val: '5', lbl: 'Vie' },
+      { val: '6', lbl: 'Sáb' },
+      { val: '0', lbl: 'Dom' }
+    ];
     const MESES_NOMBRES = {
       '01': 'Enero', '02': 'Febrero', '03': 'Marzo', '04': 'Abril',
       '05': 'Mayo', '06': 'Junio', '07': 'Julio', '08': 'Agosto',
@@ -1009,6 +1088,10 @@
       '1': 'Lunes', '2': 'Martes', '3': 'Miércoles',
       '4': 'Jueves', '5': 'Viernes', '6': 'Sábado', '0': 'Domingo'
     };
+
+    let selectedAno = '';
+    let selectedMes = '';
+    let selectedDia = '';
 
     let entries = [];
     let staffList = [];
@@ -1020,6 +1103,51 @@
     let isAdminUnlocked = false;
     let isSyncingStaffFields = false;
     let lastFilteredEntries = [];
+
+    function renderDateChips(availableYears) {
+      const anoBox = document.getElementById('anoChips');
+      if (anoBox) {
+        const yearsList = availableYears.length ? availableYears : [String(new Date().getFullYear())];
+        anoBox.innerHTML = yearsList
+          .map(y => `<button type="button" class="chip-btn ${selectedAno === y ? 'active' : ''}" data-ano="${y}">${y}</button>`)
+          .join('');
+        anoBox.querySelectorAll('.chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const val = btn.dataset.ano || '';
+            selectedAno = selectedAno === val ? '' : val;
+            render();
+          });
+        });
+      }
+
+      const mesBox = document.getElementById('mesChips');
+      if (mesBox) {
+        mesBox.innerHTML = MESES_CORTOS
+          .map(m => `<button type="button" class="chip-btn ${selectedMes === m.val ? 'active' : ''}" data-mes="${m.val}">${m.lbl}</button>`)
+          .join('');
+        mesBox.querySelectorAll('.chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const val = btn.dataset.mes || '';
+            selectedMes = selectedMes === val ? '' : val;
+            render();
+          });
+        });
+      }
+
+      const diaBox = document.getElementById('diaChips');
+      if (diaBox) {
+        diaBox.innerHTML = DIAS_CORTOS
+          .map(d => `<button type="button" class="chip-btn ${selectedDia === d.val ? 'active' : ''}" data-dia="${d.val}">${d.lbl}</button>`)
+          .join('');
+        diaBox.querySelectorAll('.chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const val = btn.dataset.dia ?? '';
+            selectedDia = selectedDia === val ? '' : val;
+            render();
+          });
+        });
+      }
+    }
 
     function wipeAllLocalRecords() {
       if (!isAdminUnlocked) return;
@@ -1170,9 +1298,9 @@
 
     function prepareCanvas(canvas) {
       const rect = canvas.getBoundingClientRect();
-      const parentW = canvas.parentElement ? canvas.parentElement.clientWidth - 20 : 720;
-      const width = Math.max(640, Math.floor(rect.width || parentW || 720));
-      const height = Math.max(180, Math.floor(rect.height || 280));
+      const parentW = canvas.parentElement ? canvas.parentElement.clientWidth - 20 : 320;
+      const width = Math.max(280, Math.floor(rect.width || parentW || 320));
+      const height = Math.max(170, Math.floor(rect.height || 240));
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
         canvas.width = width * dpr;
@@ -1184,23 +1312,17 @@
       return { ctx, width, height };
     }
 
-    function renderLegend() {
-      const legendEl = document.getElementById('serviceChartLegend');
-      legendEl.innerHTML = HERRAMIENTAS.map(h => `
-        <span class="legend-item">
-          <i class="legend-dot" style="background:${TOOL_COLORS[h] || '#94a3b8'}"></i>${h}
-        </span>
-      `).join('');
-    }
-
     function renderServiceChart(filtered) {
       lastFilteredEntries = filtered;
-      renderLegend();
 
+      const selectedToolRaw = document.getElementById('chartHerramienta').value || 'Bolsa';
+      const selectedTool = normalizeHerramientaName(selectedToolRaw);
+      const toolColor = TOOL_COLORS[selectedTool] || '#10b981';
       const metric = document.getElementById('chartMetric').value || 'cantidad';
-      const ano = document.getElementById('filterAno').value;
-      const mes = document.getElementById('filterMes').value;
-      const dia = document.getElementById('filterDia').value;
+
+      const ano = selectedAno;
+      const mes = selectedMes;
+      const dia = selectedDia;
       const numDia = document.getElementById('filterNumDia').value;
 
       const parts = [];
@@ -1212,50 +1334,53 @@
         ? `· ${parts.join(' · ')}`
         : '· Todo el periodo';
 
-      const matrix = SERVICIOS_OFICIALES.map((srvFull, sIdx) => {
-        const numLabel = String(sIdx + 1);
-        const shortName = srvFull.replace(/^\d+\s*-\s*/, '').replace(/\s*\([^)]*\)$/, '');
-        const byTool = {};
-        HERRAMIENTAS.forEach(h => { byTool[h] = 0; });
-        return { srvFull, numLabel, shortName, byTool };
-      });
+      document.getElementById('chartToolDot').style.background = toolColor;
+      document.getElementById('chartToolTitle').textContent = `${selectedTool} · Servicios 1 al 10`;
 
-      let totalMetric = 0;
+      const serviceVals = SERVICIOS_OFICIALES.map((srvFull, sIdx) => ({
+        sIdx,
+        numLabel: String(sIdx + 1),
+        srvFull,
+        val: 0
+      }));
+
+      let totalToolVal = 0;
       filtered.forEach(item => {
+        if (normalizeHerramientaName(item.herramienta) !== selectedTool) return;
         const mapped = matchServicioOficial(item.servicio);
         const sIdx = SERVICIOS_OFICIALES.findIndex(s => normalizeSimple(s) === normalizeSimple(mapped));
         if (sIdx < 0) return;
-        const toolName = HERRAMIENTAS.includes(item.herramienta) ? item.herramienta : 'Otro';
-        const val = metric === 'registros' ? 1 : (Number(item.cantidad) || 0);
-        matrix[sIdx].byTool[toolName] += val;
-        totalMetric += val;
+        const v = metric === 'registros' ? 1 : (Number(item.cantidad) || 0);
+        serviceVals[sIdx].val += v;
+        totalToolVal += v;
       });
 
       document.getElementById('serviceChartSummary').textContent =
-        `${metric === 'registros' ? 'Registros' : 'Cantidad total'}: ${totalMetric}`;
+        `${metric === 'registros' ? 'Registros' : 'Total'} ${selectedTool}: ${totalToolVal}`;
+
+      const topItem = serviceVals.reduce((best, cur) => (cur.val > best.val ? cur : best), { val: 0, srvFull: '—' });
+      document.getElementById('chartTopService').textContent = topItem.val > 0
+        ? `Mayor servicio: ${topItem.srvFull} (${topItem.val})`
+        : 'Mayor servicio: Sin entregas';
 
       const canvas = document.getElementById('serviceChartCanvas');
       const { ctx, width, height } = prepareCanvas(canvas);
+      const isCompact = width < 520;
 
-      const padLeft = 44;
-      const padRight = 14;
-      const padTop = 22;
-      const padBottom = 38;
-      const plotW = Math.max(120, width - padLeft - padRight);
-      const plotH = Math.max(80, height - padTop - padBottom);
+      const padLeft = isCompact ? 34 : 44;
+      const padRight = 10;
+      const padTop = 20;
+      const padBottom = isCompact ? 28 : 34;
+      const plotW = Math.max(100, width - padLeft - padRight);
+      const plotH = Math.max(70, height - padTop - padBottom);
 
-      let maxBarVal = 0;
-      matrix.forEach(row => {
-        HERRAMIENTAS.forEach(h => {
-          if (row.byTool[h] > maxBarVal) maxBarVal = row.byTool[h];
-        });
-      });
-      const yMax = Math.max(1, maxBarVal);
+      const maxVal = Math.max(0, ...serviceVals.map(d => d.val));
+      const yMax = Math.max(1, maxVal);
 
       ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
       ctx.lineWidth = 1;
       ctx.fillStyle = '#94a3b8';
-      ctx.font = '10px system-ui, sans-serif';
+      ctx.font = `${isCompact ? 9 : 10}px system-ui, sans-serif`;
       ctx.textAlign = 'right';
       for (let i = 0; i <= 4; i++) {
         const frac = i / 4;
@@ -1264,59 +1389,51 @@
         ctx.moveTo(padLeft, y);
         ctx.lineTo(width - padRight, y);
         ctx.stroke();
-        const tick = maxBarVal === 0 && i > 0 ? 0 : Math.round(yMax * frac);
-        ctx.fillText(String(tick), padLeft - 6, y + 3.5);
+        const tick = maxVal === 0 && i > 0 ? 0 : Math.round(yMax * frac);
+        ctx.fillText(String(tick), padLeft - 5, y + 3.5);
       }
 
-      const groupCount = matrix.length;
-      const groupSlotW = plotW / groupCount;
-      const clusterW = Math.min(groupSlotW * 0.88, 106);
-      const barCount = HERRAMIENTAS.length;
-      const gapW = 1.5;
-      const barW = Math.max(3.5, (clusterW - gapW * (barCount - 1)) / barCount);
+      const count = serviceVals.length;
+      const slotW = plotW / count;
+      const barW = Math.max(10, Math.min(slotW * 0.62, isCompact ? 22 : 36));
 
-      matrix.forEach((row, gIdx) => {
-        const centerX = padLeft + gIdx * groupSlotW + groupSlotW / 2;
-        const startX = centerX - clusterW / 2;
+      serviceVals.forEach((d, idx) => {
+        const centerX = padLeft + idx * slotW + slotW / 2;
+        const x = centerX - barW / 2;
+        const baseY = padTop + plotH;
 
-        if (gIdx > 0) {
-          const sepX = padLeft + gIdx * groupSlotW;
-          ctx.strokeStyle = 'rgba(148, 163, 184, 0.08)';
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.16)';
+        ctx.fillRect(x, baseY - 2, barW, 2);
+
+        if (d.val > 0) {
+          const hPx = Math.max(6, (d.val / yMax) * plotH);
+          const y = baseY - hPx;
+          ctx.fillStyle = toolColor;
           ctx.beginPath();
-          ctx.moveTo(sepX, padTop);
-          ctx.lineTo(sepX, padTop + plotH);
-          ctx.stroke();
+          if (ctx.roundRect) {
+            ctx.roundRect(x, y, barW, hPx, [4, 4, 0, 0]);
+          } else {
+            ctx.rect(x, y, barW, hPx);
+          }
+          ctx.fill();
+
+          ctx.fillStyle = '#f8fafc';
+          ctx.font = `bold ${isCompact ? 9.5 : 10.5}px system-ui, sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText(String(d.val), centerX, y - 4);
         }
 
-        HERRAMIENTAS.forEach((h, tIdx) => {
-          const val = row.byTool[h];
-          const x = startX + tIdx * (barW + gapW);
-          const baseY = padTop + plotH;
-
-          ctx.fillStyle = 'rgba(148, 163, 184, 0.18)';
-          ctx.fillRect(x, baseY - 2, barW, 2);
-
-          if (val > 0) {
-            const hPx = Math.max(4, (val / yMax) * plotH);
-            const y = baseY - hPx;
-            ctx.fillStyle = TOOL_COLORS[h] || '#38bdf8';
-            ctx.fillRect(x, y, barW, hPx);
-
-            ctx.fillStyle = '#f8fafc';
-            ctx.font = 'bold 8.5px system-ui, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(String(val), x + barW / 2, y - 3);
-          }
-        });
-
-        ctx.fillStyle = '#e2e8f0';
-        ctx.font = 'bold 11px system-ui, sans-serif';
+        ctx.fillStyle = d.val > 0 ? '#f8fafc' : '#94a3b8';
+        ctx.font = `bold ${isCompact ? 10.5 : 11.5}px system-ui, sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillText(row.numLabel, centerX, height - 18);
+        ctx.fillText(d.numLabel, centerX, height - (isCompact ? 12 : 16));
 
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '9px system-ui, sans-serif';
-        ctx.fillText(row.shortName.slice(0, 11), centerX, height - 6);
+        if (!isCompact) {
+          const shortName = d.srvFull.replace(/^\d+\s*-\s*/, '').replace(/\s*\([^)]*\)$/, '');
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '9px system-ui, sans-serif';
+          ctx.fillText(shortName.slice(0, 12), centerX, height - 4);
+        }
       });
     }
 
@@ -2019,13 +2136,10 @@
 
       const parsedDates = entries.map(e => parseLocalDate(e.fecha)).filter(Boolean);
 
-      const anoSel = document.getElementById('filterAno');
-      const curAno = anoSel.value;
-      const anos = [...new Set(parsedDates.map(dt => String(dt.getFullYear())))].sort().reverse();
+      const anos = [...new Set(parsedDates.map(dt => String(dt.getFullYear())))].sort();
       if (!anos.length) anos.push(String(new Date().getFullYear()));
-      anoSel.innerHTML = '<option value="">Año (Todos)</option>' +
-        anos.map(a => `<option value="${a}">${a}</option>`).join('');
-      anoSel.value = curAno;
+      if (selectedAno && !anos.includes(selectedAno)) selectedAno = '';
+      renderDateChips(anos);
 
       const numDiaSel = document.getElementById('filterNumDia');
       const curNumDia = numDiaSel.value;
@@ -2033,8 +2147,8 @@
       const dayList = existingDays.length
         ? existingDays
         : Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
-      numDiaSel.innerHTML = '<option value="">N° Día (Todos)</option>' +
-        dayList.map(d => `<option value="${d}">Día ${d}</option>`).join('');
+      numDiaSel.innerHTML = '<option value="">Todos</option>' +
+        dayList.map(d => `<option value="${d}">${d}</option>`).join('');
       numDiaSel.value = curNumDia;
 
       const fecSel = document.getElementById('filterFecha');
@@ -2062,9 +2176,9 @@
       const herr = document.getElementById('filterHerramienta').value;
       const est = document.getElementById('filterEstado').value;
       const sup = document.getElementById('filterSupervisor').value;
-      const ano = document.getElementById('filterAno').value;
-      const mes = document.getElementById('filterMes').value;
-      const dia = document.getElementById('filterDia').value;
+      const ano = selectedAno;
+      const mes = selectedMes;
+      const dia = selectedDia;
       const numDia = document.getElementById('filterNumDia').value;
       const fec = document.getElementById('filterFecha').value;
 
@@ -2298,12 +2412,16 @@
     });
 
     document.getElementById('btnClearDate').addEventListener('click', () => {
-      document.getElementById('filterAno').value = '';
-      document.getElementById('filterMes').value = '';
-      document.getElementById('filterDia').value = '';
+      selectedAno = '';
+      selectedMes = '';
+      selectedDia = '';
       document.getElementById('filterNumDia').value = '';
       document.getElementById('filterFecha').value = '';
       render();
+    });
+
+    document.getElementById('chartHerramienta').addEventListener('change', () => {
+      renderServiceChart(lastFilteredEntries);
     });
 
     document.getElementById('chartMetric').addEventListener('change', () => {
@@ -2529,9 +2647,6 @@
       'filterHerramienta',
       'filterEstado',
       'filterSupervisor',
-      'filterAno',
-      'filterMes',
-      'filterDia',
       'filterNumDia',
       'filterFecha'
     ].forEach(id => {
