@@ -605,11 +605,11 @@
 
       <div class="admin-group">
         <div id="adminTools" class="admin-tools">
+          <button id="btnWipeLocal" class="btn-wipe" type="button" title="Limpiar todos los registros">🧹 Limpiar Registros</button>
           <button id="btnSeed" type="button">☁️ Subir a Nube</button>
           <button id="btnExportCsv" class="info" type="button">📊 Excel (CSV)</button>
           <button id="btnExportJson" type="button">💾 Respaldo JSON</button>
           <button id="btnImportJson" type="button">📂 Cargar JSON</button>
-          <button id="btnWipeLocal" class="btn-wipe" type="button">🧹 Limpiar Todo</button>
           <button id="btnDebug" type="button">🔍 Ver Crudo</button>
         </div>
         <button id="btnAdminToggle" class="btn-admin-toggle" type="button">🔒 Admin</button>
@@ -1151,8 +1151,17 @@
 
     function wipeAllLocalRecords() {
       if (!isAdminUnlocked) return;
-      const ok = confirm('¿Borrar TODOS los registros locales, pendientes y filtros de eliminados para iniciar desde cero? (Se conserva el catálogo de personal)');
+      if (!entries.length && !Object.keys(pendingMap).length && !Object.keys(deletedMap).length) {
+        setStatus('No hay registros cargados para limpiar.');
+        return;
+      }
+      const ok = confirm(`¿Seguro que deseas limpiar todos los ${entries.length} registros cargados en esta vista/dispositivo? (Se conserva el catálogo de personal)`);
       if (!ok) return;
+      const phrase = prompt('Escribe LIMPIAR para confirmar el borrado de registros:');
+      if (phrase === null || phrase.trim().toUpperCase() !== 'LIMPIAR') {
+        setStatus('Limpieza cancelada.');
+        return;
+      }
       entries = [];
       pendingMap = {};
       deletedMap = {};
@@ -1161,7 +1170,7 @@
       localStorage.removeItem(DELETED_KEY);
       render();
       renderDetail(null);
-      setStatus('Datos locales limpiados a cero. Asegúrate de vaciar también las filas de prueba en Google Sheets.');
+      setStatus('Registros limpiados. Si deseas borrarlos también en Google Sheets, vacía las filas en la hoja o usa "Subir a Nube".');
     }
 
     function extractSectorCodeOnly(rawVal) {
