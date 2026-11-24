@@ -145,6 +145,15 @@
       background: rgba(239, 68, 68, 0.28);
     }
 
+    button.btn-wipe {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: rgba(248, 113, 113, 0.7);
+      color: #fecaca;
+    }
+    button.btn-wipe:hover {
+      background: rgba(239, 68, 68, 0.36);
+    }
+
     button.btn-admin-toggle {
       background: rgba(245, 158, 11, 0.12);
       border-color: rgba(245, 158, 11, 0.4);
@@ -554,6 +563,7 @@
           <button id="btnExportCsv" class="info" type="button">📊 Excel (CSV)</button>
           <button id="btnExportJson" type="button">💾 Respaldo JSON</button>
           <button id="btnImportJson" type="button">📂 Cargar JSON</button>
+          <button id="btnWipeLocal" class="btn-wipe" type="button">🧹 Limpiar Todo</button>
           <button id="btnDebug" type="button">🔍 Ver Crudo</button>
         </div>
         <button id="btnAdminToggle" class="btn-admin-toggle" type="button">🔒 Admin</button>
@@ -1010,6 +1020,21 @@
     let isAdminUnlocked = false;
     let isSyncingStaffFields = false;
     let lastFilteredEntries = [];
+
+    function wipeAllLocalRecords() {
+      if (!isAdminUnlocked) return;
+      const ok = confirm('¿Borrar TODOS los registros locales, pendientes y filtros de eliminados para iniciar desde cero? (Se conserva el catálogo de personal)');
+      if (!ok) return;
+      entries = [];
+      pendingMap = {};
+      deletedMap = {};
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(PENDING_KEY);
+      localStorage.removeItem(DELETED_KEY);
+      render();
+      renderDetail(null);
+      setStatus('Datos locales limpiados a cero. Asegúrate de vaciar también las filas de prueba en Google Sheets.');
+    }
 
     function extractSectorCodeOnly(rawVal) {
       const s = String(rawVal || '').trim();
@@ -2316,6 +2341,7 @@
     document.getElementById('btnNewCarretilla').addEventListener('click', () => openModal('', 'Carretilla'));
     document.getElementById('btnSync').addEventListener('click', syncFromSheets);
     document.getElementById('btnSeed').addEventListener('click', seedToSheets);
+    document.getElementById('btnWipeLocal').addEventListener('click', wipeAllLocalRecords);
     document.getElementById('btnCancel').addEventListener('click', closeModal);
 
     document.getElementById('btnDebug').addEventListener('click', () => {
@@ -2349,9 +2375,12 @@
 
     document.getElementById('entregaForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const existingUid = document.getElementById('fUid').value.trim();
+      const isEditing = Boolean(existingUid);
       const srvVal = document.getElementById('fServicio').value.trim();
       const turnoVal = normalizeTurno(document.getElementById('fTurno').value);
       const herrVal = normalizeHerramientaName(document.getElementById('fHerramienta').value);
+      const supervisorVal = document.getElementById('fSupervisor').value.trim();
       const mappedSrv = matchServicioOficial(srvVal);
 
       if (mappedSrv === '5 - Áridos (m3)' && herrVal === 'Bolsa') {
@@ -2359,7 +2388,9 @@
         if (!goOn) return;
       }
 
-      let obsFinal = document.getElementById('fObservaciones').value.trim();
+      let obsFinal = document.getElementById('fObservaciones').value.trim()
+        .replace(/\s*\[Editado:[^\]]*\]/gi, '')
+        .trim();
       let tagStr = '';
 
       if (mappedSrv === '1 - Barrido (Km)') {
@@ -2386,7 +2417,21 @@
         obsFinal = obsFinal ? `${tagStr} ${obsFinal}` : tagStr;
       }
 
-      const uid = document.getElementById('fUid').value || ('id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6));
+      const nowStamp = new Date().toLocaleString('es-BO', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      if (isEditing) {
+        const supTag = supervisorVal ? ` · Sup: ${supervisorVal}` : '';
+        const editMark = `[Editado: ${nowStamp}${supTag}]`;
+        obsFinal = obsFinal ? `${obsFinal} ${editMark}` : editMark;
+      }
+
+      const uid = existingUid || ('id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6));
       const record = normalizeEntry({
         uid,
         fecha: document.getElementById('fFecha').value,
@@ -2398,7 +2443,7 @@
         estado: document.getElementById('fEstado').value,
         servicio: srvVal,
         sector: document.getElementById('fSector').value.trim(),
-        supervisor: document.getElementById('fSupervisor').value.trim(),
+        supervisor: supervisorVal,
         celular: document.getElementById('fCelular').value.trim(),
         observaciones: obsFinal,
         foto: document.getElementById('fFoto').value.trim(),
@@ -2418,7 +2463,11 @@
       renderDetail(record);
       closeModal();
 
-      setStatus(`Guardado local de ${record.nombre} (${record.turno} · ${record.estado}). Enviando a Google Sheets...`);
+      setStatus(
+        isEditing
+          ? `Registro editado y marcado (${record.nombre}). Enviando a Google Sheets...`
+          : `Guardado local de ${record.nombre} (${record.turno} · ${record.estado}). Enviando a Google Sheets...`
+      );
       try {
         await postToSheets({ action: 'upsert', record });
         setTimeout(syncFromSheets, 5000);
@@ -2502,4 +2551,3 @@
   </script>
 </body>
 </html>
-
