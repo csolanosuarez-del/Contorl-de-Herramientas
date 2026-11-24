@@ -217,7 +217,6 @@
     .summary-table tr.total-row td { background: #131d2e; font-weight: 700; color: #34d399; border-bottom: none; }
     .summary-table tr.total-row td:first-child { color: var(--text); }
 
-    /* Panel de filtros tipo chips estilo referencia */
     .service-chart-section {
       margin-bottom: 16px;
     }
@@ -815,7 +814,6 @@
       <form id="entregaForm">
         <input type="hidden" id="fUid" />
 
-        <!-- Encabezado inicial: Fecha, Servicio, Turno -->
         <div class="form-top-header">
           <div class="form-top-header-title">Encabezado · Datos iniciales del registro</div>
           <div class="form-top-grid">
@@ -890,7 +888,6 @@
             <div id="staffNameHint" class="staff-warn"></div>
           </div>
 
-          <!-- Sub-panel para Servicio 1 (Barrido) -->
           <div id="barridoSubbox" class="service-subbox">
             <div>
               <label>Modalidad de Barrido</label>
@@ -913,7 +910,6 @@
             </div>
           </div>
 
-          <!-- Sub-panel para Servicio 3 (3.1 CUADRILLA / 3.2 ZONAS FIJAS) -->
           <div id="areasVerdesSubbox" class="service-subbox single-col">
             <div>
               <label>Tipo de Servicio — Áreas Verdes</label>
@@ -924,7 +920,6 @@
             </div>
           </div>
 
-          <!-- Sub-panel para Servicio 4 (Grupo 1 / Grupo 2 - 10 personas) -->
           <div id="feriasSubbox" class="service-subbox single-col">
             <div>
               <label>Grupo de Ferias y Eventos (10 personas por grupo)</label>
@@ -935,7 +930,6 @@
             </div>
           </div>
 
-          <!-- Sub-panel para Servicio 6 (Cisternas de Lavado) -->
           <div id="lavadoSubbox" class="service-subbox single-col">
             <div>
               <label>Cisterna de Lavado</label>
@@ -948,7 +942,6 @@
             </div>
           </div>
 
-          <!-- Fila de Sector / Lugar de Trabajo y Teléfono -->
           <div class="triple">
             <div>
               <label id="fSectorLabel">Sector / Lugar de Trabajo</label>
@@ -1149,28 +1142,43 @@
       }
     }
 
-    function wipeAllLocalRecords() {
+    async function wipeAllLocalRecords() {
       if (!isAdminUnlocked) return;
       if (!entries.length && !Object.keys(pendingMap).length && !Object.keys(deletedMap).length) {
         setStatus('No hay registros cargados para limpiar.');
         return;
       }
-      const ok = confirm(`¿Seguro que deseas limpiar todos los ${entries.length} registros cargados en esta vista/dispositivo? (Se conserva el catálogo de personal)`);
+      const ok = confirm(`¿Seguro que deseas borrar TODOS los ${entries.length} registros (local y en Google Sheets)? Se conserva el catálogo de personal.`);
       if (!ok) return;
-      const phrase = prompt('Escribe LIMPIAR para confirmar el borrado de registros:');
+      const phrase = prompt('Escribe LIMPIAR para confirmar el borrado completo:');
       if (phrase === null || phrase.trim().toUpperCase() !== 'LIMPIAR') {
         setStatus('Limpieza cancelada.');
         return;
       }
+
+      const purgeUntil = Date.now() + 3600000;
+      entries.forEach(item => {
+        if (item && item.uid) deletedMap[item.uid] = purgeUntil;
+      });
       entries = [];
       pendingMap = {};
-      deletedMap = {};
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(PENDING_KEY);
-      localStorage.removeItem(DELETED_KEY);
+      saveDeleted();
+      savePending();
+      saveEntries();
       render();
       renderDetail(null);
-      setStatus('Registros limpiados. Si deseas borrarlos también en Google Sheets, vacía las filas en la hoja o usa "Subir a Nube".');
+
+      setStatus('Registros borrados localmente. Enviando orden de limpieza a Google Sheets...');
+      try {
+        await postToSheets({ action: 'clear_all' });
+        setTimeout(() => {
+          deletedMap = {};
+          saveDeleted();
+          syncFromSheets();
+        }, 3000);
+      } catch (err) {
+        setStatus(`Limpiado localmente; error al enviar a Google Sheets: ${err.message}`, true);
+      }
     }
 
     function extractSectorCodeOnly(rawVal) {
