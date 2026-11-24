@@ -713,6 +713,9 @@
               <option value="Cepillo lateral de acero">🛠️ Cepillo lateral de acero</option>
               <option value="Cepillo central de acero">🛠️ Cepillo central de acero</option>
               <option value="Detergente Pinol">🛠️ Detergente Pinol</option>
+              <option value="Machete">🛠️ Machete</option>
+              <option value="Aceite 2 tiempos para motosierra">🛠️ Aceite 2 tiempos para motosierra</option>
+              <option value="Gasolina para motobomba">🛠️ Gasolina para motobomba</option>
               <option value="Otro">🛠️ Otro</option>
             </select>
             <select id="chartMetric" class="metric-select" aria-label="Métrica de gráfica">
@@ -759,6 +762,9 @@
         <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
         <option value="Cepillo central de acero">Cepillo central de acero</option>
         <option value="Detergente Pinol">Detergente Pinol</option>
+        <option value="Machete">Machete</option>
+        <option value="Aceite 2 tiempos para motosierra">Aceite 2 tiempos para motosierra</option>
+        <option value="Gasolina para motobomba">Gasolina para motobomba</option>
         <option value="Otro">Otro</option>
       </select>
       <select id="filterEstado">
@@ -860,6 +866,9 @@
               <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
               <option value="Cepillo central de acero">Cepillo central de acero</option>
               <option value="Detergente Pinol">Detergente Pinol</option>
+              <option value="Machete">Machete</option>
+              <option value="Aceite 2 tiempos para motosierra">Aceite 2 tiempos para motosierra</option>
+              <option value="Gasolina para motobomba">Gasolina para motobomba</option>
               <option value="Otro">Otro</option>
             </select>
           </div>
@@ -1024,6 +1033,9 @@
       'Cepillo lateral de acero',
       'Cepillo central de acero',
       'Detergente Pinol',
+      'Machete',
+      'Aceite 2 tiempos para motosierra',
+      'Gasolina para motobomba',
       'Otro'
     ];
     const TOOL_COLORS = {
@@ -1036,6 +1048,9 @@
       'Cepillo lateral de acero': '#ec4899',
       'Cepillo central de acero': '#f97316',
       'Detergente Pinol': '#22c55e',
+      'Machete': '#eab308',
+      'Aceite 2 tiempos para motosierra': '#8b5cf6',
+      'Gasolina para motobomba': '#38bdf8',
       'Otro': '#94a3b8'
     };
     const SERVICIOS_OFICIALES = [
@@ -1244,6 +1259,12 @@
       }
       if (norm === 'PINOL' || norm === 'DETERGENTE PINOL') {
         return 'Detergente Pinol';
+      }
+      if (norm === 'ACEITE 2T' || norm === 'ACEITE 2 TIEMPOS' || norm === 'ACEITE PARA MOTOSIERRA') {
+        return 'Aceite 2 tiempos para motosierra';
+      }
+      if (norm === 'GASOLINA MOTOBOMBA' || norm === 'GASOLINA PARA MOTOBOMBA') {
+        return 'Gasolina para motobomba';
       }
       return HERRAMIENTAS.find(h => normalizeSimple(h) === norm) || clean;
     }
@@ -2158,7 +2179,7 @@
     function getToolPillClass(herr) {
       if (herr === 'Bolsa') return 'pill-bolsa';
       if (herr === 'Lutocar') return 'pill-lutocar';
-      if (['Escobillón', 'Pala', 'Rastrillo', 'Carretilla', 'Cepillo lateral de acero', 'Cepillo central de acero'].includes(herr)) {
+      if (['Escobillón', 'Pala', 'Rastrillo', 'Carretilla', 'Cepillo lateral de acero', 'Cepillo central de acero', 'Machete'].includes(herr)) {
         return 'pill-escobillon';
       }
       return 'pill-otro';
