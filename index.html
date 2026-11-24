@@ -1593,36 +1593,57 @@
         .toUpperCase();
     }
 
+    function pickField(obj, candidates) {
+      if (!obj || typeof obj !== 'object') return '';
+      for (const key of candidates) {
+        if (obj[key] !== undefined && obj[key] !== null && String(obj[key]).trim() !== '') {
+          return String(obj[key]).trim();
+        }
+      }
+      const normalizedMap = {};
+      Object.keys(obj).forEach(k => {
+        const cleanKey = String(k)
+          .trim()
+          .toUpperCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^A-Z0-9]+/g, '_');
+        normalizedMap[cleanKey] = obj[k];
+      });
+      for (const key of candidates) {
+        const cleanKey = String(key)
+          .trim()
+          .toUpperCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^A-Z0-9]+/g, '_');
+        if (normalizedMap[cleanKey] !== undefined && normalizedMap[cleanKey] !== null && String(normalizedMap[cleanKey]).trim() !== '') {
+          return String(normalizedMap[cleanKey]).trim();
+        }
+      }
+      return '';
+    }
+
     function normalizeStaffItem(raw) {
       const r = raw || {};
-      const codigo = String(
-        r.codigo ??
-        r.CODIGO ??
-        r.COD ??
-        r.cod ??
-        r.ID ??
-        r.id ??
-        ''
-      ).trim();
-      const nombre = String(
-        r.nombre ??
-        r.NOMBRE_COMPLETO ??
-        r.NOMBRE ??
-        r.NOMBRES ??
-        r.OPERARIO ??
-        r.TRABAJADOR ??
-        r.APELLIDOS_NOMBRES ??
-        r.APELLIDO_NOMBRE ??
-        r.PERSONAL ??
-        r.COLABORADOR ??
-        ''
-      ).trim().replace(/\s+/g, ' ').toUpperCase();
-      const servicio = String(r.servicio ?? r.SERVICIO ?? '').trim();
-      const sector = String(r.sector ?? r.SECTOR ?? '').trim();
-      const turno = String(r.turno ?? r.TURNO ?? '').trim();
-      const supervisor = String(r.supervisor ?? r.SUPERVISOR ?? r.encargado ?? r.ENCARGADO ?? '').trim();
-      const celular = String(r.celular ?? r.CELULAR ?? r.telefono ?? r.TELEFONO ?? '').trim();
-      const status = String(r.status ?? r.STATUS ?? 'ACTIVO').trim();
+      const codigo = pickField(r, ['CODIGO', 'codigo', 'COD', 'cod', 'ID', 'id']);
+      const nombre = pickField(r, [
+        'NOMBRE COMPLETO',
+        'NOMBRE_COMPLETO',
+        'nombre',
+        'NOMBRE',
+        'NOMBRES',
+        'OPERARIO',
+        'TRABAJADOR',
+        'APELLIDOS Y NOMBRES',
+        'APELLIDOS_NOMBRES'
+      ]).replace(/\s+/g, ' ').toUpperCase();
+      const servicio = pickField(r, ['SERVICIO', 'servicio']);
+      const sector = pickField(r, ['SECTOR', 'sector']);
+      const turno = pickField(r, ['TURNO', 'turno']);
+      const supervisor = pickField(r, ['SUPERVISOR', 'supervisor', 'ENCARGADO', 'encargado']);
+      const celular = pickField(r, ['CELULAR', 'celular', 'TELEFONO', 'telefono']);
+      const status = pickField(r, ['STATUS', 'status']) || 'ACTIVO';
       return { codigo, nombre, servicio, sector, turno, supervisor, celular, status };
     }
 
