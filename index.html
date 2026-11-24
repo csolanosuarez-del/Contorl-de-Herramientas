@@ -811,7 +811,7 @@
           </div>
           <div>
             <label>Cantidad</label>
-            <input id="fCantidad" type="number" min="1" value="1" required />
+            <input id="fCantidad" type="number" min="1" value="" placeholder="Ej: 100" required />
           </div>
           <div>
             <label>Código Trabajador (o interno MA-001)</label>
@@ -2198,8 +2198,8 @@
 
     function openModal(uid = '', defaultTool = 'Bolsa') {
       const item = uid ? entries.find(e => e.uid === uid) : null;
-      const lastEntry = entries.length > 0 ? entries[entries.length - 1] : null;
-      const today = new Date().toISOString().slice(0, 10);
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
       let modalHeading = 'Nueva Entrega de Herramienta / Insumo';
       if (item) {
@@ -2233,11 +2233,11 @@
       const isSingleUnitTool = (defaultTool === 'Lutocar' || defaultTool === 'Carretilla');
 
       document.getElementById('fUid').value = item ? item.uid : '';
-      document.getElementById('fFecha').value = item ? item.fecha : (lastEntry?.fecha || today);
-      setServicioSelectValue(item ? item.servicio : (lastEntry?.servicio || ''), true);
-      turnoEl.value = item ? normalizeTurno(item.turno, item.observaciones) : (lastEntry ? normalizeTurno(lastEntry.turno, lastEntry.observaciones) : 'Día');
+      document.getElementById('fFecha').value = item ? item.fecha : today;
+      setServicioSelectValue(item ? item.servicio : '', true);
+      turnoEl.value = item ? normalizeTurno(item.turno, item.observaciones) : 'Día';
       document.getElementById('fHerramienta').value = item ? normalizeHerramientaName(item.herramienta) : defaultTool;
-      document.getElementById('fCantidad').value = item ? item.cantidad : (isSingleUnitTool ? 1 : 100);
+      document.getElementById('fCantidad').value = item ? item.cantidad : (isSingleUnitTool ? 1 : '');
       codigoEl.value = item ? item.codigo : '';
       document.getElementById('fEstado').value = item ? item.estado : 'Entregado / Operativo';
       nombreEl.value = item ? item.nombre : '';
@@ -2249,7 +2249,7 @@
       document.getElementById('fAreaVerdeModo').value = '3.1 CUADRILLA';
       document.getElementById('fFeriaGrupo').value = 'Grupo 1';
       document.getElementById('fCisternaLavado').value = 'Cisterna 10000 L 6006-GTE';
-      supervisorEl.value = item ? item.supervisor : (lastEntry?.supervisor || '');
+      supervisorEl.value = item ? item.supervisor : '';
       document.getElementById('fObservaciones').value = item ? item.observaciones : '';
       document.getElementById('fFoto').value = item ? item.foto : '';
       document.getElementById('fFotoFile').value = '';
