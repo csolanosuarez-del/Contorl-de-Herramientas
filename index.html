@@ -1002,6 +1002,7 @@
     const STORAGE_KEY = 'control_herramientas_v1';
     const PENDING_KEY = 'control_herramientas_pending_v1';
     const DELETED_KEY = 'control_herramientas_deleted_v1';
+    const CLEARED_AT_KEY = 'control_herramientas_cleared_at_v1';
     const STAFF_CACHE_KEY = 'control_herramientas_staff_v1';
 
     const CODIGOS_SECTOR_BARRIDO_BASE = [
@@ -1092,6 +1093,7 @@
     let staffByName = new Map();
     let pendingMap = {};
     let deletedMap = {};
+    let clearedAtTs = 0;
     let lastRawSample = null;
     let isAdminUnlocked = false;
     let isSyncingStaffFields = false;
@@ -1144,7 +1146,7 @@
 
     async function wipeAllLocalRecords() {
       if (!isAdminUnlocked) return;
-      if (!entries.length && !Object.keys(pendingMap).length && !Object.keys(deletedMap).length) {
+      if (!entries.length && !Object.keys(pendingMap).length && !clearedAtTs) {
         setStatus('No hay registros cargados para limpiar.');
         return;
       }
@@ -1156,26 +1158,20 @@
         return;
       }
 
-      const purgeUntil = Date.now() + 3600000;
-      entries.forEach(item => {
-        if (item && item.uid) deletedMap[item.uid] = purgeUntil;
-      });
+      clearedAtTs = Date.now();
+      localStorage.setItem(CLEARED_AT_KEY, String(clearedAtTs));
       entries = [];
       pendingMap = {};
+      deletedMap = {};
       saveDeleted();
       savePending();
       saveEntries();
       render();
       renderDetail(null);
 
-      setStatus('Registros borrados localmente. Enviando orden de limpieza a Google Sheets...');
+      setStatus('Registros borrados. Enviando orden de limpieza a Google Sheets...');
       try {
-        await postToSheets({ action: 'clear_all' });
-        setTimeout(() => {
-          deletedMap = {};
-          saveDeleted();
-          syncFromSheets();
-        }, 3000);
+        await postToSheets({ action: 'clear_all', clearedAt: clearedAtTs });
       } catch (err) {
         setStatus(`Limpiado localmente; error al enviar a Google Sheets: ${err.message}`, true);
       }
@@ -1599,8 +1595,28 @@
 
     function normalizeStaffItem(raw) {
       const r = raw || {};
-      const codigo = String(r.codigo ?? r.CODIGO ?? '').trim();
-      const nombre = String(r.nombre ?? r.NOMBRE_COMPLETO ?? r.NOMBRE ?? '').trim().replace(/\s+/g, ' ').toUpperCase();
+      const codigo = String(
+        r.codigo ??
+        r.CODIGO ??
+        r.COD ??
+        r.cod ??
+        r.ID ??
+        r.id ??
+        ''
+      ).trim();
+      const nombre = String(
+        r.nombre ??
+        r.NOMBRE_COMPLETO ??
+        r.NOMBRE ??
+        r.NOMBRES ??
+        r.OPERARIO ??
+        r.TRABAJADOR ??
+        r.APELLIDOS_NOMBRES ??
+        r.APELLIDO_NOMBRE ??
+        r.PERSONAL ??
+        r.COLABORADOR ??
+        ''
+      ).trim().replace(/\s+/g, ' ').toUpperCase();
       const servicio = String(r.servicio ?? r.SERVICIO ?? '').trim();
       const sector = String(r.sector ?? r.SECTOR ?? '').trim();
       const turno = String(r.turno ?? r.TURNO ?? '').trim();
@@ -1967,6 +1983,7 @@
     function mergeServerAndLocal(serverList, localList) {
       const mapByUid = new Map();
       const now = Date.now();
+      const keepFromServer = !clearedAtTs;
 
       localList.forEach(item => {
         const norm = normalizeEntry(item);
@@ -1977,26 +1994,28 @@
       let changedPending = false;
       let changedDeleted = false;
 
-      serverList.forEach(item => {
-        const norm = normalizeEntry(item);
-        if (deletedMap[norm.uid] && deletedMap[norm.uid] > now) {
-          return;
-        }
-        const prev = mapByUid.get(norm.uid);
-        const pEntry = pendingMap[norm.uid];
-        const pRec = (pEntry && pEntry.expiresAt > now) ? normalizeEntry(pEntry.record) : null;
+      if (keepFromServer) {
+        serverList.forEach(item => {
+          const norm = normalizeEntry(item);
+          if (deletedMap[norm.uid] && deletedMap[norm.uid] > now) {
+            return;
+          }
+          const prev = mapByUid.get(norm.uid);
+          const pEntry = pendingMap[norm.uid];
+          const pRec = (pEntry && pEntry.expiresAt > now) ? normalizeEntry(pEntry.record) : null;
 
-        const merged = {
-          ...norm,
-          foto: norm.foto || (pRec && pRec.foto) || (prev && prev.foto) || ''
-        };
-        mapByUid.set(norm.uid, merged);
+          const merged = {
+            ...norm,
+            foto: norm.foto || (pRec && pRec.foto) || (prev && prev.foto) || ''
+          };
+          mapByUid.set(norm.uid, merged);
 
-        if (pRec && norm.cantidad === pRec.cantidad && norm.herramienta === pRec.herramienta && norm.estado === pRec.estado) {
-          delete pendingMap[norm.uid];
-          changedPending = true;
-        }
-      });
+          if (pRec && norm.cantidad === pRec.cantidad && norm.herramienta === pRec.herramienta && norm.estado === pRec.estado) {
+            delete pendingMap[norm.uid];
+            changedPending = true;
+          }
+        });
+      }
 
       Object.keys(pendingMap).forEach(uid => {
         const pEntry = pendingMap[uid];
@@ -2042,8 +2061,21 @@
 
         const rawList = Array.isArray(data.records) ? data.records : [];
         lastRawSample = rawList.length > 0 ? rawList[0] : { note: 'Hoja vacía' };
-        const serverRecords = rawList.map(normalizeEntry);
 
+        if (clearedAtTs && rawList.length > 0) {
+          entries = [];
+          saveEntries();
+          render();
+          setStatus('Limpieza activa: actualiza tu Google Apps Script con "clear_all" para vaciar la hoja definitivamente.', true);
+          return;
+        }
+
+        if (clearedAtTs && rawList.length === 0) {
+          clearedAtTs = 0;
+          localStorage.removeItem(CLEARED_AT_KEY);
+        }
+
+        const serverRecords = rawList.map(normalizeEntry);
         entries = mergeServerAndLocal(serverRecords, entries);
         saveEntries();
         render();
@@ -2089,6 +2121,8 @@
           await postToSheets({ action, records: chunk });
           await new Promise(r => setTimeout(r, 800));
         }
+        clearedAtTs = 0;
+        localStorage.removeItem(CLEARED_AT_KEY);
         setStatus('Subida completada. Verificando en nube...');
         setTimeout(syncFromSheets, 2000);
       } catch (err) {
@@ -2486,6 +2520,7 @@
         totalPersonal: staffList.length,
         pendientes: Object.keys(pendingMap).length,
         eliminadosRecientes: Object.keys(deletedMap).length,
+        clearedAtTs,
         primerRegistroNube: lastRawSample
       }, null, 2);
       document.getElementById('debugBackdrop').classList.add('open');
@@ -2585,6 +2620,9 @@
         ultimaActualizacion: new Date().toLocaleString()
       });
 
+      clearedAtTs = 0;
+      localStorage.removeItem(CLEARED_AT_KEY);
+
       const idx = entries.findIndex(x => x.uid === uid);
       if (idx >= 0) entries[idx] = record;
       else entries.push(record);
@@ -2672,11 +2710,12 @@
     });
 
     isAdminUnlocked = sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
+    clearedAtTs = Number(localStorage.getItem(CLEARED_AT_KEY) || '0') || 0;
     applyAdminUiState();
     rebuildStaffIndex(loadCachedStaff());
     pendingMap = loadPending();
     deletedMap = loadDeleted();
-    entries = mergeServerAndLocal([], loadEntries());
+    entries = clearedAtTs ? [] : mergeServerAndLocal([], loadEntries());
     saveEntries();
     render();
     syncFromSheets();
