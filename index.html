@@ -1169,10 +1169,17 @@
       render();
       renderDetail(null);
 
-      setStatus('Registros borrados. Enviando orden de limpieza a Google Sheets...');
+      setStatus('Registros borrados. Vaciando hoja ENTREGAS en Google Sheets...');
       try {
         await postToSheets({ action: 'clear_all', clearedAt: clearedAtTs });
+        setTimeout(async () => {
+          clearedAtTs = 0;
+          localStorage.removeItem(CLEARED_AT_KEY);
+          await syncFromSheets();
+        }, 2500);
       } catch (err) {
+        clearedAtTs = 0;
+        localStorage.removeItem(CLEARED_AT_KEY);
         setStatus(`Limpiado localmente; error al enviar a Google Sheets: ${err.message}`, true);
       }
     }
@@ -2004,7 +2011,6 @@
     function mergeServerAndLocal(serverList, localList) {
       const mapByUid = new Map();
       const now = Date.now();
-      const keepFromServer = !clearedAtTs;
 
       localList.forEach(item => {
         const norm = normalizeEntry(item);
@@ -2015,28 +2021,26 @@
       let changedPending = false;
       let changedDeleted = false;
 
-      if (keepFromServer) {
-        serverList.forEach(item => {
-          const norm = normalizeEntry(item);
-          if (deletedMap[norm.uid] && deletedMap[norm.uid] > now) {
-            return;
-          }
-          const prev = mapByUid.get(norm.uid);
-          const pEntry = pendingMap[norm.uid];
-          const pRec = (pEntry && pEntry.expiresAt > now) ? normalizeEntry(pEntry.record) : null;
+      serverList.forEach(item => {
+        const norm = normalizeEntry(item);
+        if (deletedMap[norm.uid] && deletedMap[norm.uid] > now) {
+          return;
+        }
+        const prev = mapByUid.get(norm.uid);
+        const pEntry = pendingMap[norm.uid];
+        const pRec = (pEntry && pEntry.expiresAt > now) ? normalizeEntry(pEntry.record) : null;
 
-          const merged = {
-            ...norm,
-            foto: norm.foto || (pRec && pRec.foto) || (prev && prev.foto) || ''
-          };
-          mapByUid.set(norm.uid, merged);
+        const merged = {
+          ...norm,
+          foto: norm.foto || (pRec && pRec.foto) || (prev && prev.foto) || ''
+        };
+        mapByUid.set(norm.uid, merged);
 
-          if (pRec && norm.cantidad === pRec.cantidad && norm.herramienta === pRec.herramienta && norm.estado === pRec.estado) {
-            delete pendingMap[norm.uid];
-            changedPending = true;
-          }
-        });
-      }
+        if (pRec && norm.cantidad === pRec.cantidad && norm.herramienta === pRec.herramienta && norm.estado === pRec.estado) {
+          delete pendingMap[norm.uid];
+          changedPending = true;
+        }
+      });
 
       Object.keys(pendingMap).forEach(uid => {
         const pEntry = pendingMap[uid];
@@ -2083,15 +2087,15 @@
         const rawList = Array.isArray(data.records) ? data.records : [];
         lastRawSample = rawList.length > 0 ? rawList[0] : { note: 'Hoja vacía' };
 
-        if (clearedAtTs && rawList.length > 0) {
+        if (clearedAtTs && Date.now() - clearedAtTs < 8000 && rawList.length > 0) {
           entries = [];
           saveEntries();
           render();
-          setStatus('Limpieza activa: actualiza tu Google Apps Script con "clear_all" para vaciar la hoja definitivamente.', true);
+          setStatus('Vaciando hoja ENTREGAS en Google Sheets...', false);
           return;
         }
 
-        if (clearedAtTs && rawList.length === 0) {
+        if (clearedAtTs) {
           clearedAtTs = 0;
           localStorage.removeItem(CLEARED_AT_KEY);
         }
@@ -2466,7 +2470,7 @@
 
       entries = entries.filter(x => x.uid !== uid);
       delete pendingMap[uid];
-      deletedMap[uid] = Date.now() + 300000;
+      deletedMap[uid] = Date.now() + 600000;
       savePending();
       saveDeleted();
       saveEntries();
@@ -2474,10 +2478,10 @@
       renderDetail(null);
       closeModal();
 
-      setStatus(`Registro eliminado localmente (${label}). Enviando a Google Sheets...`);
+      setStatus(`Registro eliminado localmente (${label}). Eliminando en Google Sheets...`);
       try {
         await postToSheets({ action: 'delete', uid });
-        setTimeout(syncFromSheets, 4000);
+        setTimeout(syncFromSheets, 3500);
       } catch (err) {
         setStatus(`Eliminado localmente; error al sincronizar: ${err.message}`, true);
       }
