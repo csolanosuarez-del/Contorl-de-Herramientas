@@ -713,9 +713,6 @@
               <option value="Cepillo lateral de acero">🛠️ Cepillo lateral de acero</option>
               <option value="Cepillo central de acero">🛠️ Cepillo central de acero</option>
               <option value="Detergente Pinol">🛠️ Detergente Pinol</option>
-              <option value="Machete">🛠️ Machete</option>
-              <option value="Aceite 2 tiempos para motosierra">🛠️ Aceite 2 tiempos para motosierra</option>
-              <option value="Gasolina para motobomba">🛠️ Gasolina para motobomba</option>
               <option value="Otro">🛠️ Otro</option>
             </select>
             <select id="chartMetric" class="metric-select" aria-label="Métrica de gráfica">
@@ -762,9 +759,6 @@
         <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
         <option value="Cepillo central de acero">Cepillo central de acero</option>
         <option value="Detergente Pinol">Detergente Pinol</option>
-        <option value="Machete">Machete</option>
-        <option value="Aceite 2 tiempos para motosierra">Aceite 2 tiempos para motosierra</option>
-        <option value="Gasolina para motobomba">Gasolina para motobomba</option>
         <option value="Otro">Otro</option>
       </select>
       <select id="filterEstado">
@@ -820,168 +814,182 @@
       <form id="entregaForm">
         <input type="hidden" id="fUid" />
 
-        <div class="form-top-header">
-          <div class="form-top-header-title">Encabezado · Datos iniciales del registro</div>
-          <div class="form-top-grid">
-            <div>
-              <label>Fecha</label>
-              <input id="fFecha" type="date" required />
+        <div id="lavadoOrderedFlow" style="display:none;">
+          <div class="form-top-header">
+            <div class="form-top-header-title">Servicio 6 · Lavado — Orden de menú</div>
+            <div class="form-top-grid">
+              <div id="lavadoSlotFecha">
+                <label>Fecha</label>
+                <input id="fFecha" type="date" required />
+              </div>
+              <div id="lavadoSlotServicio">
+                <label>Servicio</label>
+                <select id="fServicio">
+                  <option value="">— Seleccionar servicio —</option>
+                  <option value="1 - Barrido (Km)">1 - Barrido (Km)</option>
+                  <option value="2 - Desempapelado (Km)">2 - Desempapelado (Km)</option>
+                  <option value="3 - Areas Verdes (Ha)">3 - Areas Verdes (Ha)</option>
+                  <option value="4 - Ferias y Eventos (EQ)">4 - Ferias y Eventos (EQ)</option>
+                  <option value="5 - Áridos (m3)">5 - Áridos (m3)</option>
+                  <option value="6 - Lavado (EQ)">6 - Lavado (EQ)</option>
+                  <option value="7 - Recolección (Ton)">7 - Recolección (Ton)</option>
+                  <option value="8 - Microbasural (EQ)">8 - Microbasural (EQ)</option>
+                  <option value="9 - Puntos Limpios (m3)">9 - Puntos Limpios (m3)</option>
+                  <option value="10 - Patológico CI (Kg)">10 - Patológico CI (Kg)</option>
+                </select>
+              </div>
+              <div id="lavadoSlotTurno">
+                <label>Turno</label>
+                <select id="fTurno" required>
+                  <option value="Día">Día</option>
+                  <option value="Noche">Noche</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label>Servicio</label>
-              <select id="fServicio">
-                <option value="">— Seleccionar servicio —</option>
-                <option value="1 - Barrido (Km)">1 - Barrido (Km)</option>
-                <option value="2 - Desempapelado (Km)">2 - Desempapelado (Km)</option>
-                <option value="3 - Areas Verdes (Ha)">3 - Areas Verdes (Ha)</option>
-                <option value="4 - Ferias y Eventos (EQ)">4 - Ferias y Eventos (EQ)</option>
-                <option value="5 - Áridos (m3)">5 - Áridos (m3)</option>
-                <option value="6 - Lavado (EQ)">6 - Lavado (EQ)</option>
-                <option value="7 - Recolección (Ton)">7 - Recolección (Ton)</option>
-                <option value="8 - Microbasural (EQ)">8 - Microbasural (EQ)</option>
-                <option value="9 - Puntos Limpios (m3)">9 - Puntos Limpios (m3)</option>
-                <option value="10 - Patológico CI (Kg)">10 - Patológico CI (Kg)</option>
-              </select>
-            </div>
-            <div>
-              <label>Turno</label>
-              <select id="fTurno" required>
-                <option value="Día">Día</option>
-                <option value="Noche">Noche</option>
-              </select>
+          </div>
+
+          <div id="lavadoUnidadContainer" class="form-grid" style="margin-bottom:10px;">
+            <div id="lavadoSubbox" class="service-subbox single-col">
+              <div>
+                <label>Unidad / Cisterna de Lavado</label>
+                <select id="fCisternaLavado">
+                  <option value="Cisterna 10000 L 6006-GTE">Cisterna 10000 L 6006-GTE</option>
+                  <option value="Cisterna 6004 (3000 L 6006-GTE)">Cisterna 6004 (3000 L 6006-GTE)</option>
+                  <option value="Cisterna 6006 (3000 L 6012-YUA)">Cisterna 6006 (3000 L 6012-YUA)</option>
+                  <option value="Cisterna 6002 (3000 L 6006-GSB)">Cisterna 6002 (3000 L 6006-GSB)</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="form-grid">
-          <div>
-            <label>Herramienta / Insumo</label>
-            <select id="fHerramienta" required>
-              <option value="Bolsa">Bolsa</option>
-              <option value="Lutocar">Lutocar</option>
-              <option value="Escobillón">Escobillón</option>
-              <option value="Rastrillo">Rastrillo</option>
-              <option value="Pala">Pala</option>
-              <option value="Carretilla">Carretilla</option>
-              <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
-              <option value="Cepillo central de acero">Cepillo central de acero</option>
-              <option value="Detergente Pinol">Detergente Pinol</option>
-              <option value="Machete">Machete</option>
-              <option value="Aceite 2 tiempos para motosierra">Aceite 2 tiempos para motosierra</option>
-              <option value="Gasolina para motobomba">Gasolina para motobomba</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-          <div>
-            <label>Cantidad</label>
-            <input id="fCantidad" type="number" min="1" value="" placeholder="Ej: 100" required />
-          </div>
-          <div>
-            <label>Código Trabajador (o interno MA-001)</label>
-            <input id="fCodigo" list="staffCodeList" placeholder="Ej: 894 o MA-532" autocomplete="off" />
-            <datalist id="staffCodeList"></datalist>
-            <div id="staffCodeHint" class="staff-match"></div>
-          </div>
-          <div>
-            <label>Estado</label>
-            <select id="fEstado" required>
-              <option value="Entregado / Operativo">Entregado / Operativo</option>
-              <option value="Devuelto">Devuelto</option>
-              <option value="Dañado / Repuesto">Dañado / Repuesto</option>
-            </select>
-          </div>
-          <div class="full">
-            <label>Nombre y Apellido del Personal Operativo (búsqueda o escritura manual)</label>
-            <input id="fNombre" list="staffNameList" placeholder="Escribe o busca nombre para ubicar su código..." autocomplete="off" required />
-            <datalist id="staffNameList"></datalist>
-            <div id="staffNameHint" class="staff-warn"></div>
+        <div id="defaultFormFlow">
+          <div class="form-top-header">
+            <div class="form-top-header-title">Encabezado · Datos iniciales del registro</div>
+            <div class="form-top-grid">
+              <div id="defaultSlotFecha"></div>
+              <div id="defaultSlotServicio"></div>
+              <div id="defaultSlotTurno"></div>
+            </div>
           </div>
 
-          <div id="barridoSubbox" class="service-subbox">
+          <div id="defaultRestGrid" class="form-grid">
             <div>
-              <label>Modalidad de Barrido</label>
-              <select id="fBarridoModalidad">
-                <option value="(Sector/Mercados)">(Sector/Mercados)</option>
-                <option value="Barrido mecanizado">Barrido mecanizado</option>
-                <option value="Barrido por escuadras">Barrido por escuadras</option>
+              <label>Herramienta / Insumo</label>
+              <select id="fHerramienta" required>
+                <option value="Bolsa">Bolsa</option>
+                <option value="Lutocar">Lutocar</option>
+                <option value="Escobillón">Escobillón</option>
+                <option value="Rastrillo">Rastrillo</option>
+                <option value="Pala">Pala</option>
+                <option value="Carretilla">Carretilla</option>
+                <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
+                <option value="Cepillo central de acero">Cepillo central de acero</option>
+                <option value="Detergente Pinol">Detergente Pinol</option>
+                <option value="Otro">Otro</option>
               </select>
             </div>
             <div>
-              <label id="fBarridoEquipoLabel">Equipo / Escuadra / Detalle</label>
-              <select id="fBarridoEquipo" style="display:none">
-                <option value="">— Seleccionar equipo —</option>
-                <option value="BARREDORA 1011">BARREDORA 1011</option>
-                <option value="BARREDORA 1017">BARREDORA 1017</option>
-                <option value="MINICARGADOR 1">MINICARGADOR 1</option>
-                <option value="MINICARGADOR 2">MINICARGADOR 2</option>
-              </select>
-              <input id="fBarridoDetalle" placeholder="Ej: Calle / Avenida / Referencia..." />
+              <label>Cantidad</label>
+              <input id="fCantidad" type="number" min="1" value="" placeholder="Ej: 100" required />
             </div>
-          </div>
-
-          <div id="areasVerdesSubbox" class="service-subbox single-col">
             <div>
-              <label>Tipo de Servicio — Áreas Verdes</label>
-              <select id="fAreaVerdeModo">
-                <option value="3.1 CUADRILLA">3.1 CUADRILLA</option>
-                <option value="3.2 ZONAS FIJAS">3.2 ZONAS FIJAS</option>
+              <label>Código Trabajador (o interno MA-001)</label>
+              <input id="fCodigo" list="staffCodeList" placeholder="Ej: 894 o MA-532" autocomplete="off" />
+              <datalist id="staffCodeList"></datalist>
+              <div id="staffCodeHint" class="staff-match"></div>
+            </div>
+            <div>
+              <label>Estado</label>
+              <select id="fEstado" required>
+                <option value="Entregado / Operativo">Entregado / Operativo</option>
+                <option value="Devuelto">Devuelto</option>
+                <option value="Dañado / Repuesto">Dañado / Repuesto</option>
               </select>
             </div>
-          </div>
-
-          <div id="feriasSubbox" class="service-subbox single-col">
-            <div>
-              <label>Grupo de Ferias y Eventos (10 personas por grupo)</label>
-              <select id="fFeriaGrupo">
-                <option value="Grupo 1">Grupo 1</option>
-                <option value="Grupo 2">Grupo 2</option>
-              </select>
+            <div class="full">
+              <label>Nombre y Apellido del Personal Operativo (búsqueda o escritura manual)</label>
+              <input id="fNombre" list="staffNameList" placeholder="Escribe o busca nombre para ubicar su código..." autocomplete="off" required />
+              <datalist id="staffNameList"></datalist>
+              <div id="staffNameHint" class="staff-warn"></div>
             </div>
-          </div>
 
-          <div id="lavadoSubbox" class="service-subbox single-col">
-            <div>
-              <label>Cisterna de Lavado</label>
-              <select id="fCisternaLavado">
-                <option value="Cisterna 10000 L 6006-GTE">Cisterna 10000 L 6006-GTE</option>
-                <option value="Cisterna 6004 (3000 L 6006-GTE)">Cisterna 6004 (3000 L 6006-GTE)</option>
-                <option value="Cisterna 6006 (3000 L 6012-YUA)">Cisterna 6006 (3000 L 6012-YUA)</option>
-                <option value="Cisterna 6002 (3000 L 6006-GSB)">Cisterna 6002 (3000 L 6006-GSB)</option>
-              </select>
+            <div id="barridoSubbox" class="service-subbox">
+              <div>
+                <label>Modalidad de Barrido</label>
+                <select id="fBarridoModalidad">
+                  <option value="(Sector/Mercados)">(Sector/Mercados)</option>
+                  <option value="Barrido mecanizado">Barrido mecanizado</option>
+                  <option value="Barrido por escuadras">Barrido por escuadras</option>
+                </select>
+              </div>
+              <div>
+                <label id="fBarridoEquipoLabel">Equipo / Escuadra / Detalle</label>
+                <select id="fBarridoEquipo" style="display:none">
+                  <option value="">— Seleccionar equipo —</option>
+                  <option value="BARREDORA 1011">BARREDORA 1011</option>
+                  <option value="BARREDORA 1017">BARREDORA 1017</option>
+                  <option value="MINICARGADOR 1">MINICARGADOR 1</option>
+                  <option value="MINICARGADOR 2">MINICARGADOR 2</option>
+                </select>
+                <input id="fBarridoDetalle" placeholder="Ej: Calle / Avenida / Referencia..." />
+              </div>
             </div>
-          </div>
 
-          <div class="triple">
+            <div id="areasVerdesSubbox" class="service-subbox single-col">
+              <div>
+                <label>Tipo de Servicio — Áreas Verdes</label>
+                <select id="fAreaVerdeModo">
+                  <option value="3.1 CUADRILLA">3.1 CUADRILLA</option>
+                  <option value="3.2 ZONAS FIJAS">3.2 ZONAS FIJAS</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="feriasSubbox" class="service-subbox single-col">
+              <div>
+                <label>Grupo de Ferias y Eventos (10 personas por grupo)</label>
+                <select id="fFeriaGrupo">
+                  <option value="Grupo 1">Grupo 1</option>
+                  <option value="Grupo 2">Grupo 2</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="lavadoDefaultSlot" class="full" style="display:none;"></div>
+
+            <div class="triple">
+              <div>
+                <label id="fSectorLabel">Sector / Lugar de Trabajo</label>
+                <input id="fSector" placeholder="Ej: 1-001 o lugar asignado..." autocomplete="off" />
+                <datalist id="sectorBarridoList"></datalist>
+                <datalist id="sectorCodigoBarridoList"></datalist>
+              </div>
+              <div>
+                <label>Teléfono</label>
+                <input id="fCelular" placeholder="Ej: 75078399" />
+              </div>
+            </div>
+
             <div>
-              <label id="fSectorLabel">Sector / Lugar de Trabajo</label>
-              <input id="fSector" placeholder="Ej: 1-001 o lugar asignado..." autocomplete="off" />
-              <datalist id="sectorBarridoList"></datalist>
-              <datalist id="sectorCodigoBarridoList"></datalist>
+              <label>Supervisor</label>
+              <input id="fSupervisor" placeholder="Ej: Marcial Rojas" />
             </div>
             <div>
-              <label>Teléfono</label>
-              <input id="fCelular" placeholder="Ej: 75078399" />
+              <label>Observaciones / Ruta</label>
+              <input id="fObservaciones" placeholder="Ej: Grupo / Cuadrilla / Detalle de entrega..." />
             </div>
-          </div>
 
-          <div>
-            <label>Supervisor</label>
-            <input id="fSupervisor" placeholder="Ej: Marcial Rojas" />
-          </div>
-          <div>
-            <label>Observaciones / Ruta</label>
-            <input id="fObservaciones" placeholder="Ej: Grupo / Cuadrilla / Detalle de entrega..." />
-          </div>
+            <div class="full">
+              <div id="serviceRuleHint" class="rule-banner info-rule" style="display:none"></div>
+            </div>
 
-          <div class="full">
-            <div id="serviceRuleHint" class="rule-banner info-rule" style="display:none"></div>
-          </div>
-
-          <div class="full">
-            <label>Foto de Evidencia o Acta Firmada (Cámara o URL)</label>
-            <input id="fFoto" placeholder="URL de imagen o captura desde cámara..." />
-            <input id="fFotoFile" type="file" accept="image/*" capture="environment" style="margin-top:6px" />
-            <div id="fotoMsg" class="msg-hint"></div>
+            <div class="full">
+              <label>Foto de Evidencia o Acta Firmada (Cámara o URL)</label>
+              <input id="fFoto" placeholder="URL de imagen o captura desde cámara..." />
+              <input id="fFotoFile" type="file" accept="image/*" capture="environment" style="margin-top:6px" />
+              <div id="fotoMsg" class="msg-hint"></div>
+            </div>
           </div>
         </div>
         <div class="modal-actions">
@@ -1033,9 +1041,6 @@
       'Cepillo lateral de acero',
       'Cepillo central de acero',
       'Detergente Pinol',
-      'Machete',
-      'Aceite 2 tiempos para motosierra',
-      'Gasolina para motobomba',
       'Otro'
     ];
     const TOOL_COLORS = {
@@ -1048,9 +1053,6 @@
       'Cepillo lateral de acero': '#ec4899',
       'Cepillo central de acero': '#f97316',
       'Detergente Pinol': '#22c55e',
-      'Machete': '#eab308',
-      'Aceite 2 tiempos para motosierra': '#8b5cf6',
-      'Gasolina para motobomba': '#38bdf8',
       'Otro': '#94a3b8'
     };
     const SERVICIOS_OFICIALES = [
@@ -1184,17 +1186,10 @@
       render();
       renderDetail(null);
 
-      setStatus('Registros borrados. Vaciando hoja ENTREGAS en Google Sheets...');
+      setStatus('Registros borrados. Enviando orden de limpieza a Google Sheets...');
       try {
         await postToSheets({ action: 'clear_all', clearedAt: clearedAtTs });
-        setTimeout(async () => {
-          clearedAtTs = 0;
-          localStorage.removeItem(CLEARED_AT_KEY);
-          await syncFromSheets();
-        }, 2500);
       } catch (err) {
-        clearedAtTs = 0;
-        localStorage.removeItem(CLEARED_AT_KEY);
         setStatus(`Limpiado localmente; error al enviar a Google Sheets: ${err.message}`, true);
       }
     }
@@ -1259,12 +1254,6 @@
       }
       if (norm === 'PINOL' || norm === 'DETERGENTE PINOL') {
         return 'Detergente Pinol';
-      }
-      if (norm === 'ACEITE 2T' || norm === 'ACEITE 2 TIEMPOS' || norm === 'ACEITE PARA MOTOSIERRA') {
-        return 'Aceite 2 tiempos para motosierra';
-      }
-      if (norm === 'GASOLINA MOTOBOMBA' || norm === 'GASOLINA PARA MOTOBOMBA') {
-        return 'Gasolina para motobomba';
       }
       return HERRAMIENTAS.find(h => normalizeSimple(h) === norm) || clean;
     }
@@ -1508,6 +1497,62 @@
       document.getElementById('lavadoSubbox').classList.remove('active');
     }
 
+    function syncLavadoMenuOrder(isLavado) {
+      const orderedFlow = document.getElementById('lavadoOrderedFlow');
+      const defaultFlow = document.getElementById('defaultFlow');
+      const defaultRestGrid = document.getElementById('defaultRestGrid');
+      const slotFecha = document.getElementById('lavadoSlotFecha');
+      const slotServicio = document.getElementById('lavadoSlotServicio');
+      const slotTurno = document.getElementById('lavadoSlotTurno');
+      const defSlotFecha = document.getElementById('defaultSlotFecha');
+      const defSlotServicio = document.getElementById('defaultSlotServicio');
+      const defSlotTurno = document.getElementById('defaultSlotTurno');
+      const lavadoUnidadContainer = document.getElementById('lavadoUnidadContainer');
+      const lavadoDefaultSlot = document.getElementById('lavadoDefaultSlot');
+      const lavadoSubbox = document.getElementById('lavadoSubbox');
+
+      const fechaInput = document.getElementById('fFecha');
+      const servicioSelect = document.getElementById('fServicio');
+      const turnoSelect = document.getElementById('fTurno');
+
+      if (!orderedFlow || !defaultFlow || !defaultRestGrid) return;
+
+      const placeFieldInto = (slotEl, controlEl, labelText) => {
+        if (!slotEl || !controlEl) return;
+        const parentDiv = controlEl.parentElement;
+        if (parentDiv && parentDiv !== slotEl) {
+          slotEl.innerHTML = `<label>${labelText}</label>`;
+          slotEl.appendChild(controlEl);
+        }
+      };
+
+      if (isLavado) {
+        orderedFlow.style.display = 'block';
+        placeFieldInto(slotFecha, fechaInput, 'Fecha');
+        placeFieldInto(slotServicio, servicioSelect, 'Servicio');
+        placeFieldInto(slotTurno, turnoSelect, 'Turno');
+        if (lavadoSubbox && lavadoUnidadContainer && lavadoSubbox.parentElement !== lavadoUnidadContainer) {
+          lavadoUnidadContainer.appendChild(lavadoSubbox);
+        }
+        if (defaultRestGrid.parentElement !== orderedFlow) {
+          orderedFlow.appendChild(defaultRestGrid);
+        }
+        defaultFlow.style.display = 'none';
+      } else {
+        orderedFlow.style.display = 'none';
+        defaultFlow.style.display = 'block';
+        placeFieldInto(defSlotFecha, fechaInput, 'Fecha');
+        placeFieldInto(defSlotServicio, servicioSelect, 'Servicio');
+        placeFieldInto(defSlotTurno, turnoSelect, 'Turno');
+        if (lavadoSubbox && lavadoDefaultSlot && lavadoSubbox.parentElement !== lavadoDefaultSlot) {
+          lavadoDefaultSlot.appendChild(lavadoSubbox);
+        }
+        if (defaultRestGrid.parentElement !== defaultFlow) {
+          defaultFlow.appendChild(defaultRestGrid);
+        }
+      }
+    }
+
     function applyServiceAndToolRules() {
       const srvVal = document.getElementById('fServicio').value;
       const herrEl = document.getElementById('fHerramienta');
@@ -1515,7 +1560,9 @@
       const sectorInput = document.getElementById('fSector');
       const ruleHint = document.getElementById('serviceRuleHint');
       const mappedSrv = matchServicioOficial(srvVal);
+      const isLavado = mappedSrv === '6 - Lavado (EQ)';
 
+      syncLavadoMenuOrder(isLavado);
       hideAllServiceSubboxes();
       sectorInput.removeAttribute('list');
 
@@ -2032,739 +2079,10 @@
     function mergeServerAndLocal(serverList, localList) {
       const mapByUid = new Map();
       const now = Date.now();
+      const keepFromServer = !clearedAtTs;
 
       localList.forEach(item => {
         const norm = normalizeEntry(item);
         if (deletedMap[norm.uid] && deletedMap[norm.uid] > now) return;
         mapByUid.set(norm.uid, norm);
       });
-
-      let changedPending = false;
-      let changedDeleted = false;
-
-      serverList.forEach(item => {
-        const norm = normalizeEntry(item);
-        if (deletedMap[norm.uid] && deletedMap[norm.uid] > now) {
-          return;
-        }
-        const prev = mapByUid.get(norm.uid);
-        const pEntry = pendingMap[norm.uid];
-        const pRec = (pEntry && pEntry.expiresAt > now) ? normalizeEntry(pEntry.record) : null;
-
-        const merged = {
-          ...norm,
-          foto: norm.foto || (pRec && pRec.foto) || (prev && prev.foto) || ''
-        };
-        mapByUid.set(norm.uid, merged);
-
-        if (pRec && norm.cantidad === pRec.cantidad && norm.herramienta === pRec.herramienta && norm.estado === pRec.estado) {
-          delete pendingMap[norm.uid];
-          changedPending = true;
-        }
-      });
-
-      Object.keys(pendingMap).forEach(uid => {
-        const pEntry = pendingMap[uid];
-        if (!pEntry || pEntry.expiresAt <= now) {
-          delete pendingMap[uid];
-          changedPending = true;
-          return;
-        }
-        if (!mapByUid.has(uid)) {
-          mapByUid.set(uid, normalizeEntry(pEntry.record));
-        }
-      });
-
-      Object.keys(deletedMap).forEach(uid => {
-        if (deletedMap[uid] <= now) {
-          delete deletedMap[uid];
-          changedDeleted = true;
-        }
-      });
-
-      if (changedPending) savePending();
-      if (changedDeleted) saveDeleted();
-      return Array.from(mapByUid.values());
-    }
-
-    async function syncFromSheets() {
-      if (!API_URL || API_URL.includes('TU_URL_DE_APPS_SCRIPT_AQUI')) {
-        setStatus('Modo local activo · Crea tu URL de Apps Script cuando estés listo.');
-        render();
-        return;
-      }
-      setStatus('Sincronizando con Google Sheets...');
-      try {
-        const res = await fetch(`${API_URL}?t=${Date.now()}`, { method: 'GET', redirect: 'follow' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (!data.ok) throw new Error(data.error || 'Respuesta inválida');
-
-        if (Array.isArray(data.staff)) {
-          rebuildStaffIndex(data.staff);
-          saveCachedStaff(staffList);
-        }
-
-        const rawList = Array.isArray(data.records) ? data.records : [];
-        lastRawSample = rawList.length > 0 ? rawList[0] : { note: 'Hoja vacía' };
-
-        if (clearedAtTs && Date.now() - clearedAtTs < 8000 && rawList.length > 0) {
-          entries = [];
-          saveEntries();
-          render();
-          setStatus('Vaciando hoja ENTREGAS en Google Sheets...', false);
-          return;
-        }
-
-        if (clearedAtTs) {
-          clearedAtTs = 0;
-          localStorage.removeItem(CLEARED_AT_KEY);
-        }
-
-        const serverRecords = rawList.map(normalizeEntry);
-        entries = mergeServerAndLocal(serverRecords, entries);
-        saveEntries();
-        render();
-        setStatus(`Sincronizado: ${serverRecords.length} entregas · ${staffList.length} personal (${new Date().toLocaleTimeString()})`);
-      } catch (err) {
-        entries = mergeServerAndLocal([], entries);
-        saveEntries();
-        render();
-        setStatus(`Error al sincronizar (datos locales intactos): ${err.message}`, true);
-      }
-    }
-
-    async function postToSheets(payload) {
-      if (!API_URL || API_URL.includes('TU_URL_DE_APPS_SCRIPT_AQUI')) return;
-      await fetch(API_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-    }
-
-    async function seedToSheets() {
-      if (!isAdminUnlocked) return;
-      if (!entries.length) {
-        setStatus('No hay registros para subir.', true);
-        return;
-      }
-      if (!API_URL || API_URL.includes('TU_URL_DE_APPS_SCRIPT_AQUI')) {
-        setStatus('Primero coloca la URL de tu Google Apps Script en API_URL.', true);
-        return;
-      }
-      const ok = confirm(`¿Subir ${entries.length} registros a Google Sheets?`);
-      if (!ok) return;
-
-      const batchSize = 25;
-      try {
-        for (let i = 0; i < entries.length; i += batchSize) {
-          const chunk = entries.slice(i, i + batchSize);
-          const action = i === 0 ? 'seed' : 'append_batch';
-          setStatus(`Subiendo lote ${Math.floor(i / batchSize) + 1} (${Math.min(i + chunk.length, entries.length)}/${entries.length})...`);
-          await postToSheets({ action, records: chunk });
-          await new Promise(r => setTimeout(r, 800));
-        }
-        clearedAtTs = 0;
-        localStorage.removeItem(CLEARED_AT_KEY);
-        setStatus('Subida completada. Verificando en nube...');
-        setTimeout(syncFromSheets, 2000);
-      } catch (err) {
-        setStatus(`Error al subir: ${err.message}`, true);
-      }
-    }
-
-    function getToolPillClass(herr) {
-      if (herr === 'Bolsa') return 'pill-bolsa';
-      if (herr === 'Lutocar') return 'pill-lutocar';
-      if (['Escobillón', 'Pala', 'Rastrillo', 'Carretilla', 'Cepillo lateral de acero', 'Cepillo central de acero', 'Machete'].includes(herr)) {
-        return 'pill-escobillon';
-      }
-      return 'pill-otro';
-    }
-
-    function compressImage(file, maxW = 800, quality = 0.65) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onerror = () => reject(new Error('No se pudo leer la imagen'));
-        reader.onload = () => {
-          const img = new Image();
-          img.onerror = () => reject(new Error('Imagen no válida'));
-          img.onload = () => {
-            let w = img.width;
-            let h = img.height;
-            if (w > maxW) {
-              h = Math.round((h * maxW) / w);
-              w = maxW;
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL('image/jpeg', quality));
-          };
-          img.src = reader.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    function updateFilterOptions() {
-      const supSel = document.getElementById('filterSupervisor');
-      const curSup = supSel.value;
-      const sups = [...new Set(entries.map(e => (e.supervisor || '').trim()).filter(Boolean))].sort();
-      supSel.innerHTML = '<option value="">Todos los Supervisores</option>' +
-        sups.map(s => `<option value="${s.replace(/"/g, '&quot;')}">${s}</option>`).join('');
-      supSel.value = curSup;
-
-      const srvSel = document.getElementById('filterServicio');
-      const curSrv = srvSel.value;
-      const extraSrvs = entries
-        .map(e => (e.servicio || '').trim())
-        .filter(Boolean)
-        .filter(s => !matchServicioOficial(s) && !SERVICIOS_OFICIALES.some(of => normalizeSimple(of) === normalizeSimple(s)));
-      const baseOptions = ['<option value="">10 Servicios (Todos)</option>']
-        .concat(SERVICIOS_OFICIALES.map(s => `<option value="${s.replace(/"/g, '&quot;')}">${s}</option>`));
-      const extraOptions = [...new Set(extraSrvs)].map(s => `<option value="${s.replace(/"/g, '&quot;')}">${s}</option>`);
-      srvSel.innerHTML = baseOptions.concat(extraOptions).join('');
-      srvSel.value = curSrv;
-
-      const parsedDates = entries.map(e => parseLocalDate(e.fecha)).filter(Boolean);
-
-      const anos = [...new Set(parsedDates.map(dt => String(dt.getFullYear())))].sort();
-      if (!anos.length) anos.push(String(new Date().getFullYear()));
-      if (selectedAno && !anos.includes(selectedAno)) selectedAno = '';
-      renderDateChips(anos);
-
-      const numDiaSel = document.getElementById('filterNumDia');
-      const curNumDia = numDiaSel.value;
-      const existingDays = [...new Set(parsedDates.map(dt => String(dt.getDate()).padStart(2, '0')))].sort();
-      const dayList = existingDays.length
-        ? existingDays
-        : Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
-      numDiaSel.innerHTML = '<option value="">Todos</option>' +
-        dayList.map(d => `<option value="${d}">${d}</option>`).join('');
-      numDiaSel.value = curNumDia;
-
-      const fecSel = document.getElementById('filterFecha');
-      const curFec = fecSel.value;
-      const fecs = [...new Set(entries.map(e => (e.fecha || '').trim()).filter(Boolean))].sort().reverse();
-      fecSel.innerHTML = '<option value="">Todas las Fechas</option>' +
-        fecs.map(f => `<option value="${f}">${f}</option>`).join('');
-      fecSel.value = curFec;
-    }
-
-    function matchesServicioFilter(entryServicio, selectedFilter) {
-      if (!selectedFilter) return true;
-      const normFilter = normalizeSimple(selectedFilter);
-      const normEntry = normalizeSimple(entryServicio);
-      if (!normEntry) return false;
-      if (normEntry === normFilter) return true;
-      const mappedEntry = matchServicioOficial(entryServicio);
-      if (mappedEntry && normalizeSimple(mappedEntry) === normFilter) return true;
-      return false;
-    }
-
-    function getFiltered() {
-      const q = document.getElementById('searchInput').value.trim().toLowerCase();
-      const srv = document.getElementById('filterServicio').value;
-      const herr = document.getElementById('filterHerramienta').value;
-      const est = document.getElementById('filterEstado').value;
-      const sup = document.getElementById('filterSupervisor').value;
-      const ano = selectedAno;
-      const mes = selectedMes;
-      const dia = selectedDia;
-      const numDia = document.getElementById('filterNumDia').value;
-      const fec = document.getElementById('filterFecha').value;
-
-      return entries.filter(e => {
-        if (!matchesServicioFilter(e.servicio, srv)) return false;
-        if (herr && normalizeHerramientaName(e.herramienta) !== normalizeHerramientaName(herr)) return false;
-        if (est && e.estado !== est) return false;
-        if (sup && (e.supervisor || '').trim() !== sup) return false;
-        if (fec && (e.fecha || '').trim() !== fec) return false;
-
-        if (ano || mes || dia !== '' || numDia) {
-          const dt = parseLocalDate(e.fecha);
-          if (!dt) return false;
-          if (ano && String(dt.getFullYear()) !== ano) return false;
-          if (mes && String(dt.getMonth() + 1).padStart(2, '0') !== mes) return false;
-          if (dia !== '' && String(dt.getDay()) !== dia) return false;
-          if (numDia && String(dt.getDate()).padStart(2, '0') !== numDia) return false;
-        }
-
-        if (q) {
-          const hay = [e.codigo, e.nombre, e.sector, e.observaciones, e.servicio, e.turno, e.supervisor, e.celular, e.herramienta, e.estado, e.fecha]
-            .join(' ')
-            .toLowerCase();
-          if (!hay.includes(q)) return false;
-        }
-        return true;
-      });
-    }
-
-    function renderDetail(item) {
-      const box = document.getElementById('detailCard');
-      if (!item) {
-        box.innerHTML = '<h3>Detalle de entrega</h3><div class="status-text">Haz clic en cualquier fila de la tabla para ver la información completa y la foto de evidencia.</div>';
-        return;
-      }
-      const imgHtml = item.foto ? `<img src="${item.foto}" alt="${item.nombre}" onerror="this.style.display='none'" />` : '';
-      box.innerHTML = `
-        <h3>[${item.codigo || 'S/C'}] ${item.nombre}</h3>
-        <div class="status-text">Fecha: ${item.fecha || '-'} · Turno: <strong>${item.turno || 'Día'}</strong> · <strong>${item.herramienta}</strong> (${item.cantidad}) · Estado: <strong>${item.estado}</strong></div>
-        <div style="margin-top:8px; font-size:0.86rem; line-height:1.55;">
-          <strong>Servicio:</strong> ${item.servicio || '-'}<br/>
-          <strong>Turno:</strong> ${item.turno || 'Día'}<br/>
-          <strong>Sector / Lugar:</strong> ${item.sector || '-'}<br/>
-          <strong>Teléfono:</strong> ${item.celular || '-'}<br/>
-          <strong>Supervisor:</strong> ${item.supervisor || '-'}<br/>
-          <strong>Observaciones / Ruta:</strong> ${item.observaciones || '-'}
-        </div>
-        ${imgHtml}
-      `;
-    }
-
-    function renderSummary(filtered) {
-      const tbody = document.getElementById('summaryBody');
-      let totalRegs = 0;
-      let totalCant = 0;
-
-      const rows = HERRAMIENTAS.map(h => {
-        const list = filtered.filter(e => normalizeHerramientaName(e.herramienta) === h);
-        const regs = list.length;
-        const cant = list.reduce((acc, e) => acc + (Number(e.cantidad) || 0), 0);
-        totalRegs += regs;
-        totalCant += cant;
-        return `
-          <tr>
-            <td>${h}</td>
-            <td>${regs}</td>
-            <td>${cant}</td>
-          </tr>
-        `;
-      }).join('');
-
-      tbody.innerHTML = rows + `
-        <tr class="total-row">
-          <td>Total general</td>
-          <td>${totalRegs}</td>
-          <td>${totalCant}</td>
-        </tr>
-      `;
-    }
-
-    function render() {
-      updateFilterOptions();
-      refreshSectorDatalist();
-      const filtered = getFiltered();
-      renderSummary(filtered);
-      renderServiceChart(filtered);
-
-      const totalEntregas = filtered.length;
-      const uniqueOps = new Set(filtered.map(e => `${(e.codigo || '').trim()}|${(e.nombre || '').trim().toLowerCase()}`)).size;
-      const bolsas = filtered.filter(e => e.herramienta === 'Bolsa').reduce((a, b) => a + (Number(b.cantidad) || 0), 0);
-      const lutocar = filtered.filter(e => e.herramienta === 'Lutocar').reduce((a, b) => a + (Number(b.cantidad) || 0), 0);
-      const carretillas = filtered.filter(e => e.herramienta === 'Carretilla').reduce((a, b) => a + (Number(b.cantidad) || 0), 0);
-      const danados = filtered.filter(e => e.estado === 'Dañado / Repuesto').reduce((a, b) => a + (Number(b.cantidad) || 0), 0);
-      const conFotos = filtered.filter(e => Boolean(e.foto)).length;
-
-      document.getElementById('kpiEntregas').textContent = totalEntregas;
-      document.getElementById('kpiOperarios').textContent = `${uniqueOps} operarios únicos`;
-      document.getElementById('kpiBolsas').textContent = bolsas;
-      document.getElementById('kpiLutocar').textContent = lutocar;
-      document.getElementById('kpiCarretillas').textContent = carretillas;
-      document.getElementById('kpiDanados').textContent = danados;
-      document.getElementById('kpiFotos').textContent = conFotos;
-
-      const tbody = document.getElementById('tableBody');
-      tbody.innerHTML = filtered.map(e => `
-        <tr onclick="selectEntry('${e.uid}')" style="cursor:pointer">
-          <td>${e.fecha || '-'}</td>
-          <td>${e.turno || 'Día'}</td>
-          <td><strong>${e.codigo || 'S/C'}</strong></td>
-          <td>${e.nombre || '-'}</td>
-          <td><span class="pill ${getToolPillClass(e.herramienta)}">${e.herramienta}</span></td>
-          <td><strong>${e.cantidad}</strong></td>
-          <td><span class="pill ${getEstadoClass(e.estado)}">${e.estado}</span></td>
-          <td>${e.servicio || '-'}</td>
-          <td>${e.sector || '-'}</td>
-          <td>${e.celular || '-'}</td>
-          <td>${e.supervisor || '-'}</td>
-          <td>${e.observaciones || '-'}</td>
-          <td>${e.foto ? '📷 Sí' : '—'}</td>
-          <td onclick="event.stopPropagation()">
-            <button type="button" onclick="openModal('${e.uid}')">Editar</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function selectEntry(uid) {
-      const found = entries.find(e => e.uid === uid);
-      if (found) renderDetail(found);
-    }
-
-    function openModal(uid = '', defaultTool = 'Bolsa') {
-      const item = uid ? entries.find(e => e.uid === uid) : null;
-      const now = new Date();
-      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
-      let modalHeading = 'Nueva Entrega de Herramienta / Insumo';
-      if (item) {
-        modalHeading = `Editar Entrega — ${item.nombre}`;
-      } else if (defaultTool === 'Lutocar') {
-        modalHeading = 'Asignar Carro Lutocar';
-      } else if (defaultTool === 'Carretilla') {
-        modalHeading = 'Asignar Carretilla';
-      }
-      document.getElementById('modalTitle').textContent = modalHeading;
-
-      const btnDelete = document.getElementById('btnDeleteEntry');
-      btnDelete.style.display = item ? 'inline-flex' : 'none';
-
-      const codigoEl = document.getElementById('fCodigo');
-      const nombreEl = document.getElementById('fNombre');
-      const servicioEl = document.getElementById('fServicio');
-      const turnoEl = document.getElementById('fTurno');
-      const sectorEl = document.getElementById('fSector');
-      const supervisorEl = document.getElementById('fSupervisor');
-      const celularEl = document.getElementById('fCelular');
-
-      codigoEl.dataset.autofilled = item ? '0' : '1';
-      nombreEl.dataset.autofilled = item ? '0' : '1';
-      servicioEl.dataset.autofilled = item ? '0' : '1';
-      turnoEl.dataset.autofilled = item ? '0' : '1';
-      sectorEl.dataset.autofilled = item ? '0' : '1';
-      supervisorEl.dataset.autofilled = item ? '0' : '1';
-      celularEl.dataset.autofilled = item ? '0' : '1';
-
-      const isSingleUnitTool = (defaultTool === 'Lutocar' || defaultTool === 'Carretilla');
-
-      document.getElementById('fUid').value = item ? item.uid : '';
-      document.getElementById('fFecha').value = item ? item.fecha : today;
-      setServicioSelectValue(item ? item.servicio : '', true);
-      turnoEl.value = item ? normalizeTurno(item.turno, item.observaciones) : 'Día';
-      document.getElementById('fHerramienta').value = item ? normalizeHerramientaName(item.herramienta) : defaultTool;
-      document.getElementById('fCantidad').value = item ? item.cantidad : (isSingleUnitTool ? 1 : '');
-      codigoEl.value = item ? item.codigo : '';
-      document.getElementById('fEstado').value = item ? item.estado : 'Entregado / Operativo';
-      nombreEl.value = item ? item.nombre : '';
-      sectorEl.value = item ? (item.sector || '') : '';
-      celularEl.value = item ? (item.celular || '') : '';
-      document.getElementById('fBarridoModalidad').value = '(Sector/Mercados)';
-      document.getElementById('fBarridoEquipo').value = '';
-      document.getElementById('fBarridoDetalle').value = '';
-      document.getElementById('fAreaVerdeModo').value = '3.1 CUADRILLA';
-      document.getElementById('fFeriaGrupo').value = 'Grupo 1';
-      document.getElementById('fCisternaLavado').value = 'Cisterna 10000 L 6006-GTE';
-      supervisorEl.value = item ? item.supervisor : '';
-      document.getElementById('fObservaciones').value = item ? item.observaciones : '';
-      document.getElementById('fFoto').value = item ? item.foto : '';
-      document.getElementById('fFotoFile').value = '';
-      document.getElementById('fotoMsg').textContent = '';
-      document.getElementById('staffCodeHint').textContent = staffList.length ? `${staffList.length} operarios cargados.` : '';
-      document.getElementById('staffNameHint').textContent = 'Puedes escribir el nombre manual o elegirlo para hallar su código.';
-
-      applyServiceAndToolRules();
-
-      if (item && item.codigo) {
-        handleCodeInput(false);
-      }
-      document.getElementById('modalBackdrop').classList.add('open');
-      setTimeout(() => document.getElementById('fFecha').focus(), 40);
-    }
-
-    function closeModal() {
-      document.getElementById('modalBackdrop').classList.remove('open');
-    }
-
-    document.getElementById('btnDeleteEntry').addEventListener('click', async () => {
-      const uid = document.getElementById('fUid').value;
-      if (!uid) return;
-      const target = entries.find(x => x.uid === uid);
-      const label = target ? `${target.nombre} (${target.herramienta})` : uid;
-      const ok = confirm(`¿Eliminar el registro de ${label}?`);
-      if (!ok) return;
-
-      entries = entries.filter(x => x.uid !== uid);
-      delete pendingMap[uid];
-      deletedMap[uid] = Date.now() + 600000;
-      savePending();
-      saveDeleted();
-      saveEntries();
-      render();
-      renderDetail(null);
-      closeModal();
-
-      setStatus(`Registro eliminado localmente (${label}). Eliminando en Google Sheets...`);
-      try {
-        await postToSheets({ action: 'delete', uid });
-        setTimeout(syncFromSheets, 3500);
-      } catch (err) {
-        setStatus(`Eliminado localmente; error al sincronizar: ${err.message}`, true);
-      }
-    });
-
-    document.getElementById('btnClearDate').addEventListener('click', () => {
-      selectedAno = '';
-      selectedMes = '';
-      selectedDia = '';
-      document.getElementById('filterNumDia').value = '';
-      document.getElementById('filterFecha').value = '';
-      render();
-    });
-
-    document.getElementById('chartHerramienta').addEventListener('change', () => {
-      renderServiceChart(lastFilteredEntries);
-    });
-
-    document.getElementById('chartMetric').addEventListener('change', () => {
-      renderServiceChart(lastFilteredEntries);
-    });
-
-    window.addEventListener('resize', () => {
-      renderServiceChart(lastFilteredEntries);
-    });
-
-    document.getElementById('fCodigo').addEventListener('input', () => handleCodeInput(true));
-    document.getElementById('fCodigo').addEventListener('change', () => handleCodeInput(true));
-    document.getElementById('fNombre').addEventListener('input', () => handleNameInput(true));
-    document.getElementById('fNombre').addEventListener('change', () => handleNameInput(true));
-    document.getElementById('fServicio').addEventListener('change', (e) => {
-      e.target.dataset.autofilled = '0';
-      applyServiceAndToolRules();
-    });
-    document.getElementById('fTurno').addEventListener('change', (e) => {
-      e.target.dataset.autofilled = '0';
-    });
-    document.getElementById('fBarridoModalidad').addEventListener('change', applyServiceAndToolRules);
-    document.getElementById('fBarridoEquipo').addEventListener('change', applyServiceAndToolRules);
-    document.getElementById('fAreaVerdeModo').addEventListener('change', applyServiceAndToolRules);
-    document.getElementById('fFeriaGrupo').addEventListener('change', applyServiceAndToolRules);
-    document.getElementById('fCisternaLavado').addEventListener('change', applyServiceAndToolRules);
-    document.getElementById('fHerramienta').addEventListener('change', applyServiceAndToolRules);
-    document.getElementById('fSector').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
-    document.getElementById('fSupervisor').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
-    document.getElementById('fCelular').addEventListener('input', (e) => { e.target.dataset.autofilled = '0'; });
-
-    document.getElementById('btnAdminToggle').addEventListener('click', handleAdminToggle);
-    document.getElementById('btnNewEntrega').addEventListener('click', () => openModal('', 'Bolsa'));
-    document.getElementById('btnNewLutocar').addEventListener('click', () => openModal('', 'Lutocar'));
-    document.getElementById('btnNewCarretilla').addEventListener('click', () => openModal('', 'Carretilla'));
-    document.getElementById('btnSync').addEventListener('click', syncFromSheets);
-    document.getElementById('btnSeed').addEventListener('click', seedToSheets);
-    document.getElementById('btnWipeLocal').addEventListener('click', wipeAllLocalRecords);
-    document.getElementById('btnCancel').addEventListener('click', closeModal);
-
-    document.getElementById('btnDebug').addEventListener('click', () => {
-      if (!isAdminUnlocked) return;
-      document.getElementById('debugOutput').textContent = JSON.stringify({
-        totalLocal: entries.length,
-        totalPersonal: staffList.length,
-        pendientes: Object.keys(pendingMap).length,
-        eliminadosRecientes: Object.keys(deletedMap).length,
-        clearedAtTs,
-        primerRegistroNube: lastRawSample
-      }, null, 2);
-      document.getElementById('debugBackdrop').classList.add('open');
-    });
-
-    document.getElementById('btnCloseDebug').addEventListener('click', () => {
-      document.getElementById('debugBackdrop').classList.remove('open');
-    });
-
-    document.getElementById('fFotoFile').addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      document.getElementById('fotoMsg').textContent = 'Optimizando imagen...';
-      try {
-        const dataUrl = await compressImage(file);
-        document.getElementById('fFoto').value = dataUrl;
-        document.getElementById('fotoMsg').textContent = 'Imagen lista.';
-      } catch (err) {
-        document.getElementById('fotoMsg').textContent = err.message;
-      }
-    });
-
-    document.getElementById('entregaForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const existingUid = document.getElementById('fUid').value.trim();
-      const isEditing = Boolean(existingUid);
-      const srvVal = document.getElementById('fServicio').value.trim();
-      const turnoVal = normalizeTurno(document.getElementById('fTurno').value);
-      const herrVal = normalizeHerramientaName(document.getElementById('fHerramienta').value);
-      const supervisorVal = document.getElementById('fSupervisor').value.trim();
-      const mappedSrv = matchServicioOficial(srvVal);
-
-      if (mappedSrv === '5 - Áridos (m3)' && herrVal === 'Bolsa') {
-        const goOn = confirm('El servicio de Áridos no ocupa bolsas. ¿Deseas guardar de todas formas?');
-        if (!goOn) return;
-      }
-
-      let obsFinal = document.getElementById('fObservaciones').value.trim()
-        .replace(/\s*\[Editado:[^\]]*\]/gi, '')
-        .trim();
-      let tagStr = '';
-
-      if (mappedSrv === '1 - Barrido (Km)') {
-        const mod = document.getElementById('fBarridoModalidad').value;
-        const extraBarrido = mod === 'Barrido mecanizado'
-          ? document.getElementById('fBarridoEquipo').value.trim()
-          : document.getElementById('fBarridoDetalle').value.trim();
-        const tagParts = [mod];
-        if (mod === 'Barrido por escuadras') tagParts.push('5 pers.');
-        if (extraBarrido) tagParts.push(extraBarrido);
-        tagStr = `[${tagParts.join(' · ')}]`;
-      } else if (mappedSrv === '3 - Areas Verdes (Ha)') {
-        const avModo = document.getElementById('fAreaVerdeModo').value;
-        tagStr = `[${avModo}]`;
-      } else if (mappedSrv === '4 - Ferias y Eventos (EQ)') {
-        const grupoFeria = document.getElementById('fFeriaGrupo').value;
-        tagStr = `[${grupoFeria} · 10 pers.]`;
-      } else if (mappedSrv === '6 - Lavado (EQ)') {
-        const cisterna = document.getElementById('fCisternaLavado').value;
-        tagStr = `[${cisterna}]`;
-      }
-
-      if (tagStr && !obsFinal.includes(tagStr)) {
-        obsFinal = obsFinal ? `${tagStr} ${obsFinal}` : tagStr;
-      }
-
-      const nowStamp = new Date().toLocaleString('es-BO', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-
-      if (isEditing) {
-        const supTag = supervisorVal ? ` · Sup: ${supervisorVal}` : '';
-        const editMark = `[Editado: ${nowStamp}${supTag}]`;
-        obsFinal = obsFinal ? `${obsFinal} ${editMark}` : editMark;
-      }
-
-      const uid = existingUid || ('id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6));
-      const record = normalizeEntry({
-        uid,
-        fecha: document.getElementById('fFecha').value,
-        turno: turnoVal,
-        codigo: document.getElementById('fCodigo').value.trim(),
-        nombre: document.getElementById('fNombre').value.trim().toUpperCase(),
-        herramienta: herrVal,
-        cantidad: Number(document.getElementById('fCantidad').value) || 0,
-        estado: document.getElementById('fEstado').value,
-        servicio: srvVal,
-        sector: document.getElementById('fSector').value.trim(),
-        supervisor: supervisorVal,
-        celular: document.getElementById('fCelular').value.trim(),
-        observaciones: obsFinal,
-        foto: document.getElementById('fFoto').value.trim(),
-        ultimaActualizacion: new Date().toLocaleString()
-      });
-
-      clearedAtTs = 0;
-      localStorage.removeItem(CLEARED_AT_KEY);
-
-      const idx = entries.findIndex(x => x.uid === uid);
-      if (idx >= 0) entries[idx] = record;
-      else entries.push(record);
-
-      delete deletedMap[uid];
-      saveDeleted();
-      pendingMap[uid] = { record, expiresAt: Date.now() + 300000 };
-      savePending();
-      saveEntries();
-      render();
-      renderDetail(record);
-      closeModal();
-
-      setStatus(
-        isEditing
-          ? `Registro editado y marcado (${record.nombre}). Enviando a Google Sheets...`
-          : `Guardado local de ${record.nombre} (${record.turno} · ${record.estado}). Enviando a Google Sheets...`
-      );
-      try {
-        await postToSheets({ action: 'upsert', record });
-        setTimeout(syncFromSheets, 5000);
-      } catch (err) {
-        setStatus(`Guardado local; error al enviar: ${err.message}`, true);
-      }
-    });
-
-    document.getElementById('btnExportCsv').addEventListener('click', () => {
-      if (!isAdminUnlocked) return;
-      const headers = ['UID', 'FECHA', 'TURNO', 'CODIGO', 'NOMBRE', 'HERRAMIENTA', 'CANTIDAD', 'ESTADO', 'SERVICIO', 'SECTOR_LUGAR', 'TELEFONO', 'SUPERVISOR', 'OBSERVACIONES'];
-      const rows = entries.map(e => [
-        e.uid, e.fecha, e.turno, e.codigo, e.nombre, e.herramienta, e.cantidad, e.estado, e.servicio, e.sector, e.celular, e.supervisor, e.observaciones
-      ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
-      const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv;charset=utf-8;' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'control_herramientas.csv';
-      a.click();
-    });
-
-    document.getElementById('btnExportJson').addEventListener('click', () => {
-      if (!isAdminUnlocked) return;
-      const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'respaldo_control_herramientas.json';
-      a.click();
-    });
-
-    document.getElementById('btnImportJson').addEventListener('click', () => {
-      if (!isAdminUnlocked) return;
-      document.getElementById('fileJsonInput').click();
-    });
-
-    document.getElementById('fileJsonInput').addEventListener('change', (e) => {
-      if (!isAdminUnlocked) return;
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const parsed = JSON.parse(reader.result);
-          if (!Array.isArray(parsed)) throw new Error('JSON inválido');
-          entries = parsed.map(normalizeEntry);
-          saveEntries();
-          render();
-          setStatus(`Cargados ${entries.length} registros desde JSON.`);
-        } catch (err) {
-          setStatus(`Error al cargar JSON: ${err.message}`, true);
-        }
-      };
-      reader.readAsText(file);
-    });
-
-    [
-      'searchInput',
-      'filterServicio',
-      'filterHerramienta',
-      'filterEstado',
-      'filterSupervisor',
-      'filterNumDia',
-      'filterFecha'
-    ].forEach(id => {
-      document.getElementById(id).addEventListener('input', render);
-      document.getElementById(id).addEventListener('change', render);
-    });
-
-    isAdminUnlocked = sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
-    clearedAtTs = Number(localStorage.getItem(CLEARED_AT_KEY) || '0') || 0;
-    applyAdminUiState();
-    rebuildStaffIndex(loadCachedStaff());
-    pendingMap = loadPending();
-    deletedMap = loadDeleted();
-    entries = clearedAtTs ? [] : mergeServerAndLocal([], loadEntries());
-    saveEntries();
-    render();
-    syncFromSheets();
-  </script>
-</body>
-</html>
