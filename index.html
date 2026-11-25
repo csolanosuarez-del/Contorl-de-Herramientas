@@ -874,46 +874,6 @@
           </div>
 
           <div id="defaultRestGrid" class="form-grid">
-            <div>
-              <label>Herramienta / Insumo</label>
-              <select id="fHerramienta" required>
-                <option value="Bolsa">Bolsa</option>
-                <option value="Lutocar">Lutocar</option>
-                <option value="Escobillón">Escobillón</option>
-                <option value="Rastrillo">Rastrillo</option>
-                <option value="Pala">Pala</option>
-                <option value="Carretilla">Carretilla</option>
-                <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
-                <option value="Cepillo central de acero">Cepillo central de acero</option>
-                <option value="Detergente Pinol">Detergente Pinol</option>
-                <option value="Otro">Otro</option>
-              </select>
-            </div>
-            <div>
-              <label>Cantidad</label>
-              <input id="fCantidad" type="number" min="1" value="" placeholder="Ej: 100" required />
-            </div>
-            <div>
-              <label>Código Trabajador (o interno MA-001)</label>
-              <input id="fCodigo" list="staffCodeList" placeholder="Ej: 894 o MA-532" autocomplete="off" />
-              <datalist id="staffCodeList"></datalist>
-              <div id="staffCodeHint" class="staff-match"></div>
-            </div>
-            <div>
-              <label>Estado</label>
-              <select id="fEstado" required>
-                <option value="Entregado / Operativo">Entregado / Operativo</option>
-                <option value="Devuelto">Devuelto</option>
-                <option value="Dañado / Repuesto">Dañado / Repuesto</option>
-              </select>
-            </div>
-            <div class="full">
-              <label>Nombre y Apellido del Personal Operativo (búsqueda o escritura manual)</label>
-              <input id="fNombre" list="staffNameList" placeholder="Escribe o busca nombre para ubicar su código..." autocomplete="off" required />
-              <datalist id="staffNameList"></datalist>
-              <div id="staffNameHint" class="staff-warn"></div>
-            </div>
-
             <div id="barridoSubbox" class="service-subbox">
               <div>
                 <label>Modalidad de Barrido</label>
@@ -934,6 +894,47 @@
                 </select>
                 <input id="fBarridoDetalle" placeholder="Ej: Calle / Avenida / Referencia..." />
               </div>
+            </div>
+
+
+            <div>
+              <label>Herramienta / Insumo</label>
+              <select id="fHerramienta" required>
+                <option value="Bolsa">Bolsa</option>
+                <option value="Lutocar">Lutocar</option>
+                <option value="Escobillón">Escobillón</option>
+                <option value="Rastrillo">Rastrillo</option>
+                <option value="Pala">Pala</option>
+                <option value="Carretilla">Carretilla</option>
+                <option value="Cepillo lateral de acero">Cepillo lateral de acero</option>
+                <option value="Cepillo central de acero">Cepillo central de acero</option>
+                <option value="Detergente Pinol">Detergente Pinol</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div>
+              <label>Cantidad</label>
+              <input id="fCantidad" type="number" min="1" value="" placeholder="Ej: 100" required />
+            </div>
+            <div id="codigoFieldWrap">
+              <label>Código Trabajador (o interno MA-001)</label>
+              <input id="fCodigo" list="staffCodeList" placeholder="Ej: 894 o MA-532" autocomplete="off" />
+              <datalist id="staffCodeList"></datalist>
+              <div id="staffCodeHint" class="staff-match"></div>
+            </div>
+            <div id="estadoFieldWrap">
+              <label>Estado</label>
+              <select id="fEstado" required>
+                <option value="Entregado / Operativo">Entregado / Operativo</option>
+                <option value="Devuelto">Devuelto</option>
+                <option value="Dañado / Repuesto">Dañado / Repuesto</option>
+              </select>
+            </div>
+            <div id="nombreFieldWrap" class="full">
+              <label>Nombre y Apellido del Personal Operativo (búsqueda o escritura manual)</label>
+              <input id="fNombre" list="staffNameList" placeholder="Escribe o busca nombre para ubicar su código..." autocomplete="off" required />
+              <datalist id="staffNameList"></datalist>
+              <div id="staffNameHint" class="staff-warn"></div>
             </div>
 
             <div id="areasVerdesSubbox" class="service-subbox single-col">
@@ -958,7 +959,7 @@
 
             <div id="lavadoDefaultSlot" class="full" style="display:none;"></div>
 
-            <div class="triple">
+            <div id="sectorCelularWrap" class="triple">
               <div>
                 <label id="fSectorLabel">Sector / Lugar de Trabajo</label>
                 <input id="fSector" placeholder="Ej: 1-001 o lugar asignado..." autocomplete="off" />
@@ -1562,6 +1563,38 @@
       const mappedSrv = matchServicioOficial(srvVal);
       const isLavado = mappedSrv === '6 - Lavado (EQ)';
 
+      const isBolsaEnLavado = isLavado && herrEl.value === 'Bolsa';
+      const codigoWrap = document.getElementById('codigoFieldWrap');
+      const estadoWrap = document.getElementById('estadoFieldWrap');
+      const nombreWrap = document.getElementById('nombreFieldWrap');
+      const sectorCelularWrap = document.getElementById('sectorCelularWrap');
+      const nombreInput = document.getElementById('fNombre');
+      const codigoInput = document.getElementById('fCodigo');
+      const celularInput = document.getElementById('fCelular');
+
+      if (codigoWrap && nombreWrap && estadoWrap && sectorCelularWrap && nombreInput && codigoInput) {
+        if (isBolsaEnLavado) {
+          codigoWrap.style.display = 'none';
+          estadoWrap.style.display = 'none';
+          nombreWrap.style.display = 'none';
+          sectorCelularWrap.style.display = 'none';
+          nombreInput.required = false;
+          sectorInput.required = false;
+          codigoInput.value = '';
+          nombreInput.value = '';
+          sectorInput.value = '';
+          if (celularInput) celularInput.value = '';
+        } else {
+          codigoWrap.style.display = '';
+          estadoWrap.style.display = '';
+          nombreWrap.style.display = '';
+          sectorCelularWrap.style.display = '';
+          estadoWrap.classList.remove('full');
+          nombreInput.required = true;
+          sectorInput.required = false;
+        }
+      }
+
       syncLavadoMenuOrder(isLavado);
       hideAllServiceSubboxes();
       sectorInput.removeAttribute('list');
@@ -1643,7 +1676,9 @@
         const cisterna = document.getElementById('fCisternaLavado').value;
         sectorLabel.textContent = 'Lugar de Lavado';
         sectorInput.placeholder = 'Lugar o punto de lavado...';
-        hintText = `Servicio 6 (Lavado): cisterna seleccionada → ${cisterna}.`;
+        hintText = isBolsaEnLavado
+          ? `Servicio 6 (Lavado) con Bolsa: dotación al equipo completo de ${cisterna}.`
+          : `Servicio 6 (Lavado): cisterna seleccionada → ${cisterna}.`;
       } else {
         sectorLabel.textContent = 'Sector / Lugar de Trabajo';
         sectorInput.placeholder = 'Sector o lugar de trabajo...';
@@ -2698,15 +2733,22 @@
       }
 
       const uid = existingUid || ('id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6));
+      const isBolsaEnLavadoSubmit = mappedSrv === '6 - Lavado (EQ)' && herrVal === 'Bolsa';
+      const cisternaSubmit = document.getElementById('fCisternaLavado').value.trim();
+      const rawNombreSubmit = document.getElementById('fNombre').value.trim().toUpperCase();
+      const finalNombreSubmit = isBolsaEnLavadoSubmit && !rawNombreSubmit
+        ? (cisternaSubmit ? `EQUIPO LAVADO (${cisternaSubmit.toUpperCase()})` : 'EQUIPO LAVADO')
+        : rawNombreSubmit;
+
       const record = normalizeEntry({
         uid,
         fecha: document.getElementById('fFecha').value,
         turno: turnoVal,
-        codigo: document.getElementById('fCodigo').value.trim(),
-        nombre: document.getElementById('fNombre').value.trim().toUpperCase(),
+        codigo: isBolsaEnLavadoSubmit ? '' : document.getElementById('fCodigo').value.trim(),
+        nombre: finalNombreSubmit,
         herramienta: herrVal,
         cantidad: Number(document.getElementById('fCantidad').value) || 0,
-        estado: document.getElementById('fEstado').value,
+        estado: isBolsaEnLavadoSubmit ? 'Entregado / Operativo' : document.getElementById('fEstado').value,
         servicio: srvVal,
         sector: document.getElementById('fSector').value.trim(),
         supervisor: supervisorVal,
